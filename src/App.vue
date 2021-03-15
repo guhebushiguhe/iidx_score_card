@@ -64,12 +64,16 @@
       <p v-if="isLoading">加载中，请耐心等候···</p>
       <ul v-if="scores.length>0 && !isLoading">
         <li
-          v-for="item in scores"
+          v-for="(item,index) in scores"
           :key="item.label"
-          class="score"
+          class="score-li"
         >
         <span>{{item.label}}</span>
-        <span>{{item.value}}</span>
+        <span class="score">{{item.value}}</span>
+        <span
+         v-if="oldScores.length > 0"
+         class="plus"
+        >{{ parsePlus(item.value,oldScores[index].value) }}</span>
         </li>
       </ul>
     </div>
@@ -100,8 +104,10 @@ export default {
           body: "XXXX"
       },
       scores: [],
+      oldScores: [],
       profilesData: {},
       scoresData:{},
+      oldScoresData:{},
       idsList:{},
       playStyleList: [
         {
@@ -168,8 +174,43 @@ export default {
           min: 0.2222,
           max: 0
         },
+      ],
+      lampList: [
+        'FULL_COMBO',
+        'EX_HARD_CLEAR',
+        'HARD_CLEAR',
+        'CLEAR',
+        'ASSIST_CLEAR',
+        'EASY_CLEAR',
+        'FAILED'
       ]
     }
+  },
+  computed: {
+      labelList () {
+        const lv = this.lv
+        return {
+          ALL_TEMP:`lv.${lv?lv:'ALL'}`,
+          FULL_COMBO: 'FC',
+          EX_HARD_CLEAR: 'EXHC',
+          HARD_CLEAR: 'HC',
+          CLEAR: 'NC',
+          ASSIST_CLEAR: 'AC',
+          EASY_CLEAR: 'EC',
+          FAILED: 'Failed',
+          clearRate: 'CLEAR RATE',
+          MAX: 'MAX',
+          'MAX-': 'MAX-',
+          AAA: 'AAA',
+          AA: 'AA',
+          A: 'A',
+          B: 'B',
+          C: 'C',
+          D: 'D',
+          E: 'E',
+          F: 'F',
+        }
+      }
   },
   methods: {
     async getProfiles() {
@@ -183,10 +224,14 @@ export default {
       const idsList = this.idsList
       const id = idsList[djName] || null
       const scoresData = this.scoresData
+      const oldScoresData = this.oldScoresData
       if( idsList[djName] ){
         const _items = this.profilesData[id]
         this.getSingleProfile(_items)
-        this.parseScores(scoresData[id])
+        this.scores = this.parseScores(scoresData[id])
+        const beforeTodayData = this.beforeToday(oldScoresData[id])
+        this.oldScores = this.parseScores(beforeTodayData)
+        this.$forceUpdate()
         return
       }
       this.profile = null
@@ -264,11 +309,26 @@ export default {
         item.grade = item.ex_score / notes / 2
       })
       this.scoresData[id]=resData
-      this.parseScores(resData)
+      this.scores = this.parseScores(resData)
+      const beforeTodayData = this.beforeToday(resData)
+      this.oldScoresData[id]=beforeTodayData
+      this.oldScores = this.parseScores(beforeTodayData)
     },
-    async parseScores(data) {
+    beforeToday (data) {
+      const {_items,_related} = data
+      const now = new Date()
+      const today = now.setHours(0,0,0,0)
+      const new_items = _items.filter(i=>new Date(i.timestamp).getTime()<today)
+      const newData = {
+        _items: new_items,
+        _related
+      }
+      return newData
+    },
+    parseScores(data) {
       const gradeList = this.gradeList
-      const {_items,_links,_related} = data
+      const labelList = this.labelList
+      const {_items,_related} = data
       const lv = this.lv
       let idList = []
       const lvList = ['1','2','3','4','5','6','7','8','9','10','11','12']
@@ -292,54 +352,24 @@ export default {
         idList =  idList.filter(({rating})=>rating==lv).map(item=>item._id)
       }
       const musicList = _items.filter(item=>idList.includes(item['chart_id']))
-      // const djName = _related.profiles[0]['dj_name']
-      const totalCount = musicList.length
-      const FCCount = musicList.filter(item=>item.lamp == 'FULL_COMBO').length
-      const EXHCCount = musicList.filter(item=>item.lamp == 'EX_HARD_CLEAR').length
-      const HCCount = musicList.filter(item=>item.lamp == 'HARD_CLEAR').length
-      const NCCount = musicList.filter(item=>item.lamp == 'CLEAR').length
-      const ACCount = musicList.filter(item=>item.lamp == 'ASSIST_CLEAR').length
-      const ECCount = musicList.filter(item=>item.lamp == 'EASY_CLEAR').length
-      const FCount = musicList.filter(item=>item.lamp == 'FAILED').length
-      const clearRate = ((totalCount - FCount)/totalCount*100).toFixed(2)+'%'
+      const LAMPS = {}
+      this.lampList.map(lamp=>{
+        LAMPS[lamp]=musicList.filter(item=>item.lamp == lamp).length
+      })
+      const { FAILED } = LAMPS
+      const NO_PLAY = musicList.filter(item=>item.status == 'NO_PLAY').length
+      const ALL_TEMP = musicList.length
+      const clearRate = ((ALL_TEMP - FAILED - NO_PLAY)/ALL_TEMP*100).toFixed(2)+'%'
 
       let res = {
-        totalCount,
-        FCCount,
-        EXHCCount,
-        HCCount,
-        NCCount,
-        ACCount,
-        ECCount,
-        FCount,
+        ALL_TEMP,
+        ...LAMPS,
         clearRate
       }
 
       gradeList.map(item=>{
         res[item.grade] = musicList.filter(i=>i.grade >= item.min && i.grade < item.max).length
       })
-
-      const labelList = {
-          totalCount:`lv.${lv?lv:'ALL'}`,
-          FCCount: 'FC',
-          EXHCCount: 'EXHC',
-          HCCount: 'HC',
-          NCCount: 'NC',
-          ACCount: 'AC',
-          ECCount: 'EC',
-          FCount: 'Failed',
-          clearRate: 'CLEAR RATE',
-          MAX: 'MAX',
-          'MAX-': 'MAX-',
-          AAA: 'AAA',
-          AA: 'AA',
-          A: 'A',
-          B: 'B',
-          C: 'C',
-          D: 'D',
-          E: 'E',
-          F: 'F',
-      }
 
       let scores = []
       Object.keys(labelList).map(item=>{
@@ -348,12 +378,23 @@ export default {
             value: res[item]
           })
       })
-      this.scores = scores
-      this.$forceUpdate()
+      return scores
+      // this.$forceUpdate()
     },
     continueGetProfile (_items) {
       this.getSingleProfile(_items)
       this.getScores()
+    },
+    parsePlus(val,oldVal){
+      let num = null
+      if(isNaN(val-oldVal)){
+        num = (parseFloat(val)-parseFloat(oldVal)).toFixed(2)
+        if(num==0)return ''
+        return num-0 > 0?'↑+'+num+"%":'↓'+num+'%'
+      }
+      num = val - oldVal
+      if(num==0)return ''
+      return num-0 > 0?'↑+'+num:'↓'+num
     }
   },
   watch: {
@@ -471,7 +512,7 @@ html,body{
     text-align: center;
   }
   ul{
-    .score{
+    .score-li{
       width: 100%;
       display: flex;
       justify-content: space-between;
@@ -484,6 +525,17 @@ html,body{
         text-align: center;
         padding: 0 10px;
         line-height: 24px;
+      }
+      .score{
+        text-align: right;
+        padding-right: 5px;
+      }
+      .plus{
+        font-weight: 700;
+        font-size: 12px;
+        text-align: left;
+        padding-left: 5px;
+        width: 50px;
       }
     }
   }
