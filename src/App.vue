@@ -1,23 +1,40 @@
 <template>
   <div id="app">
-    <h2>IIDX查分测试</h2>
+    <p class="time">{{new Date().toLocaleString()}}<span v-html="'&nbsp;&nbsp;&nbsp;&nbsp;'"></span>v1.01</p>
+    <h2 class="title">IIDX查分器</h2>
     <div class="box search-box">
-      <span>DJName </span><input type="text" v-model="djName">
+      <span>DJName </span><input type="text" v-model="djName" @keypress.enter="getProfiles" ref="nameInp">
       <span>lv </span><input type="text"  v-model="lv">
-      <button type="button" @click="getProfiles">搜索</button>
+      <button type="button" @click="getProfiles" :disabled="isLoading">搜索</button><br>
+      <span
+        v-for="item in playStyleList"
+        :key="item.value"
+      >
+        <input
+          type="radio"
+          class="radio"
+          v-model="playStyle"
+          :value="item.value"
+          :id="item.value"
+        >
+        <label :for="item.value">{{item.label}}</label>
+
+      </span>
     </div>
     <div
       class="box profiles-box"
       v-if="profiles"
     >
       <p>
-        <span>DJName: {{profiles.djName}}</span>
+        <span>DJName: <span class="djName">{{profiles.djName}}</span></span>
         <!-- <span>iidxID: {{profiles.iidxID}}</span> -->
       </p>
-      <p>
+      <p v-if="playStyle=='SINGLE' || playStyle=='ALL'">
         SP Rank: {{profiles.sp.rank}}, Plays: {{profiles.sp.plays}}, DJ Points: {{profiles.sp.djPoints}}
       </p>
+      <p v-if="playStyle=='DOUBLE' || playStyle=='ALL'">
         DP Rank: {{profiles.dp.rank}}, Plays: {{profiles.dp.plays}}, DJ Points: {{profiles.dp.djPoints}}
+      </p>
     </div>
     <div class="box score-box">
       <p v-if="isLoading">加载中，请耐心等候···</p>
@@ -43,8 +60,10 @@ export default {
   data() {
     return {
       djName: '',
-      lv: '',
+      lv: 'ALL',
+      playStyle: 'ALL',
       isLoading: false,
+      isNameSelectShow: false,
       profiles: null,
       qpros: {
           _id: "XXXX",
@@ -58,6 +77,20 @@ export default {
       scores: [],
       scoresData:{},
       idsList:{},
+      playStyleList: [
+        {
+          label: 'ALL',
+          value: 'ALL'
+        },
+        {
+          label: 'SP',
+          value: 'SINGLE'
+        },
+        {
+          label: 'DP',
+          value: 'DOUBLE'
+        },
+      ],
       gradeList: [
         {
           grade: 'MAX',
@@ -115,7 +148,12 @@ export default {
   methods: {
     async getProfiles() {
       const djName = this.djName
-      if (djName=='')return
+      if (djName==''){
+        alert('请输入DJ NAME')
+        return
+      }
+      const lv = this.lv
+      this.lv=lv==''?'ALL':lv
       const idsList = this.idsList
       const id = idsList[djName] || null
       const scoresData = this.scoresData
@@ -127,7 +165,23 @@ export default {
       this.scores = []
       this.isLoading = true
       const data = await this.$axios.getProfiles(djName)
-      const _items = data['_items'][0]
+      let index = 0
+      if(data._items.length>1){
+        // this.isNameSelectShow = true
+        data._items.sort((a,b)=>{
+          const timeA = new Date(a.access_time).getTime()
+          const timeB = new Date(b.access_time).getTime()
+          return timeB-timeA
+        })
+        const nameStr = '重名记录，请输入序号(默认按最近登录时间倒序)\n'+data._items.map(({dj_name,iidx_id,sp,dp},index)=>{
+          return `\n${index+1}  DJ NAME ${dj_name}  IIDX ID ${iidx_id}
+          SP Rank${sp.rank}  Plays${sp.plays}  DJ Points${sp.dj_points}
+          DP Rank${dp.rank}  Plays${dp.plays}  DJ Points${dp.dj_points}`
+        }).join('')
+        const indexStr = window.prompt(nameStr,'1')
+        index = indexStr==''?0:indexStr-1
+      }
+      const _items = data['_items'][index]
       const {dj_name,iidx_id,sp,dp,_id} = _items
       this.idsList[djName]=_id
       this.profiles = {
@@ -135,12 +189,12 @@ export default {
         iidxID: iidx_id,
         sp: {
           rank: sp.rank,
-          plays: sp.play,
+          plays: sp.plays,
           djPoints: sp.dj_points,
         },
         dp: {
           rank: dp.rank,
-          plays: dp.play,
+          plays: dp.plays,
           djPoints: dp.dj_points,
         },
       },
@@ -173,6 +227,11 @@ export default {
         pos = data._items[249]?data._items[249]._id:null
       }while(_next)
       this.isLoading = false
+      // 手动添加grade
+      resData._items.map(item=>{
+        const {notes,play_style} = resData._related.charts.filter(i=>i._id==item.chart_id)[0]
+        item.grade = item.ex_score / notes / 2
+      })
       this.scoresData[id]=resData
       this.parseScores(resData)
     },
@@ -181,13 +240,28 @@ export default {
       const {_items,_links,_related} = data
       const lv = this.lv
       let idList = []
-      if (!lv || lv=='') {
-          idList =  _related.charts.map(item=>item['_id'])
+      const lvList = ['1','2','3','4','5','6','7','8','9','10','11','12']
+      const playStyle = this.playStyle
+      if(playStyle!="ALL"){
+        idList = _related.charts.filter(item=>item.play_style==playStyle).map(({_id,rating,play_style})=>{
+          return {
+            _id,
+            rating,
+            play_style
+          }
+          })
       }else{
-          idList =  _related.charts.filter(({rating})=>rating==lv).map(item=>item['_id'])
+        idList = _related.charts
+      }
+      if (!lv || lv=='ALL') {
+        idList =  idList.map(item=>item._id)
+      }else if(!lvList.includes(lv)){
+        alert('lv不合法，请重新输入')
+      }else {
+        idList =  idList.filter(({rating})=>rating==lv).map(item=>item._id)
       }
       const musicList = _items.filter(item=>idList.includes(item['chart_id']))
-      const djName = _related.profiles[0]['dj_name']
+      // const djName = _related.profiles[0]['dj_name']
       const totalCount = musicList.length
       const FCCount = musicList.filter(item=>item.lamp == 'FULL_COMBO').length
       const EXHCCount = musicList.filter(item=>item.lamp == 'EX_HARD_CLEAR').length
@@ -199,7 +273,6 @@ export default {
       const clearRate = ((totalCount - FCount)/totalCount*100).toFixed(2)+'%'
 
       let res = {
-        djName,
         totalCount,
         FCCount,
         EXHCCount,
@@ -216,7 +289,6 @@ export default {
       })
 
       const labelList = {
-          djName: 'DJ NAME',
           totalCount:`lv.${lv?lv:'ALL'}`,
           FCCount: 'FC',
           EXHCCount: 'EXHC',
@@ -249,19 +321,27 @@ export default {
       this.$forceUpdate()
     }
   },
+  watch: {
+    djName(val,oldVal){
+      if(val==oldVal)return
+      this.djName = val.toUpperCase()
+    }
+  },
   mounted() {
-    this.getProfiles(this.djName)
+    this.$refs.nameInp.focus()
   }
 }
 </script>
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  margin-top: 60px;
+  // margin-top: 60px;
+  width: 400px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -274,18 +354,31 @@ html,body{
   background: #333536;
   color: #9ab5c2;
 }
+.time{
+  width: 100%;
+  font-size: 14px;
+  text-align: left;
+  text-indent: 1em;
+  color: #888;
+}
+.title {
+  margin-top: 10px;
+}
 .box{
   margin-top: 20px;
 }
 .search-box{
-  margin-top: 40px;
-  input{
+  margin-top: 20px;
+  >input{
     width: 100px;
-    margin-right: 20px;
+    margin-right: 15px;
+  }
+  .radio{
+    margin-top: 10px;
   }
 }
 .profiles-box{
-  width: 600px;
+  width: 100%;
   p{
     width: 100%;
     text-align: center;
@@ -294,6 +387,11 @@ html,body{
     span{
       padding: 0 20px;
       text-align: text-bottom;
+      >.djName{
+        padding: 0 10px;
+        font-size: 24px;
+        font-weight: 700;;
+      }
     }
   }
 }
@@ -304,7 +402,6 @@ html,body{
     text-align: center;
   }
   ul{
-    margin-top: 20px;
     .score{
       width: 100%;
       display: flex;
