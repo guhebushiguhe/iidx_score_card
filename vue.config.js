@@ -4,6 +4,9 @@ function resolve (dir) {
 }
 module.exports = {
     lintOnSave: false,
+    publicPath: './',
+    outputDir: 'dist',
+    assetsDir: 'public',
     chainWebpack: (config)=>{
         config.resolve.alias
             .set('@$', resolve('src'))
