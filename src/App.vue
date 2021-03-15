@@ -10,30 +10,54 @@
         v-for="item in playStyleList"
         :key="item.value"
       >
-        <input
-          type="radio"
-          class="radio"
-          v-model="playStyle"
-          :value="item.value"
-          :id="item.value"
-        >
-        <label :for="item.value">{{item.label}}</label>
+        <label>
+          <input
+            type="radio"
+            class="radio"
+            v-model="playStyle"
+            :value="item.value"
+            :id="item.value"
+            :disabled="isLoading"
+          >
+          {{item.label}}
+        </label>
 
       </span>
     </div>
     <div
+      class="box profiles-select"
+      v-if="isNameSelectShow"
+    >
+      <p class="msg">存在重名账号，请选择账号继续</p>
+      <div
+        v-for="(item,index) in profiles"
+        :key="index"
+        class="profile-card"
+        @click="getSingleProfile(item)"
+      >
+        <p>
+          <span>DJName: <span class="djName">{{item.dj_name}}</span></span>
+        </p>
+        <p v-if="playStyle=='SINGLE' || playStyle=='ALL'">
+          SP Rank: {{item.sp.rank}}, Plays: {{item.sp.plays}}, DJ Points: {{item.sp.dj_points}}
+        </p>
+        <p v-if="playStyle=='DOUBLE' || playStyle=='ALL'">
+          DP Rank: {{item.dp.rank}}, Plays: {{item.dp.plays}}, DJ Points: {{item.dp.dj_points}}
+        </p>
+      </div>
+    </div>
+    <div
       class="box profiles-box"
-      v-if="profiles"
+      v-if="profile"
     >
       <p>
-        <span>DJName: <span class="djName">{{profiles.djName}}</span></span>
-        <!-- <span>iidxID: {{profiles.iidxID}}</span> -->
+        <span>DJName: <span class="djName">{{profile.dj_name}}</span></span>
       </p>
       <p v-if="playStyle=='SINGLE' || playStyle=='ALL'">
-        SP Rank: {{profiles.sp.rank}}, Plays: {{profiles.sp.plays}}, DJ Points: {{profiles.sp.djPoints}}
+        SP Rank: {{profile.sp.rank}}, Plays: {{profile.sp.plays}}, DJ Points: {{profile.sp.dj_points}}
       </p>
       <p v-if="playStyle=='DOUBLE' || playStyle=='ALL'">
-        DP Rank: {{profiles.dp.rank}}, Plays: {{profiles.dp.plays}}, DJ Points: {{profiles.dp.djPoints}}
+        DP Rank: {{profile.dp.rank}}, Plays: {{profile.dp.plays}}, DJ Points: {{profile.dp.dj_points}}
       </p>
     </div>
     <div class="box score-box">
@@ -65,6 +89,7 @@ export default {
       isLoading: false,
       isNameSelectShow: false,
       profiles: null,
+      profile: null,
       qpros: {
           _id: "XXXX",
           _etag: "XXXX",
@@ -161,41 +186,43 @@ export default {
         this.parseScores(scoresData[id])
         return
       }
-      this.profiles = null
+      this.profile = null
       this.scores = []
       this.isLoading = true
       const data = await this.$axios.getProfiles(djName)
       let index = 0
       if(data._items.length>1){
-        // this.isNameSelectShow = true
+        this.isNameSelectShow = true
+        this.isLoading = false
         data._items.sort((a,b)=>{
           const timeA = new Date(a.access_time).getTime()
           const timeB = new Date(b.access_time).getTime()
           return timeB-timeA
         })
-        const nameStr = '重名记录，请输入序号(默认按最近登录时间倒序)\n'+data._items.map(({dj_name,iidx_id,sp,dp},index)=>{
-          return `\n${index+1}  DJ NAME ${dj_name}  IIDX ID ${iidx_id}
-          SP Rank${sp.rank}  Plays${sp.plays}  DJ Points${sp.dj_points}
-          DP Rank${dp.rank}  Plays${dp.plays}  DJ Points${dp.dj_points}`
-        }).join('')
-        const indexStr = window.prompt(nameStr,'1')
-        index = indexStr==''?0:indexStr-1
+        this.profiles = data._items
+        return
       }
       const _items = data['_items'][index]
+      this.getSingleProfile(_items)
+    },
+    getSingleProfile(_items) {
+      this.isNameSelectShow = false
+      this.profiles = null
+      this.isLoading = true
       const {dj_name,iidx_id,sp,dp,_id} = _items
-      this.idsList[djName]=_id
-      this.profiles = {
-        djName: dj_name,
-        iidxID: iidx_id,
+      this.idsList[dj_name]=_id
+      this.profile = {
+        dj_name,
+        iidx_id,
         sp: {
           rank: sp.rank,
           plays: sp.plays,
-          djPoints: sp.dj_points,
+          dj_points: sp.dj_points,
         },
         dp: {
           rank: dp.rank,
           plays: dp.plays,
-          djPoints: dp.dj_points,
+          dj_points: dp.dj_points,
         },
       },
       this.$forceUpdate()
@@ -325,6 +352,10 @@ export default {
     djName(val,oldVal){
       if(val==oldVal)return
       this.djName = val.toUpperCase()
+    },
+    playStyle(val,oldVal){
+      if(val==oldVal || this.djName=='')return
+      this.getProfiles()
     }
   },
   mounted() {
@@ -375,6 +406,36 @@ html,body{
   }
   .radio{
     margin-top: 10px;
+  }
+}
+.profiles-select{
+  width: 100%;
+  .msg{
+    margin-bottom: 10px;
+  }
+  .profile-card{
+    margin-bottom: 10px;
+    background: #444;
+    padding: 10px 0;
+    cursor: pointer;
+    &:hover{
+      background: #555;
+    }
+  }
+  p{
+    width: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    span{
+      padding: 0 20px;
+      text-align: text-bottom;
+      >.djName{
+        padding: 0 10px;
+        font-size: 24px;
+        font-weight: 700;;
+      }
+    }
   }
 }
 .profiles-box{
