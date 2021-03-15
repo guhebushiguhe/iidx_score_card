@@ -33,7 +33,7 @@
         v-for="(item,index) in profiles"
         :key="index"
         class="profile-card"
-        @click="getSingleProfile(item)"
+        @click="continueGetProfile(item)"
       >
         <p>
           <span>DJName: <span class="djName">{{item.dj_name}}</span></span>
@@ -100,6 +100,7 @@ export default {
           body: "XXXX"
       },
       scores: [],
+      profilesData: {},
       scoresData:{},
       idsList:{},
       playStyleList: [
@@ -183,6 +184,8 @@ export default {
       const id = idsList[djName] || null
       const scoresData = this.scoresData
       if( idsList[djName] ){
+        const _items = this.profilesData[id]
+        this.getSingleProfile(_items)
         this.parseScores(scoresData[id])
         return
       }
@@ -204,11 +207,12 @@ export default {
       }
       const _items = data['_items'][index]
       this.getSingleProfile(_items)
+      this.getScores()
     },
     getSingleProfile(_items) {
       this.isNameSelectShow = false
       this.profiles = null
-      this.isLoading = true
+      this.profilesData[_items._id]=_items
       const {dj_name,iidx_id,sp,dp,_id} = _items
       this.idsList[dj_name]=_id
       this.profile = {
@@ -226,9 +230,9 @@ export default {
         },
       },
       this.$forceUpdate()
-      this.getScores()
     },
     async getScores() {
+      this.isLoading = true
       const id = this.idsList[this.djName] || null
       let _next = null
       let pos = null
@@ -346,6 +350,10 @@ export default {
       })
       this.scores = scores
       this.$forceUpdate()
+    },
+    continueGetProfile (_items) {
+      this.getSingleProfile(_items)
+      this.getScores()
     }
   },
   watch: {
