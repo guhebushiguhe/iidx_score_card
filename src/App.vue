@@ -3,8 +3,8 @@
     <p class="time">{{new Date().toLocaleString()}}<span v-html="'&nbsp;&nbsp;&nbsp;&nbsp;'"></span>v1.01</p>
     <h2 class="title">IIDX查分器</h2>
     <div class="box search-box">
-      <span>DJName </span><input type="text" v-model="djName" @keypress.enter="getProfiles" ref="nameInp">
-      <span>lv </span><input type="text"  v-model="lv">
+      <span>DJName </span><input type="text" v-model="djName" @keypress.enter="getProfiles" :disabled="isLoading" ref="nameInp">
+      <span>lv </span><input type="text" v-model="lv" @keypress.enter="getProfiles" :disabled="isLoading">
       <button type="button" @click="getProfiles" :disabled="isLoading">搜索</button><br>
       <span
         v-for="item in playStyleList"
