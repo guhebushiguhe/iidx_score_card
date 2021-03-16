@@ -1,6 +1,9 @@
 <template>
-  <div id="app">
-    <p class="time">{{new Date().toLocaleString()}}<span v-html="'&nbsp;&nbsp;&nbsp;&nbsp;'"></span>v1.01</p>
+  <div id="app" ref="app">
+    <div class="title-wrap">
+      <p class="time">{{new Date().toLocaleString()}}<span v-html="'&nbsp;&nbsp;&nbsp;&nbsp;'"></span>{{version}}</p>
+      <div class="share-btn" @click="capture">↗</div>
+    </div>
     <h2 class="title">IIDX查分器</h2>
     <div class="box search-box">
       <span>DJName </span><input type="text" v-model="djName" @keypress.enter="getProfiles" :disabled="isLoading" ref="nameInp">
@@ -69,24 +72,35 @@
           class="score-li"
         >
         <span>{{item.label}}</span>
-        <span class="score">{{item.value}}</span>
+        <span :class="`${newScores.length > 0?'score':''}`">{{item.value}}</span>
         <span
-         v-if="oldScores.length > 0"
+         v-if="newScores.length > 0"
          class="plus"
-        >{{ parsePlus(item.value,oldScores[index].value) }}</span>
+        >{{ parsePlus(newScores[index].value) }}</span>
         </li>
       </ul>
+    </div>
+    <div class="cap-wrap" v-if="capURL">
+      <div class="btn-wrap">
+        <button @click="downloadCap">下载</button>
+        <button @click="capURL=null">取消</button>
+      </div>
+      <img class="cap-img" :src="capURL" alt="" ref="capImg">
     </div>
   </div>
 </template>
 
 <script>
+import html2canvas from 'html2canvas'
+import '@/utils/canvas2image.js'
 export default {
   name: 'App',
   components: {
   },
   data() {
     return {
+      version: 'v1.02',
+      capURL: null,
       djName: '',
       lv: 'ALL',
       playStyle: 'ALL',
@@ -104,10 +118,10 @@ export default {
           body: "XXXX"
       },
       scores: [],
-      oldScores: [],
+      newScores: [],
       profilesData: {},
       scoresData:{},
-      oldScoresData:{},
+      newScoresData:{},
       idsList:{},
       playStyleList: [
         {
@@ -213,6 +227,21 @@ export default {
       }
   },
   methods: {
+    capture() {
+      const appRef = this.$refs.app
+      html2canvas(appRef,{
+        backgroundColor: '#333536',
+        useCORS: true
+      }).then((canvas)=>{
+        let capURL = canvas.toDataURL(`${this.id||null}_scores/jpg`)
+        this.capURL = capURL
+      })
+    },
+    downloadCap(){
+      const ele = this.$refs.capImg
+      Canvas2Image.saveAsJPEG(ele,400,900)
+      this.capURL = null
+    },
     async getProfiles() {
       const djName = this.djName
       if (djName==''){
@@ -224,13 +253,13 @@ export default {
       const idsList = this.idsList
       const id = idsList[djName] || null
       const scoresData = this.scoresData
-      const oldScoresData = this.oldScoresData
+      const newScoresData = this.newScoresData
       if( idsList[djName] ){
         const _items = this.profilesData[id]
         this.getSingleProfile(_items)
         this.scores = this.parseScores(scoresData[id])
-        const beforeTodayData = this.beforeToday(oldScoresData[id])
-        this.oldScores = this.parseScores(beforeTodayData)
+        const todayData = newScoresData[id]
+        this.newScores = todayData._items.length>0?this.parseScores(todayData):[]
         this.$forceUpdate()
         return
       }
@@ -310,15 +339,15 @@ export default {
       })
       this.scoresData[id]=resData
       this.scores = this.parseScores(resData)
-      const beforeTodayData = this.beforeToday(resData)
-      this.oldScoresData[id]=beforeTodayData
-      this.oldScores = this.parseScores(beforeTodayData)
+      const todayData = this.newFilter(resData)
+      this.newScoresData[id]=todayData
+      this.newScores = todayData._items.length>0?this.parseScores(todayData):[]
     },
-    beforeToday (data) {
+    newFilter (data) {
       const {_items,_related} = data
       const now = new Date()
       const today = now.setHours(0,0,0,0)
-      const new_items = _items.filter(i=>new Date(i.timestamp).getTime()<today)
+      const new_items = _items.filter(i=>new Date(i.timestamp).getTime()>today)
       const newData = {
         _items: new_items,
         _related
@@ -379,22 +408,17 @@ export default {
           })
       })
       return scores
-      // this.$forceUpdate()
     },
     continueGetProfile (_items) {
       this.getSingleProfile(_items)
       this.getScores()
     },
-    parsePlus(val,oldVal){
+    parsePlus(val){
       let num = null
-      if(isNaN(val-oldVal)){
-        num = (parseFloat(val)-parseFloat(oldVal)).toFixed(2)
-        if(num==0)return ''
-        return num-0 > 0?'↑+'+num+"%":'↓'+num+'%'
+      if(isNaN(val-0)){
+        return ''
       }
-      num = val - oldVal
-      if(num==0)return ''
-      return num-0 > 0?'↑+'+num:'↓'+num
+      return val==0?'':'↑+'+val
     }
   },
   watch: {
@@ -417,6 +441,7 @@ export default {
 #app {
   text-align: center;
   // margin-top: 60px;
+  padding-bottom: 30px;
   width: 400px;
   position: absolute;
   top: 0;
@@ -434,12 +459,43 @@ html,body{
   background: #333536;
   color: #9ab5c2;
 }
-.time{
+.cap-wrap{
   width: 100%;
-  font-size: 14px;
-  text-align: left;
-  text-indent: 1em;
-  color: #888;
+  height: 100%;
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .btn-wrap{
+    width: 80%;
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-around;
+  }
+  .cap-img{
+    border: 2px solid #fff;
+    width: 340px;
+  }
+}
+.title-wrap{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  .time{
+    width: 100%;
+    font-size: 14px;
+    text-align: left;
+    text-indent: 1em;
+    color: #888;
+  }
+  .share-btn{
+    font-weight: 700;
+    cursor: pointer;
+  }
 }
 .title {
   margin-top: 10px;
@@ -535,7 +591,7 @@ html,body{
         font-size: 12px;
         text-align: left;
         padding-left: 5px;
-        width: 50px;
+        width: 30px;
       }
     }
   }
