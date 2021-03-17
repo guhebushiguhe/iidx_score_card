@@ -295,7 +295,7 @@ export default {
     },
     getNames(){
       const nameStr = this.getCookie('names')
-      this.names = nameStr.split('|')
+      if(nameStr)this.names = nameStr.split('|')
     },
     setCookie(name, value, seconds) {
         seconds = seconds || 0;   //seconds有值就直接赋值，没有为0
@@ -448,13 +448,15 @@ export default {
       // }
 
       // 过滤最后一把成绩，休息3小时算下一把
-      const endTime = new Date(this.profile.access_time).toLocaleString()
-      const waitTime = 3*60*1000*1000
+      const waitTime = 3*60*60*1000
       let new_items = _items.sort((a,b)=>{
         const timeA = new Date(a.timestamp).getTime()
         const timeB = new Date(b.timestamp).getTime()
         return timeB - timeA
       })
+      // 最后刷卡时间，使用不准，暂废
+      // const endTime = new Date(this.profile.access_time).toLocaleString()
+      const endTime = new Date(new_items[0].timestamp).toLocaleString()
       let startDay = 0 
       new_items.some((item,index)=>{
         function parseTime(t) {
@@ -474,6 +476,7 @@ export default {
       this.newTime = newTime
       // console.log('startTime',startTime)
       // console.log('endTime',endTime)
+      // console.log(new_items)
       const newData = {
         _items: new_items,
         _related,
