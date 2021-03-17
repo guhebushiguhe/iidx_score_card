@@ -123,6 +123,95 @@ Request Header: authorization （Bearer Token）
       "body": "miko"
   }
   ```
+  
+  响应字段值为主题名theme
+  
+  之后对应的图片link为：
+  
+  ````js
+  `https://arcana.nu/asset/iidx/qpart/${theme.value}_${theme.key}/${qpparts.theme}.png`
+  ````
+  
+  
+  
+  ````json
+  "qpparts":{
+      "head":[
+          "qp_head_b",
+          "qp_head_f"
+      ],
+      "hair":[
+          "qp_hair_b",
+          "qp_hair_f"
+      ],
+      "hand":[
+          "qp_hand_l",
+          "qp_hand_r"
+      ],
+      "face":[
+          "qp_face_neutral"
+      ],
+      "body":[
+          "qp_body_b",
+          "qp_body_f",
+          "qp_arm_l_upper",
+          "qp_arm_l_lower",
+          "qp_arm_r_upper",
+          "qp_arm_r_lower",
+          "qp_leg_l_upper",
+          "qp_leg_l_lower",
+          "qp_leg_r_upper",
+          "qp_leg_r_lower",
+      ]
+  }
+  ````
+  
+  叠加顺序及样式为
+  
+  ````css
+  .qpro {
+      width: 170px;
+      height: 200px;
+      position: relative;
+      float: right;
+  }
+  .qpro img {
+      position: absolute;
+      display: inline;
+  }
+  .qp-head-b {
+      left: 14.71%;
+      top: 5%;
+      width: 77.06%;
+      height: 88%;
+  }
+  .qp-hair-b {
+      left: 12.94%;
+      top: 5%;
+      width: 77.06%;
+      height: 88%;
+  }
+  .qp-leg-l {
+      left: 42.65%;
+      top: 61.25%;
+      width: 30%;
+      height: 33%;
+  }
+  .qp-arm-r {
+      left: 12.35%;
+      top: 44.5%;
+      width: 38.82%;
+      height: 48.5%;
+  }
+  ````
+  
+  
+  
+  
+  
+  
+
+
 
 
 

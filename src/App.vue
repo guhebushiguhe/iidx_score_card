@@ -6,8 +6,17 @@
     </div>
     <h2 class="title">IIDX查分器</h2>
     <div class="box search-box">
-      <span>DJName </span><input type="text" v-model="djName" @keypress.enter="getProfiles" :disabled="isLoading" ref="nameInp">
-      <span>lv </span><input type="text" v-model="lv" @keypress.enter="getProfiles" :disabled="isLoading">
+      <span>DJName </span><span class="search-name-wrap">
+          <input class="searchInp" type="text" v-model="djName" @keypress.enter="getProfiles"  @focus="isTyping = true" @blur="lossTyping" :disabled="isLoading" ref="nameInp">
+          <ul v-if="names.length>0 && isTyping" class="names-ul">
+            <li
+              v-for="item in names"
+              :key="item"
+              class="names-li"
+            ><span class="name" @click="searchName(item)">{{item}}</span><span class="delBtn" @click="delName(item)">×</span></li>
+          </ul>
+        </span>
+      <span>lv </span><input class="searchInp" type="text" v-model="lv" @keypress.enter="getProfiles" :disabled="isLoading">
       <button type="button" @click="getProfiles" :disabled="isLoading">搜索</button><br>
       <span
         v-for="item in playStyleList"
@@ -31,13 +40,14 @@
       class="box profiles-select"
       v-if="isNameSelectShow"
     >
-      <p class="msg">存在重名账号，请选择账号继续</p>
-      <div
-        v-for="(item,index) in profiles"
-        :key="index"
-        class="profile-card"
-        @click="continueGetProfile(item)"
-      >
+      <p class="msg">{{profiles?'存在重名账号，请选择账号继续':'查无此名，请重新输入'}}</p>
+      <div v-if="profiles">
+        <div
+          v-for="(item,index) in profiles"
+          :key="index"
+          class="profile-card"
+          @click="continueGetProfile(item)"
+        >
         <p>
           <span>DJName: <span class="djName">{{item.dj_name}}</span></span>
         </p>
@@ -47,6 +57,7 @@
         <p v-if="playStyle=='DOUBLE' || playStyle=='ALL'">
           DP Rank: {{item.dp.rank}}, Plays: {{item.dp.plays}}, DJ Points: {{item.dp.dj_points}}
         </p>
+      </div>
       </div>
     </div>
     <div
@@ -64,7 +75,7 @@
       </p>
     </div>
     <div class="box score-box">
-      <p v-if="isLoading">加载中，请耐心等候···</p>
+      <p class="#9ab5c2" v-if="isLoading">加载中，请耐心等候···</p>
       <ul v-if="scores.length>0 && !isLoading">
         <li
           v-for="(item,index) in scores"
@@ -79,13 +90,17 @@
         >{{ parsePlus(newScores[index].value) }}</span>
         </li>
       </ul>
+      <div class="new-time" v-if="newTime">最后亿把</br>{{ `${newTime.startTime} ---- ${newTime.endTime}` }}</div>
     </div>
-    <div class="cap-wrap" v-if="capURL">
+    <div class="cap-wrap" v-if="capURL" @click="capURL=null">
       <div class="btn-wrap">
-        <button @click="downloadCap">下载</button>
-        <button @click="capURL=null">取消</button>
+        长按图片选择分享图片，任意位置点击取消
+        <!-- <button @click="copyCap" ref="copyBtn" id="aaa">复制</button> -->
+        <!-- <button @click="capURL=null">取消</button> -->
       </div>
-      <img class="cap-img" :src="capURL" alt="" ref="capImg">
+      <div ref='capImg'>
+        <img class="cap-img" :src="capURL" alt="">
+      </div>
     </div>
   </div>
 </template>
@@ -93,6 +108,7 @@
 <script>
 import html2canvas from 'html2canvas'
 import '@/utils/canvas2image.js'
+import Clipboard from 'clipboard'
 export default {
   name: 'App',
   components: {
@@ -100,7 +116,10 @@ export default {
   data() {
     return {
       version: 'v1.02',
+      names: [],
+      isTyping: false,
       capURL: null,
+      newTime: null,
       djName: '',
       lv: 'ALL',
       playStyle: 'ALL',
@@ -185,8 +204,8 @@ export default {
         },
         {
           grade: 'F',
-          min: 0.2222,
-          max: 0
+          min: 0,
+          max: 0.2222
         },
       ],
       lampList: [
@@ -224,7 +243,7 @@ export default {
           E: 'E',
           F: 'F',
         }
-      }
+      },
   },
   methods: {
     capture() {
@@ -237,12 +256,73 @@ export default {
         this.capURL = capURL
       })
     },
-    downloadCap(){
-      const ele = this.$refs.capImg
-      Canvas2Image.saveAsJPEG(ele,400,900)
-      this.capURL = null
+    // 复制图片到剪贴板，因为capURL为base64暂时无法复制
+    // copyCap(e) {
+    //   const capImg = this.$refs.capImg;
+    //   this.copyFunction(capImg, "#aaa");
+    // },
+    // copyFunction(t, a){
+    //   var e = new Clipboard(a, {
+    //       target: function () {   
+    //           return console.log(t, a),
+    //           t
+    //       }
+    //   });
+    //   e.on("success", function (t) {
+    //       console.log('复制成功');
+    //   }),
+    //   e.on("error", function (t) {
+    //       console.log('复制失败');
+    //   })
+    // },
+    lossTyping() {
+      setTimeout(()=>{
+        this.isTyping = false
+      },300)
+    },
+    searchName(name) {
+      this.djName = name
+      this.getProfiles()
+    },
+    addName(name) {
+      this.names.push(name)
+      this.setCookie('names',this.names.join('|'))
+    },
+    delName(name) {
+      let newNames = [...this.names]
+      this.names = newNames.filter(i=>i!=name)
+      this.setCookie('names',this.names.join('|'))
+    },
+    getNames(){
+      const nameStr = this.getCookie('names')
+      this.names = nameStr.split('|')
+    },
+    setCookie(name, value, seconds) {
+        seconds = seconds || 0;   //seconds有值就直接赋值，没有为0
+        var expires = "";
+        if (seconds != 0) {      //设置cookie生存时间
+            var date = new Date();
+            date.setTime(date.getTime() + (seconds * 1000));
+            expires = "; expires=" + date.toGMTString();
+        }
+        document.cookie = name + "=" + escape(value) + expires + "; path=/";   //转码并赋值
+    },
+    getCookie(c_name) {
+        if (document.cookie.length > 0) {
+            var c_start = document.cookie.indexOf(c_name + "=")
+            if (c_start != -1) {
+                c_start = c_start + c_name.length + 1
+                var c_end = document.cookie.indexOf(";", c_start)
+                if (c_end == -1) c_end = document.cookie.length
+                return unescape(document.cookie.substring(c_start, c_end)).replace(/\"/g, "");
+            }
+        }
+        return null;
     },
     async getProfiles() {
+      this.isNameSelectShow = false
+      this.newTime = null
+      const names = this.names
       const djName = this.djName
       if (djName==''){
         alert('请输入DJ NAME')
@@ -258,16 +338,27 @@ export default {
         const _items = this.profilesData[id]
         this.getSingleProfile(_items)
         this.scores = this.parseScores(scoresData[id])
-        const todayData = newScoresData[id]
-        this.newScores = todayData._items.length>0?this.parseScores(todayData):[]
+        const newTimeData = newScoresData[id]
+        this.newScores = newTimeData._items.length>0?this.parseScores(newTimeData):[]
+        this.newTime = newTimeData.newTime
         this.$forceUpdate()
         return
+      }
+      if(!names.includes(djName)){
+        this.addName(djName)
       }
       this.profile = null
       this.scores = []
       this.isLoading = true
       const data = await this.$axios.getProfiles(djName)
       let index = 0
+      if(data._items.length<=0){
+        this.isNameSelectShow = true
+        this.isLoading = false
+        this.profiles = null
+        this.$refs.nameInp.focus()
+        return
+      }
       if(data._items.length>1){
         this.isNameSelectShow = true
         this.isLoading = false
@@ -287,11 +378,12 @@ export default {
       this.isNameSelectShow = false
       this.profiles = null
       this.profilesData[_items._id]=_items
-      const {dj_name,iidx_id,sp,dp,_id} = _items
+      const {dj_name,iidx_id,sp,dp,_id,access_time} = _items
       this.idsList[dj_name]=_id
       this.profile = {
         dj_name,
         iidx_id,
+        access_time,
         sp: {
           rank: sp.rank,
           plays: sp.plays,
@@ -339,19 +431,55 @@ export default {
       })
       this.scoresData[id]=resData
       this.scores = this.parseScores(resData)
-      const todayData = this.newFilter(resData)
-      this.newScoresData[id]=todayData
-      this.newScores = todayData._items.length>0?this.parseScores(todayData):[]
+      const newTimeData = this.newFilter(resData)
+      this.newScoresData[id]=newTimeData
+      this.newScores = newTimeData._items.length>0?this.parseScores(newTimeData):[]
     },
     newFilter (data) {
       const {_items,_related} = data
-      const now = new Date()
-      const today = now.setHours(0,0,0,0)
-      const new_items = _items.filter(i=>new Date(i.timestamp).getTime()>today)
+
+      // 过滤查询时间当天0点后的成绩为新成绩
+      // const now = new Date()
+      // const today = now.setHours(0,0,0,0)
+      // const new_items = _items.filter(i=>new Date(i.timestamp).getTime()>today)
+      // const newData = {
+      //   _items: new_items,
+      //   _related
+      // }
+
+      // 过滤最后一把成绩，休息3小时算下一把
+      const endTime = new Date(this.profile.access_time).toLocaleString()
+      const waitTime = 3*60*1000*1000
+      let new_items = _items.sort((a,b)=>{
+        const timeA = new Date(a.timestamp).getTime()
+        const timeB = new Date(b.timestamp).getTime()
+        return timeB - timeA
+      })
+      let startDay = 0 
+      new_items.some((item,index)=>{
+        function parseTime(t) {
+          return new Date(t.timestamp).getTime()
+        }
+        if(parseTime(item)-parseTime(new_items[index+1])>waitTime){
+          startDay = new Date(item.timestamp).setHours(5,0,0)
+          return true
+        }
+      })
+      new_items = new_items.filter(i=>new Date(i.timestamp).getTime()>startDay)
+      const startTime = new Date(new_items[new_items.length-1].timestamp).toLocaleString()
+      const newTime = {
+        startTime,
+        endTime
+      }
+      this.newTime = newTime
+      // console.log('startTime',startTime)
+      // console.log('endTime',endTime)
       const newData = {
         _items: new_items,
-        _related
+        _related,
+        newTime
       }
+
       return newData
     },
     parseScores(data) {
@@ -377,6 +505,10 @@ export default {
         idList =  idList.map(item=>item._id)
       }else if(!lvList.includes(lv)){
         alert('lv不合法，请重新输入')
+        this.$$nextTick(()=>{
+          })
+        this.lv = 'ALL'
+        return
       }else {
         idList =  idList.filter(({rating})=>rating==lv).map(item=>item._id)
       }
@@ -388,7 +520,7 @@ export default {
       const { FAILED } = LAMPS
       const NO_PLAY = musicList.filter(item=>item.status == 'NO_PLAY').length
       const ALL_TEMP = musicList.length
-      const clearRate = ((ALL_TEMP - FAILED - NO_PLAY)/ALL_TEMP*100).toFixed(2)+'%'
+      const clearRate = ALL_TEMP<=0?'----':((ALL_TEMP - FAILED - NO_PLAY)/ALL_TEMP*100).toFixed(2)+'%'
 
       let res = {
         ALL_TEMP,
@@ -433,6 +565,7 @@ export default {
   },
   mounted() {
     this.$refs.nameInp.focus()
+    this.getNames()
   }
 }
 </script>
@@ -458,6 +591,9 @@ html,body,ul,ol,li,p,div,span,i,img,h1,h2,h3,h4,h5,h6{
 html,body{
   background: #333536;
   color: #9ab5c2;
+}
+ul,ol{
+  list-style: none;
 }
 .cap-wrap{
   width: 100%;
@@ -493,6 +629,7 @@ html,body{
     color: #888;
   }
   .share-btn{
+    padding-right: 10px;
     font-weight: 700;
     cursor: pointer;
   }
@@ -505,9 +642,36 @@ html,body{
 }
 .search-box{
   margin-top: 20px;
-  >input{
+  .searchInp{
     width: 100px;
     margin-right: 15px;
+  }
+  .search-name-wrap{
+    display: inline-block;
+    position: relative;
+    .names-ul{
+      position: absolute;
+      top: 26px;
+      right: 20px;
+      width: 100px;
+      background: #333;
+      .names-li{
+        font-size: 12px;
+        line-height: 24px;
+        text-align: left;
+        text-indent: 0.5em;
+        border-bottom: 1px solid #888;
+        display: flex;
+        justify-content: space-between;
+        .name{
+          cursor: pointer;
+        }
+        .delBtn{
+          margin-right: 5px;
+          cursor: pointer;
+        }
+      }
+    }
   }
   .radio{
     margin-top: 10px;
@@ -563,7 +727,7 @@ html,body{
 }
 .score-box{
   width: 300px;
-  p{
+  .msg{
     margin-top: 40px;
     text-align: center;
   }
@@ -594,6 +758,11 @@ html,body{
         width: 30px;
       }
     }
+  }
+  >.new-time{
+    margin-top: 5px;
+    font-size: 12px;
+    color: rgba(148, 170, 180,.5);
   }
 }
 </style>
