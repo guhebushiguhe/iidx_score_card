@@ -6,7 +6,7 @@
     </div>
     <h2 class="title">IIDX查分器</h2>
     <div class="box search-box">
-      <span>DJName </span><span class="search-name-wrap">
+      <span>DJ NAME </span><span class="search-name-wrap">
           <input class="searchInp" type="text" v-model="djName" @keypress.enter="getProfiles"  @focus="isTyping = true" @blur="lossTyping" :disabled="isLoading" ref="nameInp">
           <ul v-if="names.length>0 && isTyping" class="names-ul">
             <li
@@ -16,8 +16,8 @@
             ><span class="name" @click="searchName(item)">{{item}}</span><span class="delBtn" @click="delName(item)">×</span></li>
           </ul>
         </span>
-      <span>lv </span><input class="searchInp" type="text" v-model="lv" @keypress.enter="getProfiles" :disabled="isLoading">
-      <button type="button" @click="getProfiles" :disabled="isLoading">搜索</button><br>
+      <span>LV </span><input class="searchInp" type="text" v-model="lv" @keypress.enter="getProfiles" :disabled="isLoading">
+      <button type="button" class="searchBtn" @click="getProfiles" :disabled="isLoading">🔍</button><br>
       <span
         v-for="item in playStyleList"
         :key="item.value"
@@ -82,15 +82,16 @@
           :key="item.label"
           class="score-li"
         >
-        <span>{{item.label}}</span>
-        <span :class="`${newScores.length > 0?'score':''}`">{{item.value}}</span>
+        <span class="label-wrap"><Label :text="item.label" /></span>
+        <!-- <span :class="`${newScores.length > 0?'score':''}`">{{item.value}}</span> -->
+        <span :class="`${newScores.length > 0?'score':''}`"><Score :num="item.value.toString()" :type="`${item.label=='CLEAR RATE'?'target':'default'}`" /></span>
         <span
          v-if="newScores.length > 0"
          class="plus"
-        >{{ parsePlus(newScores[index].value) }}</span>
+        ><Score :num="parsePlus(newScores[index].value)" type="plus" /></span>
         </li>
       </ul>
-      <div class="new-time" v-if="newTime">最后亿把</br>{{ `${newTime.startTime} ---- ${newTime.endTime}` }}</div>
+      <div class="new-time" v-if="newTime">新成绩：{{ `${newTime.startTime} ---- ${newTime.endTime}` }}</div>
     </div>
     <div class="cap-wrap" v-if="capURL" @click="capURL=null">
       <div class="btn-wrap">
@@ -109,9 +110,13 @@
 import html2canvas from 'html2canvas'
 import '@/utils/canvas2image.js'
 import Clipboard from 'clipboard'
+import Score from '@/components/Score.vue'
+import Label from '@/components/Label.vue'
 export default {
   name: 'App',
   components: {
+    Score,
+    Label
   },
   data() {
     return {
@@ -554,7 +559,7 @@ export default {
         return ''
       }
       return val==0?'':'↑+'+val
-    }
+    },
   },
   watch: {
     djName(val,oldVal){
@@ -567,6 +572,7 @@ export default {
     }
   },
   mounted() {
+    // document.querySelector('body').height=document.querySelector('body')[0].clientHeight
     this.$refs.nameInp.focus()
     this.getNames()
   }
@@ -574,29 +580,49 @@ export default {
 </script>
 
 <style lang="scss">
+// $fontColor1: #9ab5c2;
+$fontColor1: #fff;
+$fontShadownColor: #4d6e7c;
+html,body,ul,ol,li,p,div,span,i,img,h1,h2,h3,h4,h5,h6{
+  margin: 0;
+  padding: 0;
+}
+html,body{
+  // background: #333536;
+  background: url('./assets/bg3.jpeg') repeat fixed;
+  background-size: cover;
+  // filter: blur(20px);
+  color: $fontColor1;
+}
+ul,ol{
+  list-style: none;
+}
+::-webkit-scrollbar{
+  width: 5px;
+}
+::-webkit-scrollbar-thumb{
+  background: #9ab5c2;
+}
+::-webkit-scrollbar-track{
+  background: transparent;
+}
 #app {
+  min-height:100vh;
+  background: url('./assets/bg3.jpeg') repeat-y fixed;
   text-align: center;
   // margin-top: 60px;
+  font-family:'Segoe UI', Tahoma, 'Geneva', 'Verdana', 'sans-serif';
+  text-shadow: $fontShadownColor 1px 0 0, $fontShadownColor 0 1px 0, $fontShadownColor -1px 0 0, $fontShadownColor 0 -1px 0;
   padding-bottom: 30px;
   width: 400px;
   position: absolute;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-html,body,ul,ol,li,p,div,span,i,img,h1,h2,h3,h4,h5,h6{
-  margin: 0;
-  padding: 0;
-}
-html,body{
-  background: #333536;
-  color: #9ab5c2;
-}
-ul,ol{
-  list-style: none;
 }
 .cap-wrap{
   width: 100%;
@@ -629,7 +655,7 @@ ul,ol{
     font-size: 14px;
     text-align: left;
     text-indent: 1em;
-    color: #888;
+    color: $fontColor1;
   }
   .share-btn{
     padding-right: 10px;
@@ -640,14 +666,23 @@ ul,ol{
 .title {
   margin-top: 10px;
 }
-.box{
-  margin-top: 20px;
-}
 .search-box{
   margin-top: 20px;
   .searchInp{
     width: 100px;
     margin-right: 15px;
+    background: #013765;
+    border: 1px solid #fff;
+    border-radius: 4px;
+    color: #fff;
+    text-indent: .3em;
+  }
+  .searchBtn{
+    font-size: 12px;
+    line-height: 24px;
+    height: 24px;
+    border-width: 0;
+    border-radius: 12px;
   }
   .search-name-wrap{
     display: inline-block;
@@ -657,7 +692,7 @@ ul,ol{
       top: 26px;
       right: 20px;
       width: 100px;
-      background: #333;
+      background: #00426d;
       .names-li{
         font-size: 12px;
         line-height: 24px;
@@ -712,6 +747,8 @@ ul,ol{
 }
 .profiles-box{
   width: 100%;
+  // margin-bottom: 10px;
+  padding: 20px 0;
   p{
     width: 100%;
     text-align: center;
@@ -739,33 +776,64 @@ ul,ol{
       width: 100%;
       display: flex;
       justify-content: space-between;
-      background: #444;
+      background: rgba(68, 68, 68, .8);
+      margin-bottom: 2px;
+      // box-sizing: border-box;
+      border: 1px solid #fff;
+      border-radius: 4px 16px 4px 16px;
+      padding-top: 4px;
       &:nth-child(odd){
         background: #333;
+      }
+      .label-wrap{
+        position: relative;
+        &::after{
+          content: '';
+          display: inline-block;
+          width: 1px;
+          height: 14px;
+          background: #fff;
+          position: absolute;
+          top: 2px;
+          right: 0;
+        }
       }
       span{
         width: 100px;
         text-align: center;
         padding: 0 10px;
         line-height: 24px;
+        .label-modal{
+          img{
+            height: 17px;
+          }
+        }
       }
       .score{
         text-align: right;
-        padding-right: 5px;
+        padding-right: 0;
+        img{
+          // width: 16px;
+          height: 14px;
+        }
       }
       .plus{
         font-weight: 700;
         font-size: 12px;
         text-align: left;
-        padding-left: 5px;
-        width: 30px;
+        padding-left: 10px;
+        width: 60px;
+        img{
+          width: 12px;
+        }
       }
     }
   }
   >.new-time{
     margin-top: 5px;
-    font-size: 12px;
-    color: rgba(148, 170, 180,.5);
+    font-size: 10px;
+    // color: rgba(148, 170, 180,.5);
+    color: rgba(255, 255, 255, 0.5);
   }
 }
 </style>
