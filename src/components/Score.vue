@@ -83,6 +83,12 @@ export default {
                 }).join('')
         }
     },
+    watch:{
+        num(val,oldVal){
+            if(val==oldVal)return
+            this.imgStr = this.num2Img(this.num,this.type)
+        }
+    },
     mounted(){
         this.imgStr = this.num2Img(this.num,this.type)
     }

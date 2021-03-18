@@ -91,7 +91,7 @@
         ><Score :num="parsePlus(newScores[index].value)" type="plus" /></span>
         </li>
       </ul>
-      <div class="new-time" v-if="newTime">新成绩：{{ `${newTime.startTime} ---- ${newTime.endTime}` }}</div>
+      <div class="new-time" v-if="newTime">新成绩：{{ `${newTime.startTime} - ${newTime.endTime}` }}</div>
     </div>
     <div class="cap-wrap" v-if="capURL" @click="capURL=null">
       <div class="btn-wrap">
@@ -120,7 +120,7 @@ export default {
   },
   data() {
     return {
-      version: 'v1.02',
+      version: 'v1.03',
       names: [],
       isTyping: false,
       capURL: null,

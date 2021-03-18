@@ -60,6 +60,12 @@ export default {
             return `<img src="${source}" alt="" />`
         }
     },
+    watch:{
+        text(val,oldVal){
+            if(val==oldVal)return
+            this.labelStr = this.text2img(this.text)
+        }
+    },
     mounted(){
         this.labelStr = this.text2img(this.text)
     }
