@@ -76,11 +76,31 @@ export default {
     },
     methods: {
         num2Img(num,type){
+            if(!num)return ''
             const source = type?this.numImg[type]:this.numImg.default
-            return num.split('').map(i=>{
+            let numStr = ''
+            if(type == 'plus' && num.length<5){
+                const symbol = num.slice(0,2)
+                numStr += symbol.split('').map(i=>{
+                const className = i=="↑"?'up':''
+                return `<img src="${source[`${i}`]}" alt="" class="${className}">`}).join('')
+                for(let i=0;i<5-num.length;i++){
+                    numStr += `<img src="${source['0']}" alt="" style="opacity: 0.2" >`
+                }
+                const trueNum = num.slice(2)
+                numStr += trueNum.split('').map(i=>{
+                return `<img src="${source[i]}" alt="" >`}).join('')
+                return numStr
+            }
+            if(type == 'default' && num.length<4){
+                for(let i=0;i<4-num.length;i++){
+                    numStr += `<img src="${source['0']}" alt="" style="opacity: 0.2" >`
+                }
+            }
+            numStr += num.split('').map(i=>{
                 i = i=="."?'dot':i
-                return `<img src="${source[`${i}`]}" alt="" >`
-                }).join('')
+                return `<img src="${source[`${i}`]}" alt="" >`}).join('')
+            return numStr
         }
     },
     watch:{
@@ -94,11 +114,16 @@ export default {
     }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .score-modal{
-    color: red;
-    img{
-        height: 20px;
+    height: 30px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    .up{
+        // position: relative;
+        // height: 30px;
+        width: 24px !important;
     }
 }
 </style>

@@ -4,9 +4,8 @@
       <p class="time">{{new Date().toLocaleString()}}<span v-html="'&nbsp;&nbsp;&nbsp;&nbsp;'"></span>{{version}}</p>
       <div class="share-btn" @click="capture">↗</div>
     </div>
-    <h2 class="title">IIDX查分器</h2>
     <div class="box search-box">
-      <span>DJ NAME </span><span class="search-name-wrap">
+      <!-- <span>DJ NAME </span><span class="search-name-wrap">
           <input class="searchInp" type="text" v-model="djName" @keypress.enter="getProfiles"  @focus="isTyping = true" @blur="lossTyping" :disabled="isLoading" ref="nameInp">
           <ul v-if="names.length>0 && isTyping" class="names-ul">
             <li
@@ -15,7 +14,7 @@
               class="names-li"
             ><span class="name" @click="searchName(item)">{{item}}</span><span class="delBtn" @click="delName(item)">×</span></li>
           </ul>
-        </span>
+        </span> -->
       <span>LV </span><input class="searchInp" type="text" v-model="lv" @keypress.enter="getProfiles" :disabled="isLoading">
       <button type="button" class="searchBtn" @click="getProfiles" :disabled="isLoading">🔍</button><br>
       <span
@@ -62,15 +61,24 @@
     </div>
     <div
       class="box profiles-box"
-      v-if="profile"
     >
       <p>
-        <span>DJName: <span class="djName">{{profile.dj_name}}</span></span>
+        <span>DJ</span> 
+        <span class="search-name-wrap">
+          <input class="searchInp" type="text" v-model="djName" @keypress.enter="getProfiles"  @focus="isTyping = true" @blur="lossTyping" :disabled="isLoading" ref="nameInp">
+          <ul v-if="names.length>0 && isTyping" class="names-ul">
+            <li
+              v-for="item in names"
+              :key="item"
+              class="names-li"
+            ><span class="name" @click="searchName(item)">{{item}}</span><span class="delBtn" @click="delName(item)">×</span></li>
+          </ul>
+        </span>
       </p>
-      <p v-if="playStyle=='SINGLE' || playStyle=='ALL'">
+      <p v-if="profile && (playStyle=='SINGLE' || playStyle=='ALL')">
         SP Rank: {{profile.sp.rank}}, Plays: {{profile.sp.plays}}, DJ Points: {{profile.sp.dj_points}}
       </p>
-      <p v-if="playStyle=='DOUBLE' || playStyle=='ALL'">
+      <p v-if="profile && (playStyle=='DOUBLE' || playStyle=='ALL')">
         DP Rank: {{profile.dp.rank}}, Plays: {{profile.dp.plays}}, DJ Points: {{profile.dp.dj_points}}
       </p>
     </div>
@@ -83,7 +91,6 @@
           class="score-li"
         >
         <span class="label-wrap"><Label :text="item.label" /></span>
-        <!-- <span :class="`${newScores.length > 0?'score':''}`">{{item.value}}</span> -->
         <span :class="`${newScores.length > 0?'score':''}`"><Score :num="item.value.toString()" :type="`${item.label=='CLEAR RATE'?'target':'default'}`" /></span>
         <span
          v-if="newScores.length > 0"
@@ -96,8 +103,6 @@
     <div class="cap-wrap" v-if="capURL" @click="capURL=null">
       <div class="btn-wrap">
         长按图片选择分享图片，任意位置点击取消
-        <!-- <button @click="copyCap" ref="copyBtn" id="aaa">复制</button> -->
-        <!-- <button @click="capURL=null">取消</button> -->
       </div>
       <div ref='capImg'>
         <img class="cap-img" :src="capURL" alt="">
@@ -109,7 +114,6 @@
 <script>
 import html2canvas from 'html2canvas'
 import '@/utils/canvas2image.js'
-import Clipboard from 'clipboard'
 import Score from '@/components/Score.vue'
 import Label from '@/components/Label.vue'
 export default {
@@ -120,7 +124,7 @@ export default {
   },
   data() {
     return {
-      version: 'v1.03',
+      version: 'IIDX速查工具v1.03',
       names: [],
       isTyping: false,
       capURL: null,
@@ -261,25 +265,6 @@ export default {
         this.capURL = capURL
       })
     },
-    // 复制图片到剪贴板，因为capURL为base64暂时无法复制
-    // copyCap(e) {
-    //   const capImg = this.$refs.capImg;
-    //   this.copyFunction(capImg, "#aaa");
-    // },
-    // copyFunction(t, a){
-    //   var e = new Clipboard(a, {
-    //       target: function () {   
-    //           return console.log(t, a),
-    //           t
-    //       }
-    //   });
-    //   e.on("success", function (t) {
-    //       console.log('复制成功');
-    //   }),
-    //   e.on("error", function (t) {
-    //       console.log('复制失败');
-    //   })
-    // },
     lossTyping() {
       setTimeout(()=>{
         this.isTyping = false
@@ -291,7 +276,8 @@ export default {
     },
     addName(name) {
       this.names.push(name)
-      this.setCookie('names',this.names.join('|'))
+      const yearTime = 365*24*60*60
+      this.setCookie('names',this.names.join('|'),yearTime)
     },
     delName(name) {
       let newNames = [...this.names]
@@ -607,7 +593,7 @@ ul,ol{
   background: transparent;
 }
 #app {
-  min-height:100vh;
+  // min-height:100vh;
   background: url('./assets/bg3.jpeg') repeat-y fixed;
   text-align: center;
   // margin-top: 60px;
@@ -663,9 +649,6 @@ ul,ol{
     cursor: pointer;
   }
 }
-.title {
-  margin-top: 10px;
-}
 .search-box{
   margin-top: 20px;
   .searchInp{
@@ -676,40 +659,7 @@ ul,ol{
     border-radius: 4px;
     color: #fff;
     text-indent: .3em;
-  }
-  .searchBtn{
-    font-size: 12px;
-    line-height: 24px;
-    height: 24px;
-    border-width: 0;
-    border-radius: 12px;
-  }
-  .search-name-wrap{
-    display: inline-block;
-    position: relative;
-    .names-ul{
-      position: absolute;
-      top: 26px;
-      right: 20px;
-      width: 100px;
-      background: #00426d;
-      .names-li{
-        font-size: 12px;
-        line-height: 24px;
-        text-align: left;
-        text-indent: 0.5em;
-        border-bottom: 1px solid #888;
-        display: flex;
-        justify-content: space-between;
-        .name{
-          cursor: pointer;
-        }
-        .delBtn{
-          margin-right: 5px;
-          cursor: pointer;
-        }
-      }
-    }
+    outline: none;
   }
   .radio{
     margin-top: 10px;
@@ -722,11 +672,11 @@ ul,ol{
   }
   .profile-card{
     margin-bottom: 10px;
-    background: #444;
+    background: rgba(1, 71, 122,.4);
     padding: 10px 0;
     cursor: pointer;
     &:hover{
-      background: #555;
+      background: rgba(1, 71, 122,.8);
     }
   }
   p{
@@ -749,14 +699,56 @@ ul,ol{
   width: 100%;
   // margin-bottom: 10px;
   padding: 20px 0;
-  p{
+  >p{
     width: 100%;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    span{
-      padding: 0 20px;
-      text-align: text-bottom;
+    // text-align: center;
+    text-align: left;
+    padding: 0 20px;
+    .search-name-wrap{
+      padding: 0;
+      display: inline-block;
+      position: relative;
+      .searchInp{
+        display: inline-block;
+        width: 140px;
+        margin-right: 15px;
+        background: transparent;
+        border: none;
+        // background: #013765;
+        // border: 1px solid #fff;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 30px;
+        font-weight: 700;
+        text-indent: .3em;
+        outline: none;
+      }
+      .names-ul{
+        position: absolute;
+        top: 38px;
+        right: 18px;
+        width: 130px;
+        background: #00426d;
+        .names-li{
+          font-size: 12px;
+          line-height: 24px;
+          text-align: left;
+          text-indent: 0.5em;
+          border-bottom: 1px solid #888;
+          display: flex;
+          justify-content: space-between;
+          .name{
+            cursor: pointer;
+          }
+          .delBtn{
+            margin-right: 5px;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+    >span{
+      padding: 0 5px 10px 0;
       >.djName{
         padding: 0 10px;
         font-size: 24px;
@@ -781,7 +773,6 @@ ul,ol{
       // box-sizing: border-box;
       border: 1px solid #fff;
       border-radius: 4px 16px 4px 16px;
-      padding-top: 4px;
       &:nth-child(odd){
         background: #333;
       }
@@ -791,10 +782,10 @@ ul,ol{
           content: '';
           display: inline-block;
           width: 1px;
-          height: 14px;
+          height: 18px;
           background: #fff;
           position: absolute;
-          top: 2px;
+          top: 6px;
           right: 0;
         }
       }
@@ -821,8 +812,8 @@ ul,ol{
         font-weight: 700;
         font-size: 12px;
         text-align: left;
-        padding-left: 10px;
-        width: 60px;
+        // padding-left: 0;
+        width: 100px;
         img{
           width: 12px;
         }

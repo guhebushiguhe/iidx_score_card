@@ -51,13 +51,41 @@ export default {
                 E: require('@/assets/djlevel/lv_e.png'),
                 F: require('@/assets/djlevel/lv_f.png'),
             },
+            lvList:{
+                'lv.1': "1",
+                'lv.2': "2",
+                'lv.3': "3",
+                'lv.4': "4",
+                'lv.5': "5",
+                'lv.6': "6",
+                'lv.7': "7",
+                'lv.8': "8",
+                'lv.9': "9",
+                'lv.10': "10",
+                'lv.11': "11",
+                'lv.12': "12",
+                'lv.ALL': "13",
+            },
             labelStr: ''
         }
     },
     methods: {
         text2img(text){
             const source =  this.labelImg[text]
-            return `<img src="${source}" alt="" />`
+            let labelStr = `<img src="${source}" alt="" />`
+            if(text.match('lv.')){
+                const labelImg = this.labelImg
+                const lvList = this.lvList
+                let lvStr = ''
+                Object.keys(lvList).map(i=>{
+                    lvStr += `<li class="lv-li"><img src="${labelImg[i]}" alt="" @click="changeLv(${lvList[i]})"/></li>`
+                })
+                labelStr = `<img src="${source}" alt="" /><ul class="menu">${lvStr}</ul>`
+            }
+            return labelStr
+        },
+        changeLv(lv){
+            console.log('change lv',lv)
         }
     },
     watch:{
@@ -71,8 +99,48 @@ export default {
     }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .label-modal{
-
+    height: 30px;
+    width: 97px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    >.menu{
+        z-index: 1;
+        display: none;
+        position: absolute;
+        top: 30px;
+        right: 0;
+        width: 80px;
+        padding: 0 5px;
+        background: rgb(74, 78, 80);
+        color: #fff;
+        border: 1px solid #ccc;
+        border-width: 0 1px 1px 1px;
+        .lv-li{
+            position: relative;
+            height: 24px;
+            border-bottom: 1px solid #fff;
+            cursor: pointer;
+            img{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                height: 18px;
+                transform: translate(-50%,-50%);
+            }
+            &:hover{
+                img{
+                    height: 24px;
+                }
+                background: rgb(120, 126, 129);
+            }
+        }
+    }
+    &:hover .menu{
+        display: block;
+    }
 }
 </style>
