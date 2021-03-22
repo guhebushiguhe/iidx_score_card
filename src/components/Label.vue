@@ -19,19 +19,7 @@ export default {
     data(){
         return{
             labelImg:{
-                'lv.1': require('@/assets/level/lv_1.png'),
-                'lv.2': require('@/assets/level/lv_2.png'),
-                'lv.3': require('@/assets/level/lv_3.png'),
-                'lv.4': require('@/assets/level/lv_4.png'),
-                'lv.5': require('@/assets/level/lv_5.png'),
-                'lv.6': require('@/assets/level/lv_6.png'),
-                'lv.7': require('@/assets/level/lv_7.png'),
-                'lv.8': require('@/assets/level/lv_8.png'),
-                'lv.9': require('@/assets/level/lv_9.png'),
-                'lv.10': require('@/assets/level/lv_10.png'),
-                'lv.11': require('@/assets/level/lv_11.png'),
-                'lv.12': require('@/assets/level/lv_12.png'),
-                'lv.ALL': require('@/assets/level/lv_all.png'),
+                'ALL': require('@/assets/clear/all_scores.png'),
                 FC: require('@/assets/clear/clear_full_combo.png'),
                 EXHC: require('@/assets/clear/clear_ex_hard.png'),
                 HC: require('@/assets/clear/clear_hard.png'),
@@ -64,7 +52,7 @@ export default {
                 'lv.10': "10",
                 'lv.11': "11",
                 'lv.12': "12",
-                'lv.ALL': "13",
+                'lv.ALL': "ALL",
             },
             labelStr: ''
         }
@@ -73,20 +61,8 @@ export default {
         text2img(text){
             const source =  this.labelImg[text]
             let labelStr = `<img src="${source}" alt="" />`
-            if(text.match('lv.')){
-                const labelImg = this.labelImg
-                const lvList = this.lvList
-                let lvStr = ''
-                Object.keys(lvList).map(i=>{
-                    lvStr += `<li class="lv-li"><img src="${labelImg[i]}" alt="" @click="changeLv(${lvList[i]})"/></li>`
-                })
-                labelStr = `<img src="${source}" alt="" /><ul class="menu">${lvStr}</ul>`
-            }
             return labelStr
         },
-        changeLv(lv){
-            console.log('change lv',lv)
-        }
     },
     watch:{
         text(val,oldVal){
@@ -107,40 +83,5 @@ export default {
     justify-content: center;
     align-items: center;
     position: relative;
-    >.menu{
-        z-index: 1;
-        display: none;
-        position: absolute;
-        top: 30px;
-        right: 0;
-        width: 80px;
-        padding: 0 5px;
-        background: rgb(74, 78, 80);
-        color: #fff;
-        border: 1px solid #ccc;
-        border-width: 0 1px 1px 1px;
-        .lv-li{
-            position: relative;
-            height: 24px;
-            border-bottom: 1px solid #fff;
-            cursor: pointer;
-            img{
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                height: 18px;
-                transform: translate(-50%,-50%);
-            }
-            &:hover{
-                img{
-                    height: 24px;
-                }
-                background: rgb(120, 126, 129);
-            }
-        }
-    }
-    &:hover .menu{
-        display: block;
-    }
 }
 </style>

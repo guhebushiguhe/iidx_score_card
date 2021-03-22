@@ -4,9 +4,16 @@
       <p class="time">{{new Date().toLocaleString()}}<span v-html="'&nbsp;&nbsp;&nbsp;&nbsp;'"></span>{{version}}</p>
       <div class="share-btn" @click="capture">↗</div>
     </div>
-    <div class="box search-box">
-      <!-- <span>DJ NAME </span><span class="search-name-wrap">
-          <input class="searchInp" type="text" v-model="djName" @keypress.enter="getProfiles"  @focus="isTyping = true" @blur="lossTyping" :disabled="isLoading" ref="nameInp">
+    <div
+      class="box profiles-box"
+    >
+      <p>
+        <span>DJ</span> 
+        <span class="search-name-wrap">
+          <div class="search-inp-wrap">
+            <input class="searchInp" type="text" v-model="djName" @keypress.enter="getProfiles"  @focus="isTyping = true" @blur="lossTyping" :disabled="isLoading" ref="nameInp">
+            <span class="empty-text" v-if="djName==''">点击此处输入DJ NAME</span>
+          </div>
           <ul v-if="names.length>0 && isTyping" class="names-ul">
             <li
               v-for="item in names"
@@ -14,26 +21,46 @@
               class="names-li"
             ><span class="name" @click="searchName(item)">{{item}}</span><span class="delBtn" @click="delName(item)">×</span></li>
           </ul>
-        </span> -->
-      <span>LV </span><input class="searchInp" type="text" v-model="lv" @keypress.enter="getProfiles" :disabled="isLoading">
-      <button type="button" class="searchBtn" @click="getProfiles" :disabled="isLoading">🔍</button><br>
-      <span
-        v-for="item in playStyleList"
-        :key="item.value"
-      >
-        <label>
-          <input
-            type="radio"
-            class="radio"
-            v-model="playStyle"
-            :value="item.value"
-            :id="item.value"
-            :disabled="isLoading"
-          >
-          {{item.label}}
-        </label>
-
-      </span>
+        </span>
+      </p>
+      <p v-if="profile">
+        SP Rank: {{profile.sp.rank}}, Plays: {{profile.sp.plays}}, DJ Points: {{profile.sp.dj_points}}
+      </p>
+      <p v-if="profile">
+        DP Rank: {{profile.dp.rank}}, Plays: {{profile.dp.plays}}, DJ Points: {{profile.dp.dj_points}}
+      </p>
+    </div>
+    <div class="box search-box">
+      <LvSelector
+        :lv="lv"
+        :change-lv="changeLv"
+        class="lv-selector-wrap"
+      />
+      <PlayStyleSelector
+        class="radio-wrap"
+        :play-style="playStyle"
+        :is-loading="isLoading"
+        :play-style-list="playStyleList"
+        :change-play-style="playStyleChange"
+      />
+      <!-- <div class="radio-wrap">
+        <span
+          v-for="item in playStyleList"
+          :key="item.value"
+        >
+          <label :class="`radio-label ${playStyle==item.value?'active':''}`">
+            <input
+              type="radio"
+              class="radio"
+              v-model="playStyle"
+              :value="item.value"
+              :id="item.value"
+              :disabled="isLoading"
+            >
+            {{item.label}}
+          </label>
+        </span>
+      </div> -->
     </div>
     <div
       class="box profiles-select"
@@ -50,37 +77,14 @@
         <p>
           <span>DJName: <span class="djName">{{item.dj_name}}</span></span>
         </p>
-        <p v-if="playStyle=='SINGLE' || playStyle=='ALL'">
+        <p>
           SP Rank: {{item.sp.rank}}, Plays: {{item.sp.plays}}, DJ Points: {{item.sp.dj_points}}
         </p>
-        <p v-if="playStyle=='DOUBLE' || playStyle=='ALL'">
+        <p>
           DP Rank: {{item.dp.rank}}, Plays: {{item.dp.plays}}, DJ Points: {{item.dp.dj_points}}
         </p>
       </div>
       </div>
-    </div>
-    <div
-      class="box profiles-box"
-    >
-      <p>
-        <span>DJ</span> 
-        <span class="search-name-wrap">
-          <input class="searchInp" type="text" v-model="djName" @keypress.enter="getProfiles"  @focus="isTyping = true" @blur="lossTyping" :disabled="isLoading" ref="nameInp">
-          <ul v-if="names.length>0 && isTyping" class="names-ul">
-            <li
-              v-for="item in names"
-              :key="item"
-              class="names-li"
-            ><span class="name" @click="searchName(item)">{{item}}</span><span class="delBtn" @click="delName(item)">×</span></li>
-          </ul>
-        </span>
-      </p>
-      <p v-if="profile && (playStyle=='SINGLE' || playStyle=='ALL')">
-        SP Rank: {{profile.sp.rank}}, Plays: {{profile.sp.plays}}, DJ Points: {{profile.sp.dj_points}}
-      </p>
-      <p v-if="profile && (playStyle=='DOUBLE' || playStyle=='ALL')">
-        DP Rank: {{profile.dp.rank}}, Plays: {{profile.dp.plays}}, DJ Points: {{profile.dp.dj_points}}
-      </p>
     </div>
     <div class="box score-box">
       <p class="#9ab5c2" v-if="isLoading">加载中，请耐心等候···</p>
@@ -116,11 +120,15 @@ import html2canvas from 'html2canvas'
 import '@/utils/canvas2image.js'
 import Score from '@/components/Score.vue'
 import Label from '@/components/Label.vue'
+import LvSelector from '@/components/LvSelector.vue'
+import PlayStyleSelector from '@/components/PlayStyleSelector.vue'
 export default {
   name: 'App',
   components: {
     Score,
-    Label
+    Label,
+    LvSelector,
+    PlayStyleSelector
   },
   data() {
     return {
@@ -230,9 +238,10 @@ export default {
   },
   computed: {
       labelList () {
-        const lv = this.lv
+        // const lv = this.lv
         return {
-          ALL_TEMP:`lv.${lv?lv:'ALL'}`,
+          // ALL_TEMP:`lv.${lv?lv:'ALL'}`,
+          ALL_TEMP:'ALL',
           FULL_COMBO: 'FC',
           EX_HARD_CLEAR: 'EXHC',
           HARD_CLEAR: 'HC',
@@ -259,7 +268,8 @@ export default {
       const appRef = this.$refs.app
       html2canvas(appRef,{
         backgroundColor: '#333536',
-        useCORS: true
+        useCORS: true,
+        dpi: 300,
       }).then((canvas)=>{
         let capURL = canvas.toDataURL(`${this.id||null}_scores/jpg`)
         this.capURL = capURL
@@ -428,16 +438,6 @@ export default {
     },
     newFilter (data) {
       const {_items,_related} = data
-
-      // 过滤查询时间当天0点后的成绩为新成绩
-      // const now = new Date()
-      // const today = now.setHours(0,0,0,0)
-      // const new_items = _items.filter(i=>new Date(i.timestamp).getTime()>today)
-      // const newData = {
-      //   _items: new_items,
-      //   _related
-      // }
-
       // 过滤最后一把成绩，休息3小时算下一把
       const waitTime = 3*60*60*1000
       let new_items = _items.sort((a,b)=>{
@@ -445,8 +445,6 @@ export default {
         const timeB = new Date(b.timestamp).getTime()
         return timeB - timeA
       })
-      // 最后刷卡时间，使用不准，暂废
-      // const endTime = new Date(this.profile.access_time).toLocaleString()
       const endTime = new Date(new_items[0].timestamp).toLocaleString()
       let startDay = 0 
       new_items.some((item,index)=>{
@@ -546,6 +544,13 @@ export default {
       }
       return val==0?'':'↑+'+val
     },
+    changeLv(lv){
+      this.lv = lv
+      this.getProfiles()
+    },
+    playStyleChange(e){
+      this.playStyle=e.target.value
+    }
   },
   watch: {
     djName(val,oldVal){
@@ -558,7 +563,6 @@ export default {
     }
   },
   mounted() {
-    // document.querySelector('body').height=document.querySelector('body')[0].clientHeight
     this.$refs.nameInp.focus()
     this.getNames()
   }
@@ -577,7 +581,6 @@ html,body{
   // background: #333536;
   background: url('./assets/bg3.jpeg') repeat fixed;
   background-size: cover;
-  // filter: blur(20px);
   color: $fontColor1;
 }
 ul,ol{
@@ -593,14 +596,13 @@ ul,ol{
   background: transparent;
 }
 #app {
-  // min-height:100vh;
+  min-height:100vh;
+  width: 400px;
   background: url('./assets/bg3.jpeg') repeat-y fixed;
   text-align: center;
-  // margin-top: 60px;
   font-family:'Segoe UI', Tahoma, 'Geneva', 'Verdana', 'sans-serif';
   text-shadow: $fontShadownColor 1px 0 0, $fontShadownColor 0 1px 0, $fontShadownColor -1px 0 0, $fontShadownColor 0 -1px 0;
   padding-bottom: 30px;
-  width: 400px;
   position: absolute;
   top: 0;
   left: 50%;
@@ -650,7 +652,12 @@ ul,ol{
   }
 }
 .search-box{
-  margin-top: 20px;
+  // margin-top: 20px;
+  margin-bottom: 20px;
+  width: 80%;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
   .searchInp{
     width: 100px;
     margin-right: 15px;
@@ -661,8 +668,44 @@ ul,ol{
     text-indent: .3em;
     outline: none;
   }
-  .radio{
-    margin-top: 10px;
+  .lv-selector-wrap{
+    background: rgba(51, 51, 51,.5);
+    height: 24px;
+    border-radius: 12px;
+    border-width: 0;
+    display: flex;
+    align-items: center;
+  }
+  .radio-wrap{
+    background: rgba(51, 51, 51,.5);
+    height: 24px;
+    line-height: 24px;
+    border-radius: 12px;
+    border-width: 0;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    .radio-label{
+      padding: 0 10px;
+      cursor: pointer;
+      text-shadow: none;
+      color: rgba(255, 255, 255,.2);
+      opacity: 0.4;
+      display: flex;
+      align-items: center;
+      img{
+        display: inline-block;
+        line-height: 24px;
+      }
+    }
+    .active{
+      color: #fff;
+      opacity: 1;
+    }
+    .radio{
+      margin-top: 10px;
+      display: none;
+    }
   }
 }
 .profiles-select{
@@ -672,11 +715,11 @@ ul,ol{
   }
   .profile-card{
     margin-bottom: 10px;
-    background: rgba(1, 71, 122,.4);
+    background: rgba(51, 51, 51, 0.5);
     padding: 10px 0;
     cursor: pointer;
     &:hover{
-      background: rgba(1, 71, 122,.8);
+      background: rgba(51, 51, 51, 0.8);
     }
   }
   p{
@@ -701,29 +744,44 @@ ul,ol{
   padding: 20px 0;
   >p{
     width: 100%;
-    // text-align: center;
-    text-align: left;
+    box-sizing: border-box;
+    text-align: center;
+    // text-align: left;
     padding: 0 20px;
     .search-name-wrap{
       padding: 0;
       display: inline-block;
       position: relative;
-      .searchInp{
-        display: inline-block;
-        width: 140px;
-        margin-right: 15px;
-        background: transparent;
-        border: none;
-        // background: #013765;
-        // border: 1px solid #fff;
-        border-radius: 4px;
-        color: #fff;
-        font-size: 30px;
-        font-weight: 700;
-        text-indent: .3em;
-        outline: none;
+      .search-inp-wrap{
+        position: relative;
+        .searchInp{
+          display: inline-block;
+          width: 140px;
+          margin-right: 15px;
+          background: transparent;
+          border: none;
+          // background: #013765;
+          // border: 1px solid #fff;
+          border-radius: 4px;
+          color: #fff;
+          font-size: 30px;
+          font-weight: 700;
+          text-indent: .3em;
+          outline: none;
+        }
+        .empty-text{
+          z-index: -1;
+          position: absolute;
+          bottom: 4px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 160px;
+          font-size: 12px;
+          color: #ccc;
+        }
       }
       .names-ul{
+        z-index: 2;
         position: absolute;
         top: 38px;
         right: 18px;
