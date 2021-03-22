@@ -43,24 +43,6 @@
         :play-style-list="playStyleList"
         :change-play-style="playStyleChange"
       />
-      <!-- <div class="radio-wrap">
-        <span
-          v-for="item in playStyleList"
-          :key="item.value"
-        >
-          <label :class="`radio-label ${playStyle==item.value?'active':''}`">
-            <input
-              type="radio"
-              class="radio"
-              v-model="playStyle"
-              :value="item.value"
-              :id="item.value"
-              :disabled="isLoading"
-            >
-            {{item.label}}
-          </label>
-        </span>
-      </div> -->
     </div>
     <div
       class="box profiles-select"
@@ -524,6 +506,9 @@ export default {
         res[item.grade] = musicList.filter(i=>i.grade >= item.min && i.grade < item.max).length
       })
 
+      // 追加路由参数
+      // location.search=`?dj_name=${this.djName}&lv=${this.lv}&play_style=${this.playStyle}`
+
       let scores = []
       Object.keys(labelList).map(item=>{
           scores.push({
@@ -686,11 +671,12 @@ ul,ol{
     display: flex;
     align-items: center;
     .radio-label{
+      height: 18px;
       padding: 0 10px;
       cursor: pointer;
       text-shadow: none;
       color: rgba(255, 255, 255,.2);
-      opacity: 0.4;
+      // opacity: 0.4;
       display: flex;
       align-items: center;
       img{
@@ -700,7 +686,7 @@ ul,ol{
     }
     .active{
       color: #fff;
-      opacity: 1;
+      // opacity: 1;
     }
     .radio{
       margin-top: 10px;

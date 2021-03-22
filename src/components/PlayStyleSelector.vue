@@ -13,7 +13,7 @@
             :id="item.value"
             :disabled="isLoading"
         >
-        <img :src="playStyleImg[item.value]" alt="" />
+        <img :src="playStyle==item.value?playStyleImg[item.value]:playStyleImg[`${item.value}_p`]" alt="" />
         </label>
     </span>
     </div>
@@ -54,6 +54,9 @@ export default {
                 'SINGLE': require('@/assets/style/sp.png'),
                 'DOUBLE': require('@/assets/style/dp.png'),
                 'ALL': require('@/assets/style/all.png'),
+                'SINGLE_p': require('@/assets/style/sp_p.png'),
+                'DOUBLE_p': require('@/assets/style/dp_p.png'),
+                'ALL_p': require('@/assets/style/all_p.png'),
             },
         }
     },

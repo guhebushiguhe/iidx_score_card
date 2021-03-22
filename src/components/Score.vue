@@ -28,6 +28,7 @@ export default {
         return {
             numImg:{
                 default:{
+                    '0_p': require('@/assets/score/default/0_20p.png'),
                     0: require('@/assets/score/default/0.png'),
                     1: require('@/assets/score/default/1.png'),
                     2: require('@/assets/score/default/2.png'),
@@ -54,6 +55,7 @@ export default {
                     dot: require('@/assets/target/dot.png'),
                 },
                 plus:{
+                    '0_p': require('@/assets/score/up/0_20p.png'),
                     0: require('@/assets/score/up/0.png'),
                     1: require('@/assets/score/up/1.png'),
                     2: require('@/assets/score/up/2.png'),
@@ -85,7 +87,7 @@ export default {
                 const className = i=="↑"?'up':''
                 return `<img src="${source[`${i}`]}" alt="" class="${className}">`}).join('')
                 for(let i=0;i<5-num.length;i++){
-                    numStr += `<img src="${source['0']}" alt="" style="opacity: 0.2" >`
+                    numStr += `<img src="${source['0_p']}" alt="" >`
                 }
                 const trueNum = num.slice(2)
                 numStr += trueNum.split('').map(i=>{
@@ -94,7 +96,7 @@ export default {
             }
             if(type == 'default' && num.length<4){
                 for(let i=0;i<4-num.length;i++){
-                    numStr += `<img src="${source['0']}" alt="" style="opacity: 0.2" >`
+                    numStr += `<img src="${source['0_p']}" alt="" >`
                 }
             }
             numStr += num.split('').map(i=>{
