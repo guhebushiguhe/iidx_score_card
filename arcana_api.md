@@ -35,6 +35,7 @@ Request Header: authorization （Bearer Token）
 #### 查询玩家列表
 
 - **api**   /api/v1/iidx/27/profiles/
+- **method** GET
 - **query**
 
 | KEY             | VALUE                        | DESCRIPTION                                                  |
@@ -101,6 +102,8 @@ Request Header: authorization （Bearer Token）
 
 - **api**  /api/v1/iidx/27/qpros/${\_id}
 
+- **method** GET
+
 - **params**
 
   | KEY  | VALUE       | DESCRIPTION    |
@@ -166,7 +169,7 @@ Request Header: authorization （Bearer Token）
   }
   ````
   
-  叠加顺序及样式为
+  叠加顺序及css为
   
   ````css
   .qpro {
@@ -191,21 +194,76 @@ Request Header: authorization （Bearer Token）
       width: 77.06%;
       height: 88%;
   }
+  
+  /* _lower & _upper */
   .qp-leg-l {
       left: 42.65%;
       top: 61.25%;
       width: 30%;
       height: 33%;
   }
+  
+  /* _uppper & _lower */
   .qp-arm-r {
       left: 12.35%;
       top: 44.5%;
       width: 38.82%;
       height: 48.5%;
   }
+  .qp-hand-r {
+      left: 1.47%;
+      top: 0;
+      width: 62.35%;
+      height: 88%;
+  }
+  /*  _lower & _uppper */
+  .qp-leg-r {
+      top: 61.25%;
+      width: 30%;
+      height: 33%;
+      left: 26.47%;
+  }
+  /* _b & _f */
+  .qp-body {
+      left: 14.71%;
+      top: 5%;
+      width: 76.47%;
+      height: 88%;
+  }
+  .qp-face {
+      left: 29.41%;
+      top: 15%;
+      width: 44.17%;
+      height: 39.5%;
+  }
+  .qp-hair-f {
+      top: 5%;
+      left: 12.94%;
+      width: 77.06%;
+      height: 88%;
+  }
+  .qp-head-f {
+      top: 5%;
+      left: 14.71%;
+      width: 77.06%;
+      height: 88%;
+  }
+  /* _upper & _lower */
+  .qp-arm-l {
+      top: 44.5%;
+      height: 48.5%;
+      left: 50%;
+      width: 41.76%;
+  }
+  .qp-hand-l {
+      left: 44.12%;
+      top: 0;
+      width: 47.65%;
+      height: 88%;
+  }
   ````
   
-  
+  ![image-20210323160823397](C:\H5\project\iidx_score_card\arcana_api.assets\image-20210323160823397.png)
   
   
   
@@ -218,6 +276,8 @@ Request Header: authorization （Bearer Token）
 #### 查询最佳成绩
 
 - **api**  /api/v1/iidx/27/player_bests/
+
+- **method** GET
 
 - **query**
 
@@ -316,3 +376,73 @@ Request Header: authorization （Bearer Token）
   ```
 
   
+
+#### 获取rival列表
+
+- **api**  /api/v1/iidx/27/rivals/${_id}
+
+- **method** GET
+
+- **params**
+
+  | KEY  | VALUE       | DESCRIPTION    |
+  | ---- | ----------- | -------------- |
+  | _id  | AdhYEcTetQp | 必填，玩家\_id |
+
+- **response**
+
+  ````json
+  {
+      "_links": {
+          "_self": "https://arcana.nu/api/v1/iidx/27/rivals/AdhYEcTetQp",
+          "sp_profiles": "https://arcana.nu/api/v1/iidx/27/profiles/?sp_rival_of=AdhYEcTetQp",
+          "dp_profiles": "https://arcana.nu/api/v1/iidx/27/profiles/?dp_rival_of=AdhYEcTetQp"
+      },
+      "_id": "AdhYEcTetQp",
+      "sp_profile_ids": [
+          "FKxsA6RXsvO",
+          "EPCsp47TVTg",
+          "BG7DfW6JgXV",
+          "E7qF1sHSPkJ"
+      ],
+      "dp_profile_ids": []
+  }
+  ````
+
+#### 添加/删除rival
+
+A网添加/删除rival的逻辑是查询rival_id是否在自己_id的rival列表里，有就删，没有就添加，上传新的rival列表覆盖
+
+由于添加/删除rival接口目前看来同样不需要登录，不安全，因此不实装，仅提供rival页面跳转，自助修改
+
+https://arcana.nu/iidx/27/profiles/${rival_id}/
+
+
+
+- **api**  /api/v1/iidx/27/rivals/${_id}
+
+- **method** PUT
+
+- **params**
+
+  | KEY  | VALUE       | DESCRIPTION    |
+  | ---- | ----------- | -------------- |
+  | _id  | AdhYEcTetQp | 必填，玩家\_id |
+
+- **payload**
+
+````json
+{
+    "sp_profile_ids":[
+        "FKxsA6RXsvO",
+        "EPCsp47TVTg",
+        "BG7DfW6JgXV",
+        "E7qF1sHSPkJ",
+        "FHpW_xVYFFf"
+    ],
+    "dp_profile_ids":[
+        
+    ]
+}
+````
+

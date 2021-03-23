@@ -2,7 +2,7 @@
   <div id="app" ref="app">
     <div class="title-wrap">
       <p class="time">{{new Date().toLocaleString()}}<span v-html="'&nbsp;&nbsp;&nbsp;&nbsp;'"></span>{{version}}</p>
-      <div class="share-btn" @click="capture">↗</div>
+      <div @click="capture"><img class="share-btn" :src="icon.share" alt=""></div>
     </div>
     <div
       class="box profiles-box"
@@ -11,8 +11,9 @@
         <span>DJ</span> 
         <span class="search-name-wrap">
           <div class="search-inp-wrap">
-            <input class="searchInp" type="text" v-model="djName" @keypress.enter="getProfiles"  @focus="isTyping = true" @blur="lossTyping" :disabled="isLoading" ref="nameInp">
+            <input class="searchInp" type="text" v-model="djName" @keypress.enter="toSearch"  @focus="isTyping = true" @blur="lossTyping" :disabled="isLoading" ref="nameInp">
             <span class="empty-text" v-if="djName==''">点击此处输入DJ NAME</span>
+            <img class="refresh-btn" :src="icon.refresh" alt="刷新" @click="refresh">
           </div>
           <ul v-if="names.length>0 && isTyping" class="names-ul">
             <li
@@ -88,7 +89,8 @@
     </div>
     <div class="cap-wrap" v-if="capURL" @click="capURL=null">
       <div class="btn-wrap">
-        长按图片选择分享图片，任意位置点击取消
+        <p>长按图片分享图片，任意位置点击取消</p>
+        <p>或通过浏览器分享链接</p>
       </div>
       <div ref='capImg'>
         <img class="cap-img" :src="capURL" alt="">
@@ -126,6 +128,10 @@ export default {
       isNameSelectShow: false,
       profiles: null,
       profile: null,
+      icon:{
+        refresh: require('@/assets/refresh.png'),
+        share: require('@/assets/share.png'),
+      },
       qpros: {
           _id: "XXXX",
           _etag: "XXXX",
@@ -264,7 +270,7 @@ export default {
     },
     searchName(name) {
       this.djName = name
-      this.getProfiles()
+      this.toSearch()
     },
     addName(name) {
       this.names.push(name)
@@ -301,6 +307,20 @@ export default {
             }
         }
         return null;
+    },
+    toSearch() {
+      const djName = this.djName
+      const lv = this.lv
+      this.lv=lv==''?'ALL':lv
+      const playStyle = this.playStyle
+      this.$router.push({name: 'home',query:{djName,lv,playStyle}})
+      this.getProfiles()
+    },
+    refresh(){
+      this.idsList = {}
+      this.scoresData = {}
+      this.newScoresData = {}
+      this.toSearch()
     },
     async getProfiles() {
       this.isNameSelectShow = false
@@ -506,9 +526,6 @@ export default {
         res[item.grade] = musicList.filter(i=>i.grade >= item.min && i.grade < item.max).length
       })
 
-      // 追加路由参数
-      // location.search=`?dj_name=${this.djName}&lv=${this.lv}&play_style=${this.playStyle}`
-
       let scores = []
       Object.keys(labelList).map(item=>{
           scores.push({
@@ -531,7 +548,7 @@ export default {
     },
     changeLv(lv){
       this.lv = lv
-      this.getProfiles()
+      this.toSearch()
     },
     playStyleChange(e){
       this.playStyle=e.target.value
@@ -544,12 +561,25 @@ export default {
     },
     playStyle(val,oldVal){
       if(val==oldVal || this.djName=='')return
-      this.getProfiles()
+      this.toSearch()
     }
   },
   mounted() {
-    this.$refs.nameInp.focus()
-    this.getNames()
+    // console.log(this.$route)
+    const query = this.$route.query
+    // const {djName,lv,playStyle} = this.$route.query
+    if(query.djName){
+      // 有搜索参数
+      this.djName = query.djName
+      this.lv = query.lv || 'ALL'
+      this.playStyle = query.playStyle || 'ALL'
+      this.getProfiles()
+    }else{
+      // 没有搜索参数
+      this.$refs.nameInp.focus()
+      this.getNames()
+    }
+
   }
 }
 </script>
@@ -611,8 +641,8 @@ ul,ol{
   .btn-wrap{
     width: 80%;
     padding: 10px 0;
-    display: flex;
-    justify-content: space-around;
+    // display: flex;
+    // justify-content: space-around;
   }
   .cap-img{
     border: 2px solid #fff;
@@ -631,8 +661,10 @@ ul,ol{
     color: $fontColor1;
   }
   .share-btn{
+    width: 18px;
+    height: 18px;
     padding-right: 10px;
-    font-weight: 700;
+    // font-weight: 700;
     cursor: pointer;
   }
 }
@@ -765,12 +797,17 @@ ul,ol{
           font-size: 12px;
           color: #ccc;
         }
+        .refresh-btn{
+          width: 18px;
+          height: 18px;
+          cursor: pointer;
+        }
       }
       .names-ul{
         z-index: 2;
         position: absolute;
         top: 38px;
-        right: 18px;
+        left: 10px;
         width: 130px;
         background: #00426d;
         .names-li{
