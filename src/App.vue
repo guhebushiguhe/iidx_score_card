@@ -75,16 +75,40 @@
         <li
           v-for="(item,index) in scores"
           :key="item.label"
-          class="score-li"
+          :class="`${activeLabel!='' && activeLabel!=item.label?'inactive':''} score-li`"
         >
         <span class="label-wrap"><Label :text="item.label" /></span>
-        <span :class="`${newScores.length > 0?'score':''}`"><Score :num="item.value.toString()" :type="`${item.label=='CLEAR RATE'?'target':'default'}`" :data="item.data" /></span>
+        <span :class="`${newScores.length > 0?'score':''}`">
+          <Score
+            :num="item.value.toString()"
+            :type="`${item.label=='CLEAR RATE'?'target':'default'}`"
+            :data="item.data"
+            :label="item.label"
+            :activeLabel="activeLabel"
+            :activeType="activeType"
+            :show-music-list="showMusicList"
+          />
+          </span>
         <span
          v-if="newScores.length > 0"
          class="plus"
-        ><Score :num="parsePlus(newScores[index].value)" type="plus" :data="newScores[index].data" /></span>
+        >
+          <Score
+            :num="parsePlus(newScores[index].value)"
+            type="plus"
+            :data="newScores[index].data"
+            :label="item.label"
+            :activeLabel="activeLabel"
+            :activeType="activeType"
+            :show-music-list="showMusicList"
+          />
+        </span>
         </li>
       </ul>
+      <MusicList
+        :class="`${isMusicListShow?'show':''} music-list`" 
+        :data="musicListData"
+      />
       <div class="new-time" v-if="newTime">新成绩：{{ `${newTime.startTime} - ${newTime.endTime}` }}</div>
     </div>
     <div class="cap-wrap" v-if="capURL" @click="capURL=null">
@@ -106,13 +130,15 @@ import Score from '@/components/Score.vue'
 import Label from '@/components/Label.vue'
 import LvSelector from '@/components/LvSelector.vue'
 import PlayStyleSelector from '@/components/PlayStyleSelector.vue'
+import MusicList from '@/components/MusicList.vue'
 export default {
   name: 'App',
   components: {
     Score,
     Label,
     LvSelector,
-    PlayStyleSelector
+    PlayStyleSelector,
+    MusicList
   },
   data() {
     return {
@@ -126,6 +152,9 @@ export default {
       playStyle: 'ALL',
       isLoading: false,
       isNameSelectShow: false,
+      isMusicListShow: true,
+      activeLabel: '',
+      activeType: '',
       profiles: null,
       profile: null,
       icon:{
@@ -223,6 +252,7 @@ export default {
         'FAILED'
       ],
       lvList: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+      musicListData: []
     }
   },
   computed: {
@@ -500,7 +530,7 @@ export default {
       if(playStyle!="ALL"){
         musicList = musicList.filter(item=>item.charts.play_style==playStyle)
       }
-      if (lv || lv!='ALL') {
+      if (!lv || lv=='ALL') {
         musicList = musicList
       }else if(!lvList.includes(lv)){
         alert('lv不合法，请重新输入')
@@ -558,6 +588,12 @@ export default {
     },
     playStyleChange(e){
       this.playStyle=e.target.value
+    },
+    showMusicList(label,data,type) {
+      this.activeLabel = label==this.activeLabel?'':label
+      this.activeType = type
+      this.musicListData = data
+      this.isMusicListShow = this.activeLabel!=''
     }
   },
   watch: {
@@ -571,9 +607,7 @@ export default {
     }
   },
   mounted() {
-    // console.log(this.$route)
     const query = this.$route.query
-    // const {djName,lv,playStyle} = this.$route.query
     if(query.djName){
       // 有搜索参数
       this.djName = query.djName
@@ -591,7 +625,6 @@ export default {
 </script>
 
 <style lang="scss">
-// $fontColor1: #9ab5c2;
 $fontColor1: #fff;
 $fontShadownColor: #4d6e7c;
 html,body,ul,ol,li,p,div,span,i,img,h1,h2,h3,h4,h5,h6{
@@ -853,12 +886,15 @@ ul,ol{
   ul{
     .score-li{
       width: 100%;
+      height: 32px;
+      box-sizing: border-box;
+      transition: height .5s;
       display: flex;
       justify-content: space-between;
       background: rgba(68, 68, 68, .8);
       margin-bottom: 2px;
       // box-sizing: border-box;
-      border: 1px solid #fff;
+      border: 1px solid rgba(255,255,255,1);
       border-radius: 4px 16px 4px 16px;
       &:nth-child(odd){
         background: #333;
@@ -905,6 +941,52 @@ ul,ol{
           width: 12px;
         }
       }
+    }
+    .inactive{
+      height: 0;
+      overflow: hidden;
+      border-width: 0px;
+      margin: 0;
+    }
+  }
+  .music-list{
+    overflow: hidden;
+    height: 0;
+    transition: height 0.5s;
+    .music-ul{
+      .music-li{
+        box-sizing: border-box;
+        padding: 0 6px;
+        width: 100%;
+        height: 32px;
+        border: 1px solid #888;
+        background: rgba(49, 49, 49, 0.8);
+        display: flex;
+        justify-content: space-between;
+        .wrap{
+          display: flex;
+          justify-content: space-between;
+          line-height: 32px;
+        }
+        .left-wrap{
+          // width: 60px;
+          font-size: 12px;
+          span{
+            padding-right: 5px;
+          }
+        }
+        .right-wrap{
+          font-size: 12px;
+          // border: 1px solid red;
+          .music-name{
+            cursor: pointer;
+          }
+        }
+      }
+    }
+    &.show{
+      overflow-y: auto;
+      height: 600px;
     }
   }
   >.new-time{

@@ -1,5 +1,5 @@
 <template>
-    <div :class="`score-modal ${className}`" v-html="imgStr" @dblclick.stop="showMusicList">
+    <div :class="`score-modal ${className} ${isActive}`" v-html="imgStr" @click.stop="showMusicList(label,data,type)">
     </div>
 </template>
 
@@ -23,11 +23,31 @@ export default {
             required: false,
             default: ''
         },
+        activeType: {
+            type: String,
+            required: false,
+            default: ''
+        },
         data: {
             type: Array,
             required: false,
             default: null
-        }
+        },
+        label: {
+            type: String,
+            required: false,
+            default: ''
+        },
+        activeLabel: {
+            type: String,
+            required: false,
+            default: ''
+        },
+        showMusicList: {
+            type: Function,
+            required: false,
+            default: ()=>{}
+        },
     },
     data() {
         return {
@@ -81,6 +101,15 @@ export default {
             imgStr: ''
         }
     },
+    computed:{
+        isActive(){
+            const inactive = this.label == this.activeLabel
+                        && this.type != this.activeType
+                        && this.activeLabel != ''
+                        && this.activeType != ''
+            return inactive?'inactive':''
+        }
+    },
     methods: {
         num2Img(num,type){
             if(!num)return ''
@@ -109,9 +138,6 @@ export default {
                 return `<img src="${source[`${i}`]}" alt="" >`}).join('')
             return numStr
         },
-        showMusicList() {
-            console.log('showMusicList',this.data)
-        }
     },
     watch:{
         num(val,oldVal){
@@ -130,10 +156,14 @@ export default {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    cursor: pointer;
+    opacity: 1;
+    transition: opacity 0.5s;
     .up{
-        // position: relative;
-        // height: 30px;
         width: 24px !important;
+    }
+    &.inactive{
+        opacity: 0;
     }
 }
 </style>
