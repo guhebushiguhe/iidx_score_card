@@ -1,5 +1,5 @@
 <template>
-    <div :class="`score-modal ${className}`" v-html="imgStr">
+    <div :class="`score-modal ${className}`" v-html="imgStr" @dblclick.stop="showMusicList">
     </div>
 </template>
 
@@ -23,6 +23,11 @@ export default {
             required: false,
             default: ''
         },
+        data: {
+            type: Array,
+            required: false,
+            default: null
+        }
     },
     data() {
         return {
@@ -103,6 +108,9 @@ export default {
                 i = i=="."?'dot':i
                 return `<img src="${source[`${i}`]}" alt="" >`}).join('')
             return numStr
+        },
+        showMusicList() {
+            console.log('showMusicList',this.data)
         }
     },
     watch:{

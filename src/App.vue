@@ -78,11 +78,11 @@
           class="score-li"
         >
         <span class="label-wrap"><Label :text="item.label" /></span>
-        <span :class="`${newScores.length > 0?'score':''}`"><Score :num="item.value.toString()" :type="`${item.label=='CLEAR RATE'?'target':'default'}`" /></span>
+        <span :class="`${newScores.length > 0?'score':''}`"><Score :num="item.value.toString()" :type="`${item.label=='CLEAR RATE'?'target':'default'}`" :data="item.data" /></span>
         <span
          v-if="newScores.length > 0"
          class="plus"
-        ><Score :num="parsePlus(newScores[index].value)" type="plus" /></span>
+        ><Score :num="parsePlus(newScores[index].value)" type="plus" :data="newScores[index].data" /></span>
         </li>
       </ul>
       <div class="new-time" v-if="newTime">新成绩：{{ `${newTime.startTime} - ${newTime.endTime}` }}</div>
@@ -221,14 +221,13 @@ export default {
         'ASSIST_CLEAR',
         'EASY_CLEAR',
         'FAILED'
-      ]
+      ],
+      lvList: ['1','2','3','4','5','6','7','8','9','10','11','12'],
     }
   },
   computed: {
       labelList () {
-        // const lv = this.lv
         return {
-          // ALL_TEMP:`lv.${lv?lv:'ALL'}`,
           ALL_TEMP:'ALL',
           FULL_COMBO: 'FC',
           EX_HARD_CLEAR: 'EXHC',
@@ -465,9 +464,10 @@ export default {
         endTime
       }
       this.newTime = newTime
-      // console.log('startTime',startTime)
-      // console.log('endTime',endTime)
-      // console.log(new_items)
+      if(!startTime || !endTime){
+        const timeList = new_items.map(i=>new Date(i.timestamp).toLocaleString())
+        console.log('计算最后一把时间出错，时间列表为：',timeList)
+      }
       const newData = {
         _items: new_items,
         _related,
@@ -481,22 +481,27 @@ export default {
       const labelList = this.labelList
       const {_items,_related} = data
       const lv = this.lv
-      let idList = []
-      const lvList = ['1','2','3','4','5','6','7','8','9','10','11','12']
+      let musicList = []
+      const lvList = this.lvList
       const playStyle = this.playStyle
+      // 将_related对应内容写入_items
+      musicList = _items.map((i,index)=>{
+        const {chart_id,music_id} = i
+        const charts = _related.charts.filter(j=>j._id==chart_id)[0]
+        const music = _related.music.filter(j=>j._id==music_id)[0]
+        const profiles = _related.profiles[0]
+        return {
+          ...i,
+          charts,
+          music,
+          profiles
+        }
+      })
       if(playStyle!="ALL"){
-        idList = _related.charts.filter(item=>item.play_style==playStyle).map(({_id,rating,play_style})=>{
-          return {
-            _id,
-            rating,
-            play_style
-          }
-          })
-      }else{
-        idList = _related.charts
+        musicList = musicList.filter(item=>item.charts.play_style==playStyle)
       }
-      if (!lv || lv=='ALL') {
-        idList =  idList.map(item=>item._id)
+      if (lv || lv!='ALL') {
+        musicList = musicList
       }else if(!lvList.includes(lv)){
         alert('lv不合法，请重新输入')
         this.$$nextTick(()=>{
@@ -504,33 +509,34 @@ export default {
         this.lv = 'ALL'
         return
       }else {
-        idList =  idList.filter(({rating})=>rating==lv).map(item=>item._id)
+        musicList =  musicList.filter(({charts})=>charts.rating==lv)
       }
-      const musicList = _items.filter(item=>idList.includes(item['chart_id']))
       const LAMPS = {}
       this.lampList.map(lamp=>{
-        LAMPS[lamp]=musicList.filter(item=>item.lamp == lamp).length
+        LAMPS[lamp]=musicList.filter(item=>item.lamp == lamp)
       })
       const { FAILED } = LAMPS
-      const NO_PLAY = musicList.filter(item=>item.status == 'NO_PLAY').length
-      const ALL_TEMP = musicList.length
-      const clearRate = ALL_TEMP<=0?'----':((ALL_TEMP - FAILED - NO_PLAY)/ALL_TEMP*100).toFixed(2)+'%'
+      const NO_PLAY = musicList.filter(item=>item.status == 'NO_PLAY')
+      const ALL_TEMP = musicList
+      const clearRate = ALL_TEMP.length<=0?'----':((ALL_TEMP.length - FAILED.length - NO_PLAY.length)/ALL_TEMP.length*100).toFixed(2)+'%'
 
       let res = {
         ALL_TEMP,
         ...LAMPS,
         clearRate
       }
-
       gradeList.map(item=>{
-        res[item.grade] = musicList.filter(i=>i.grade >= item.min && i.grade < item.max).length
+        res[item.grade] = musicList.filter(i=>i.grade >= item.min && i.grade < item.max)
       })
 
       let scores = []
       Object.keys(labelList).map(item=>{
+          const value = item=='clearRate'?res[item]:res[item].length
+          const data = item=='clearRate'?null:res[item]
           scores.push({
             label: labelList[item],
-            value: res[item]
+            value,
+            data
           })
       })
       return scores
