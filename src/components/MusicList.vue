@@ -102,7 +102,9 @@ export default {
             return gradeStr
         },
         gotoChartsLink(charts){
-            const link = charts._links._self
+            const chart_id = charts._id
+            const music_id = charts.music_id
+            const link = `https://arcana.nu/iidx/27/music/${music_id}/${chart_id}` 
             window.open(link)
         }
     }

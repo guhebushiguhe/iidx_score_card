@@ -152,7 +152,7 @@ export default {
       playStyle: 'ALL',
       isLoading: false,
       isNameSelectShow: false,
-      isMusicListShow: true,
+      isMusicListShow: false,
       activeLabel: '',
       activeType: '',
       profiles: null,
@@ -483,7 +483,8 @@ export default {
           return new Date(t.timestamp).getTime()
         }
         if(parseTime(item)-parseTime(new_items[index+1])>waitTime){
-          startDay = new Date(item.timestamp).setHours(5,0,0)
+          const isBeginPlayMidnight = new Date(item.timestamp).getHours()<5
+          startDay = isBeginPlayMidnight?new Date(item.timestamp).getTime():new Date(item.timestamp).setHours(5,0,0)
           return true
         }
       })
@@ -494,10 +495,6 @@ export default {
         endTime
       }
       this.newTime = newTime
-      if(!startTime || !endTime){
-        const timeList = new_items.map(i=>new Date(i.timestamp).toLocaleString())
-        console.log('计算最后一把时间出错，时间列表为：',timeList)
-      }
       const newData = {
         _items: new_items,
         _related,
@@ -594,6 +591,7 @@ export default {
       this.activeType = type
       this.musicListData = data
       this.isMusicListShow = this.activeLabel!=''
+      // console.log('data',data)
     }
   },
   watch: {
