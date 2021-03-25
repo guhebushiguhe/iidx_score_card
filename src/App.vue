@@ -649,7 +649,7 @@ ul,ol{
   text-align: center;
   font-family:'Segoe UI', Tahoma, 'Geneva', 'Verdana', 'sans-serif';
   text-shadow: $fontShadownColor 1px 0 0, $fontShadownColor 0 1px 0, $fontShadownColor -1px 0 0, $fontShadownColor 0 -1px 0;
-  padding-bottom: 30px;
+  padding: 15px 0 30px;
   position: absolute;
   top: 0;
   left: 50%;
@@ -761,7 +761,7 @@ ul,ol{
 .profiles-box{
   width: 100%;
   // margin-bottom: 10px;
-  padding-bottom: 20px;
+  padding: 30px 0;
   >p{
     width: 100%;
     box-sizing: border-box;
