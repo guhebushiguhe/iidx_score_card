@@ -1,7 +1,7 @@
 <template>
   <div id="app" ref="app">
     <div class="title-wrap">
-      <p class="time">{{new Date().toLocaleString()}}<span v-html="'&nbsp;&nbsp;&nbsp;&nbsp;'"></span>{{version}}</p>
+      <!-- <p class="time">{{new Date().toLocaleString()}}<span v-html="'&nbsp;&nbsp;&nbsp;&nbsp;'"></span>{{version}}</p> -->
       <div @click="capture"><img class="share-btn" :src="icon.share" alt=""></div>
     </div>
     <div
@@ -36,11 +36,12 @@
         :lv="lv"
         :change-lv="changeLv"
         class="lv-selector-wrap"
+        :disabled="isLoading || isMusicListShow"
       />
       <PlayStyleSelector
         class="radio-wrap"
         :play-style="playStyle"
-        :is-loading="isLoading"
+        :disabled="isLoading || isMusicListShow"
         :play-style-list="playStyleList"
         :change-play-style="playStyleChange"
       />
@@ -71,39 +72,46 @@
     </div>
     <div class="box score-box">
       <p class="#9ab5c2" v-if="isLoading">加载中，请耐心等候···</p>
-      <ul v-if="scores.length>0 && !isLoading">
+      <ul
+        v-if="scores.length>0 && !isLoading"
+        :class="`score-ul ${isMusicListShow?'music-show':''}`"
+      >
         <li
           v-for="(item,index) in scores"
           :key="item.label"
           :class="`${activeLabel!='' && activeLabel!=item.label?'inactive':''} score-li`"
         >
-        <span class="label-wrap"><Label :text="item.label" /></span>
-        <span :class="`${newScores.length > 0?'score':''}`">
-          <Score
-            :num="item.value.toString()"
-            :type="`${item.label=='CLEAR RATE'?'target':'default'}`"
-            :data="item.data"
-            :label="item.label"
-            :activeLabel="activeLabel"
-            :activeType="activeType"
-            :show-music-list="showMusicList"
-          />
+          <span class="label-wrap"><Label :text="item.label" /></span>
+          <span :class="`${newScores.length > 0?'score':''}`">
+            <Score
+              :num="item.value.toString()"
+              :type="`${item.label=='CLEAR RATE'?'target':'default'}`"
+              :data="item.data"
+              :label="item.label"
+              :activeLabel="activeLabel"
+              :activeType="activeType"
+              :show-music-list="showMusicList"
+            />
+            </span>
+          <span
+          v-if="newScores.length > 0"
+          class="plus"
+          >
+            <Score
+              :num="parsePlus(newScores[index].value)"
+              type="plus"
+              :data="newScores[index].data"
+              :label="item.label"
+              :activeLabel="activeLabel"
+              :activeType="activeType"
+              :show-music-list="showMusicList"
+            />
           </span>
-        <span
-         v-if="newScores.length > 0"
-         class="plus"
-        >
-          <Score
-            :num="parsePlus(newScores[index].value)"
-            type="plus"
-            :data="newScores[index].data"
-            :label="item.label"
-            :activeLabel="activeLabel"
-            :activeType="activeType"
-            :show-music-list="showMusicList"
-          />
-        </span>
         </li>
+        <Sorter
+          class="sorter"
+          :disabled="!isMusicListShow"
+        />
       </ul>
       <MusicList
         :class="`${isMusicListShow?'show':''} music-list`" 
@@ -131,6 +139,7 @@ import Label from '@/components/Label.vue'
 import LvSelector from '@/components/LvSelector.vue'
 import PlayStyleSelector from '@/components/PlayStyleSelector.vue'
 import MusicList from '@/components/MusicList.vue'
+import Sorter from '@/components/Sorter.vue'
 export default {
   name: 'App',
   components: {
@@ -138,7 +147,8 @@ export default {
     Label,
     LvSelector,
     PlayStyleSelector,
-    MusicList
+    MusicList,
+    Sorter
   },
   data() {
     return {
@@ -335,6 +345,9 @@ export default {
     async getProfiles() {
       this.isNameSelectShow = false
       this.newTime = null
+      this.isMusicListShow = false
+      this.activeLabel = ''
+      this.activeType = ''
       const names = this.names
       const djName = this.djName
       if (djName==''){
@@ -636,7 +649,7 @@ ul,ol{
   text-align: center;
   font-family:'Segoe UI', Tahoma, 'Geneva', 'Verdana', 'sans-serif';
   text-shadow: $fontShadownColor 1px 0 0, $fontShadownColor 0 1px 0, $fontShadownColor -1px 0 0, $fontShadownColor 0 -1px 0;
-  padding: 30px 0;
+  padding-bottom: 30px;
   position: absolute;
   top: 0;
   left: 50%;
@@ -671,7 +684,8 @@ ul,ol{
 .title-wrap{
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  // justify-content: space-between;
   .time{
     width: 100%;
     font-size: 14px;
@@ -712,38 +726,7 @@ ul,ol{
     display: flex;
     align-items: center;
   }
-  .radio-wrap{
-    background: rgba(51, 51, 51,.5);
-    height: 24px;
-    line-height: 24px;
-    border-radius: 12px;
-    border-width: 0;
-    padding: 0 10px;
-    display: flex;
-    align-items: center;
-    .radio-label{
-      height: 18px;
-      padding: 0 10px;
-      cursor: pointer;
-      text-shadow: none;
-      color: rgba(255, 255, 255,.2);
-      // opacity: 0.4;
-      display: flex;
-      align-items: center;
-      img{
-        display: inline-block;
-        line-height: 24px;
-      }
-    }
-    .active{
-      color: #fff;
-      // opacity: 1;
-    }
-    .radio{
-      margin-top: 10px;
-      display: none;
-    }
-  }
+
 }
 .profiles-select{
   width: 100%;
@@ -778,7 +761,7 @@ ul,ol{
 .profiles-box{
   width: 100%;
   // margin-bottom: 10px;
-  padding: 20px 0;
+  padding-bottom: 20px;
   >p{
     width: 100%;
     box-sizing: border-box;
@@ -868,13 +851,24 @@ ul,ol{
     margin-top: 40px;
     text-align: center;
   }
-  ul{
-    width: 80%;
+  .score-ul{
+    width: 76%;
+    transition: width 0.5s;
+    // transition: padding-bottom 0.5s;
+    &.music-show{
+      width: 100%;
+      padding-bottom: 10px;
+      .score-li{
+        border-radius: 0;
+        border-width: 0 0 1px 0;
+        margin-bottom: 0px;
+      }
+    }
     .score-li{
       width: 100%;
       height: 28px;
       box-sizing: border-box;
-      transition: height .5s;
+      transition: height .5s,border-radius .5s;
       display: flex;
       justify-content: space-between;
       background: rgba(68, 68, 68, .8);
@@ -931,7 +925,7 @@ ul,ol{
     .inactive{
       height: 0;
       overflow: hidden;
-      border-width: 0px;
+      border-width: 0 !important;
       margin: 0;
     }
   }
@@ -947,10 +941,12 @@ ul,ol{
       width: 90%;
       .music-li{
         box-sizing: border-box;
+        margin-bottom: 10px;
         padding-right:16px;
         width: 100%;
         height: 32px;
         border: 1px solid #888;
+        border-width: 2px 2px 2px 0;
         background: rgba(49, 49, 49, 0.8);
         display: flex;
         justify-content: space-between;
@@ -962,12 +958,17 @@ ul,ol{
         .left-wrap{
           // width: 60px;
           font-size: 12px;
+          position: relative;
           .lamp{
             width: 10px;
-            height: 100%;
+            height: 32px;
+            position: absolute;
+            top: -2px;
+            left: -10px;
             box-sizing: border-box;
-            margin-right: 10px;
-            border: 1px solid #ccc;
+            // margin-right: 5px;
+            // border: 1px solid #888;
+            border-width: 2px;
             background: rgb(53, 52, 52);
             &.FULL_COMBO{
               background-image: linear-gradient(0deg, rgb(255, 224, 138), rgb(138, 255, 173), rgb(138, 222, 255), rgb(146, 138, 255), rgb(255, 138, 138),);
@@ -999,6 +1000,9 @@ ul,ol{
           font-size: 12px;
           // border: 1px solid red;
           .music-name{
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            max-width: 247px;
             cursor: pointer;
           }
         }

@@ -8,6 +8,11 @@ module.exports = {
     outputDir: 'dist',
     assetsDir: 'public',
     chainWebpack: (config)=>{
+        config.plugin('html')
+            .tap(args => {
+                args[0].title = "IIDX 速查工具v1.04";
+                return args;
+            })
         config.resolve.alias
             .set('@$', resolve('src'))
             .set('assets',resolve('src/assets'))

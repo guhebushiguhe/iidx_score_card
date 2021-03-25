@@ -1,6 +1,6 @@
 <template>
     <div :class="`${className}`">
-        <div class="lv-wrap">
+        <div :class="`lv-wrap ${disabled?'':'able'}`">
             <img class="lv-btn" :src="lvImg[`lv.${lv}`]" alt="" >
             <ul
                 class="lv-menu"
@@ -35,6 +35,11 @@ export default {
             required: false,
             default: ()=>{}
         },
+        disabled:{
+            type: Boolean,
+            required: false,
+            default: true
+        }
     },
     data() {
         return{
@@ -114,49 +119,53 @@ export default {
     },
 }
 </script>
-<style lang="scss" scope>
-.lv-wrap{
-    position: relative;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    .lv-btn{
-        cursor: pointer;
-    }
-    .lv-menu{
-        z-index: 1;
-        display: none;
-        position: absolute;
-        top: 24px;
-        right: 0;
-        width: 70px;
-        padding: 0 5px;
-        background: rgb(74, 78, 80);
-        color: #fff;
-        border: 1px solid #ccc;
-        border-width: 0 1px 1px 1px;
-        .lv-li{
-            position: relative;
-            height: 24px;
-            border-bottom: 1px solid #fff;
-            cursor: pointer;
-            img{
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                height: 18px;
-                transform: translate(-50%,-50%);
-            }
-            &:hover{
+<style lang="scss">
+.lv-selector-wrap{
+    .lv-wrap{
+        position: relative;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        .lv-menu{
+            z-index: 1;
+            display: none;
+            position: absolute;
+            top: 24px;
+            right: 0;
+            width: 70px;
+            padding: 0 5px;
+            background: rgb(74, 78, 80);
+            color: #fff;
+            border: 1px solid #ccc;
+            border-width: 0 1px 1px 1px;
+            .lv-li{
+                position: relative;
+                height: 24px;
+                border-bottom: 1px solid #fff;
+                cursor: pointer;
                 img{
-                    height: 24px;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    height: 18px;
+                    transform: translate(-50%,-50%);
                 }
-                background: rgb(120, 126, 129);
+                &:hover{
+                    img{
+                        height: 24px;
+                    }
+                    background: rgb(120, 126, 129);
+                }
             }
         }
     }
-    &:hover .lv-menu{
+    .able:hover .lv-menu{
         display: block;
+    }
+    .able {
+        .lv-btn{
+            cursor: pointer;
+        }
     }
 }
 </style>

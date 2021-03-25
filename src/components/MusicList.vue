@@ -14,7 +14,6 @@
                 <div class="wrap right-wrap">
                     <span
                         class="music-name"
-                        @click="gotoChartsLink(charts)"
                     >{{music.title}}</span>
                 </div>
             </li>
@@ -49,7 +48,7 @@ export default {
                 NORMAL: 'default',
                 HYPER: 'yellow',
                 ANOTHER: 'down',
-                LEGGENDARIA: 'black',
+                BLACK: 'black',
             }
         }
     },
@@ -117,11 +116,11 @@ export default {
             return gradeStr
         },
         gotoChartsLink(charts){
-            console.log(charts)
-            // const chart_id = charts._id
-            // const music_id = charts.music_id
-            // const link = `https://arcana.nu/iidx/27/music/${music_id}/${chart_id}` 
-            // window.open(link)
+            // console.log(charts)
+            const chart_id = charts._id
+            const music_id = charts.music_id
+            const link = `https://arcana.nu/iidx/27/music/${music_id}/${chart_id}` 
+            window.open(link)
         }
     }
 }
@@ -161,5 +160,6 @@ export default {
  animation-iteration-count: infinite;
 
  color: white;
+
 }
 </style>

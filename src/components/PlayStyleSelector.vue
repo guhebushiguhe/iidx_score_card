@@ -11,9 +11,13 @@
             @click="changePlayStyle"
             :value="item.value"
             :id="item.value"
-            :disabled="isLoading"
+            :disabled="disabled"
         >
-        <img :src="playStyle==item.value?playStyleImg[item.value]:playStyleImg[`${item.value}_p`]" alt="" />
+        <img
+            :src="playStyle==item.value?playStyleImg[item.value]:playStyleImg[`${item.value}_p`]"
+            :class="`${disabled?'':'active'}`"
+            alt=""
+        />
         </label>
     </span>
     </div>
@@ -37,7 +41,7 @@ export default {
             required: false,
             default: []
         },
-        isLoading:{
+        disabled:{
             type: Boolean,
             required: false,
             default: false
@@ -65,49 +69,37 @@ export default {
     },
 }
 </script>
-<style lang="scss" scope>
-.lv-wrap{
-    position: relative;
+<style lang="scss">
+.radio-wrap{
+    background: rgba(51, 51, 51,.5);
     height: 24px;
+    line-height: 24px;
+    border-radius: 12px;
+    border-width: 0;
+    padding: 0 10px;
     display: flex;
     align-items: center;
-    .lv-btn{
-        cursor: pointer;
-    }
-    .lv-menu{
-        z-index: 1;
-        display: none;
-        position: absolute;
-        top: 24px;
-        right: 0;
-        width: 70px;
-        padding: 0 5px;
-        background: rgb(74, 78, 80);
-        color: #fff;
-        border: 1px solid #ccc;
-        border-width: 0 1px 1px 1px;
-        .lv-li{
-            position: relative;
-            height: 24px;
-            border-bottom: 1px solid #fff;
-            cursor: pointer;
-            img{
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                height: 18px;
-                transform: translate(-50%,-50%);
-            }
-            &:hover{
-                img{
-                    height: 24px;
-                }
-                background: rgb(120, 126, 129);
-            }
+    .radio-label{
+        height: 18px;
+        padding: 0 10px;
+        text-shadow: none;
+        color: rgba(255, 255, 255,.2);
+        // opacity: 0.4;
+        display: flex;
+        align-items: center;
+        img{
+        display: inline-block;
+        line-height: 24px;
         }
     }
-    &:hover .lv-menu{
-        display: block;
+    .radio-label{
+        .active{
+            cursor: pointer;
+        }
+    }
+    .radio{
+        margin-top: 10px;
+        display: none;
     }
 }
 </style>

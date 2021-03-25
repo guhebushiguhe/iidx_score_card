@@ -98,16 +98,16 @@ export default {
                     '→': require('@/assets/arrow/arrow_default.png'),
                 },
                 down:{
-                    0: require('@/assets/score/yellow/0.png'),
-                    1: require('@/assets/score/yellow/1.png'),
-                    2: require('@/assets/score/yellow/2.png'),
-                    3: require('@/assets/score/yellow/3.png'),
-                    4: require('@/assets/score/yellow/4.png'),
-                    5: require('@/assets/score/yellow/5.png'),
-                    6: require('@/assets/score/yellow/6.png'),
-                    7: require('@/assets/score/yellow/7.png'),
-                    8: require('@/assets/score/yellow/8.png'),
-                    9: require('@/assets/score/yellow/9.png'),
+                    0: require('@/assets/score/down/0.png'),
+                    1: require('@/assets/score/down/1.png'),
+                    2: require('@/assets/score/down/2.png'),
+                    3: require('@/assets/score/down/3.png'),
+                    4: require('@/assets/score/down/4.png'),
+                    5: require('@/assets/score/down/5.png'),
+                    6: require('@/assets/score/down/6.png'),
+                    7: require('@/assets/score/down/7.png'),
+                    8: require('@/assets/score/down/8.png'),
+                    9: require('@/assets/score/down/9.png'),
                 },
                 yellow:{
                     0: require('@/assets/score/yellow/0.png'),
@@ -217,7 +217,10 @@ export default {
         opacity: 0;
     }
     &.music-level{
-        width: 30px;
+        width: 40px;
+        display: flex;
+        justify-content: center;
+        background: rgba(0, 0, 0, .2);
     }
 }
 </style>
