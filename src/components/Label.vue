@@ -1,5 +1,5 @@
 <template>
-    <div :class="`label-modal ${className}`" v-html="labelStr">label</div>
+    <div :class="`label-modal ${className} ${type}`" v-html="labelStr">label</div>
 </template>
 <script>
 export default {
@@ -15,6 +15,11 @@ export default {
             required: false,
             default: ''
         },
+        type:{
+            type: String,
+            required: false,
+            default: 'default'
+        }
     },
     data(){
         return{
@@ -77,11 +82,20 @@ export default {
 </script>
 <style lang="scss">
 .label-modal{
-    height: 30px;
+    height: 28px;
     width: 97px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    &.small{
+        // padding-left: 10px;
+        width: 55px;
+        img{
+            height: 14px;
+            width: 55px;
+            object-fit: cover;
+        }
+    }
 }
 </style>

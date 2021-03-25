@@ -304,38 +304,19 @@ export default {
     addName(name) {
       this.names.push(name)
       const yearTime = 365*24*60*60
-      this.setCookie('names',this.names.join('|'),yearTime)
+      // this.setCookie('names',this.names.join('|'),yearTime)
+      localStorage.setItem('names',this.names.join('|'))
     },
     delName(name) {
       let newNames = [...this.names]
       this.names = newNames.filter(i=>i!=name)
-      this.setCookie('names',this.names.join('|'))
+      // this.setCookie('names',this.names.join('|'))
+      localStorage.setItem('names',this.names.join('|'))
     },
     getNames(){
-      const nameStr = this.getCookie('names')
+      // const nameStr = this.getCookie('names')
+      const nameStr = localStorage.getItem('names')
       if(nameStr)this.names = nameStr.split('|')
-    },
-    setCookie(name, value, seconds) {
-        seconds = seconds || 0;   //seconds有值就直接赋值，没有为0
-        var expires = "";
-        if (seconds != 0) {      //设置cookie生存时间
-            var date = new Date();
-            date.setTime(date.getTime() + (seconds * 1000));
-            expires = "; expires=" + date.toGMTString();
-        }
-        document.cookie = name + "=" + escape(value) + expires + "; path=/";   //转码并赋值
-    },
-    getCookie(c_name) {
-        if (document.cookie.length > 0) {
-            var c_start = document.cookie.indexOf(c_name + "=")
-            if (c_start != -1) {
-                c_start = c_start + c_name.length + 1
-                var c_end = document.cookie.indexOf(";", c_start)
-                if (c_end == -1) c_end = document.cookie.length
-                return unescape(document.cookie.substring(c_start, c_end)).replace(/\"/g, "");
-            }
-        }
-        return null;
     },
     toSearch() {
       const djName = this.djName
@@ -634,12 +615,13 @@ html,body{
   background: url('./assets/bg3.jpeg') repeat fixed;
   background-size: cover;
   color: $fontColor1;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 ul,ol{
   list-style: none;
 }
 ::-webkit-scrollbar{
-  width: 5px;
+  width: 0px;
 }
 ::-webkit-scrollbar-thumb{
   background: #9ab5c2;
@@ -654,7 +636,7 @@ ul,ol{
   text-align: center;
   font-family:'Segoe UI', Tahoma, 'Geneva', 'Verdana', 'sans-serif';
   text-shadow: $fontShadownColor 1px 0 0, $fontShadownColor 0 1px 0, $fontShadownColor -1px 0 0, $fontShadownColor 0 -1px 0;
-  padding-bottom: 30px;
+  padding: 30px 0;
   position: absolute;
   top: 0;
   left: 50%;
@@ -800,6 +782,7 @@ ul,ol{
   >p{
     width: 100%;
     box-sizing: border-box;
+    // font-size: 14px;
     text-align: center;
     // text-align: left;
     padding: 0 20px;
@@ -876,15 +859,20 @@ ul,ol{
   }
 }
 .score-box{
-  width: 300px;
+  // width: 300px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   .msg{
     margin-top: 40px;
     text-align: center;
   }
   ul{
+    width: 80%;
     .score-li{
       width: 100%;
-      height: 32px;
+      height: 28px;
       box-sizing: border-box;
       transition: height .5s;
       display: flex;
@@ -948,13 +936,18 @@ ul,ol{
     }
   }
   .music-list{
+    width: 100%;
     overflow: hidden;
     height: 0;
     transition: height 0.5s;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     .music-ul{
+      width: 90%;
       .music-li{
         box-sizing: border-box;
-        padding: 0 6px;
+        padding-right:16px;
         width: 100%;
         height: 32px;
         border: 1px solid #888;
@@ -969,6 +962,35 @@ ul,ol{
         .left-wrap{
           // width: 60px;
           font-size: 12px;
+          .lamp{
+            width: 10px;
+            height: 100%;
+            box-sizing: border-box;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            background: rgb(53, 52, 52);
+            &.FULL_COMBO{
+              background-image: linear-gradient(0deg, rgb(255, 224, 138), rgb(138, 255, 173), rgb(138, 222, 255), rgb(146, 138, 255), rgb(255, 138, 138),);
+            }
+            &.EX_HARD_CLEAR{
+              background: rgb(255, 238, 0);
+            }
+            &.HARD_CLEAR{
+              background: #fff;
+            }
+            &.CLEAR{
+              background: rgb(0, 225, 255);
+            }
+            &.EASY_CLEAR{
+              background: rgb(166, 255, 0);
+            }
+            &.ASSIST_CLEAR{
+              background: rgb(183, 0, 255);
+            }
+            &.FAILED{
+              background: rgb(180, 0, 0);
+            }
+          }
           span{
             padding-right: 5px;
           }
@@ -984,7 +1006,7 @@ ul,ol{
     }
     &.show{
       overflow-y: auto;
-      height: 600px;
+      height: 540px;
     }
   }
   >.new-time{

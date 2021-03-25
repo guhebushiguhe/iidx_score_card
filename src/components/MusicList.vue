@@ -7,8 +7,9 @@
                 :key="_id"
             >
                 <div class="wrap left-wrap">
-                    <span>{{lamp}}</span>
-                    <span>{{grade2Str(grade)}}</span>
+                    <span :class="`lamp ${lamp}`"></span>
+                    <Score :num="charts.rating.toString()" :type="typeList[charts.difficulty]" label="music-level" />
+                    <Label :text="grade2Str(grade)" type="small" />
                 </div>
                 <div class="wrap right-wrap">
                     <span
@@ -21,6 +22,8 @@
     </div>
 </template>
 <script>
+import Score from '@/components/Score.vue'
+import Label from '@/components/Label.vue'
 export default {
     name: 'MusicList',
     props:{
@@ -35,8 +38,20 @@ export default {
             default: []
         },
     },
+    components:{
+        Score,
+        Label,
+    },
     data() {
-        return {}
+        return {
+            typeList:{
+                BEGINNER: 'green',
+                NORMAL: 'default',
+                HYPER: 'yellow',
+                ANOTHER: 'down',
+                LEGGENDARIA: 'black',
+            }
+        }
     },
     methods:{
         grade2Str(grade){
@@ -102,14 +117,49 @@ export default {
             return gradeStr
         },
         gotoChartsLink(charts){
-            const chart_id = charts._id
-            const music_id = charts.music_id
-            const link = `https://arcana.nu/iidx/27/music/${music_id}/${chart_id}` 
-            window.open(link)
+            console.log(charts)
+            // const chart_id = charts._id
+            // const music_id = charts.music_id
+            // const link = `https://arcana.nu/iidx/27/music/${music_id}/${chart_id}` 
+            // window.open(link)
         }
     }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
+@-moz-keyframes blinker {  
+ 0% { opacity: 1.0; }
+ 50% { opacity: 0.7; }
+ 100% { opacity: 1.0; }
+ }
 
+@-webkit-keyframes blinker {  
+ 0% { opacity: 1.0; }
+ 50% { opacity: 0.7; }
+ 100% { opacity: 1.0; }
+ }
+
+@keyframes blinker {  
+ 0% { opacity: 1.0; }
+ 50% { opacity: 0.7; }
+ 100% { opacity: 1.0; }
+ }
+.FULL_COMBO, .EX_HARD_CLEAR, .HARD_CLEAR {
+-webkit-animation-name: blinker;
+-webkit-animation-duration: .2s;
+-webkit-animation-timing-function: linear;
+-webkit-animation-iteration-count: infinite;
+
+-moz-animation-name: blinker;
+-moz-animation-duration: .2s;
+-moz-animation-timing-function: linear;
+-moz-animation-iteration-count: infinite;
+
+ animation-name: blinker;
+ animation-duration: .2s;
+ animation-timing-function: linear;
+ animation-iteration-count: infinite;
+
+ color: white;
+}
 </style>

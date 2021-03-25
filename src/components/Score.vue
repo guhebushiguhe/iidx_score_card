@@ -1,5 +1,5 @@
 <template>
-    <div :class="`score-modal ${className} ${isActive}`" v-html="imgStr" @click.stop="showMusicList(label,data,type)">
+    <div :class="`score-modal ${className} ${isActive} ${label}`" v-html="imgStr" @click.stop="showMusicList(label,data,type)">
     </div>
 </template>
 
@@ -96,7 +96,55 @@ export default {
                     '↑': require('@/assets/arrow/arrow_up.png'),
                     '↓': require('@/assets/arrow/arrow_down.png'),
                     '→': require('@/assets/arrow/arrow_default.png'),
-                }
+                },
+                down:{
+                    0: require('@/assets/score/yellow/0.png'),
+                    1: require('@/assets/score/yellow/1.png'),
+                    2: require('@/assets/score/yellow/2.png'),
+                    3: require('@/assets/score/yellow/3.png'),
+                    4: require('@/assets/score/yellow/4.png'),
+                    5: require('@/assets/score/yellow/5.png'),
+                    6: require('@/assets/score/yellow/6.png'),
+                    7: require('@/assets/score/yellow/7.png'),
+                    8: require('@/assets/score/yellow/8.png'),
+                    9: require('@/assets/score/yellow/9.png'),
+                },
+                yellow:{
+                    0: require('@/assets/score/yellow/0.png'),
+                    1: require('@/assets/score/yellow/1.png'),
+                    2: require('@/assets/score/yellow/2.png'),
+                    3: require('@/assets/score/yellow/3.png'),
+                    4: require('@/assets/score/yellow/4.png'),
+                    5: require('@/assets/score/yellow/5.png'),
+                    6: require('@/assets/score/yellow/6.png'),
+                    7: require('@/assets/score/yellow/7.png'),
+                    8: require('@/assets/score/yellow/8.png'),
+                    9: require('@/assets/score/yellow/9.png'),
+                },
+                green:{
+                    0: require('@/assets/score/green/0.png'),
+                    1: require('@/assets/score/green/1.png'),
+                    2: require('@/assets/score/green/2.png'),
+                    3: require('@/assets/score/green/3.png'),
+                    4: require('@/assets/score/green/4.png'),
+                    5: require('@/assets/score/green/5.png'),
+                    6: require('@/assets/score/green/6.png'),
+                    7: require('@/assets/score/green/7.png'),
+                    8: require('@/assets/score/green/8.png'),
+                    9: require('@/assets/score/green/9.png'),
+                },
+                black:{
+                    0: require('@/assets/score/black/0.png'),
+                    1: require('@/assets/score/black/1.png'),
+                    2: require('@/assets/score/black/2.png'),
+                    3: require('@/assets/score/black/3.png'),
+                    4: require('@/assets/score/black/4.png'),
+                    5: require('@/assets/score/black/5.png'),
+                    6: require('@/assets/score/black/6.png'),
+                    7: require('@/assets/score/black/7.png'),
+                    8: require('@/assets/score/black/8.png'),
+                    9: require('@/assets/score/black/9.png'),
+                },
             },
             imgStr: ''
         }
@@ -113,24 +161,27 @@ export default {
     methods: {
         num2Img(num,type){
             if(!num)return ''
-            const source = type?this.numImg[type]:this.numImg.default
             let numStr = ''
-            if(type == 'plus' && num.length<5){
-                const symbol = num.slice(0,2)
-                numStr += symbol.split('').map(i=>{
-                const className = i=="↑"?'up':''
-                return `<img src="${source[`${i}`]}" alt="" class="${className}">`}).join('')
-                for(let i=0;i<5-num.length;i++){
-                    numStr += `<img src="${source['0_p']}" alt="" >`
+            const source = type?this.numImg[type]:this.numImg.default
+            const label = this.label
+            if(!['music-level'].includes(label)){
+                if(type == 'plus' && num.length<5){
+                    const symbol = num.slice(0,2)
+                    numStr += symbol.split('').map(i=>{
+                    const className = i=="↑"?'up':''
+                    return `<img src="${source[`${i}`]}" alt="" class="${className}">`}).join('')
+                    for(let i=0;i<5-num.length;i++){
+                        numStr += `<img src="${source['0_p']}" alt="" >`
+                    }
+                    const trueNum = num.slice(2)
+                    numStr += trueNum.split('').map(i=>{
+                    return `<img src="${source[i]}" alt="" >`}).join('')
+                    return numStr
                 }
-                const trueNum = num.slice(2)
-                numStr += trueNum.split('').map(i=>{
-                return `<img src="${source[i]}" alt="" >`}).join('')
-                return numStr
-            }
-            if(type == 'default' && num.length<4){
-                for(let i=0;i<4-num.length;i++){
-                    numStr += `<img src="${source['0_p']}" alt="" >`
+                if(type == 'default' && num.length<4){
+                    for(let i=0;i<4-num.length;i++){
+                        numStr += `<img src="${source['0_p']}" alt="" >`
+                    }
                 }
             }
             numStr += num.split('').map(i=>{
@@ -152,7 +203,7 @@ export default {
 </script>
 <style lang="scss">
 .score-modal{
-    height: 30px;
+    height: 28px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -164,6 +215,9 @@ export default {
     }
     &.inactive{
         opacity: 0;
+    }
+    &.music-level{
+        width: 30px;
     }
 }
 </style>
