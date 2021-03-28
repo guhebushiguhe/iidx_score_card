@@ -41,7 +41,8 @@ export default {
     width: 100%;
     height: 0px;
     overflow: hidden;
-    background: #333;
+    // background: #333;
+    background: linear-gradient(180deg, rgba(0, 0, 0, .6) 0%, rgba(0, 0, 0, .6) 49%, rgba(0, 0, 0, 0.8) 50%, rgba(0, 0, 0, .4) 100%,);
     font-size: 12px;
     line-height: 24px;
     box-sizing: border-box;

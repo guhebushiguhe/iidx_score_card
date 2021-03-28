@@ -134,7 +134,8 @@ export default {
             right: 0;
             width: 70px;
             padding: 0 5px;
-            background: rgb(74, 78, 80);
+            background: rgba(30,30,30,.9);
+            
             color: #fff;
             border: 1px solid #ccc;
             border-width: 0 1px 1px 1px;

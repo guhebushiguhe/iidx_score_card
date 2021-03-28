@@ -117,8 +117,7 @@ export default {
         position: relative;
         &.small{
             // padding-left: 10px;
-            width: 28px;
-            width: 55px;
+            width: 57px;
             img{
                 height: 14px;
                 width: 55px;
@@ -138,7 +137,8 @@ export default {
     width: 120px;
     padding: 0 5px;
     box-sizing: border-box;
-    background: rgb(74, 78, 80);
+    // background: rgb(74, 78, 80);
+    background: rgba(30,30,30,.9);
     color: #fff;
     border: 1px solid #ccc;
     border-width: 0 1px 1px 1px;

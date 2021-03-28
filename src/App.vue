@@ -413,7 +413,6 @@ export default {
           const timeB = new Date(b.access_time).getTime()
           return timeB-timeA
         })
-        this.$message.warning('存在同名账号，请选择账号继续')
         this.profiles = data._items
         return
       }
@@ -699,7 +698,18 @@ export default {
       this.showMusicList()
     }
   },
+  created(){
+    const bgIframe = document.createElement('iframe')
+    bgIframe.src = "./bg/bg.html"
+    bgIframe.frameBorder = "0"
+    bgIframe.width='100%'
+    bgIframe.height='100%'
+    bgIframe.className = 'bg'
+    document.body.appendChild(bgIframe)
+  },
   mounted() {
+    console.dir(document.getElementsByTagName('iframe')[0])
+    // document.getElementsByTagName('iframe')[0]['frameBorder']="0"
     const query = this.$route.query
     if(query.djName){
       // 有搜索参数
@@ -712,7 +722,6 @@ export default {
       this.$refs.nameInp.focus()
       this.getNames()
     }
-
   }
 }
 </script>
@@ -720,7 +729,7 @@ export default {
 <style lang="scss">
 $fontColor1: #fff;
 $fontShadownColor: #4d6e7c;
-html,body,ul,ol,li,p,div,span,i,img,h1,h2,h3,h4,h5,h6{
+html,body,ul,ol,li,p,div,span,i,img,h1,h2,h3,h4,h5,h6,iframe{
   margin: 0;
   padding: 0;
 }
@@ -730,6 +739,9 @@ html,body{
   background-size: cover;
   color: $fontColor1;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
 }
 ul,ol{
   list-style: none;
@@ -743,13 +755,23 @@ ul,ol{
 ::-webkit-scrollbar-track{
   background: transparent;
 }
+.bg{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 107%;
+  z-index: 0;
+  border-width: 0;
+}
 #app {
-  min-height:100vh;
-  width: 400px;
-  background: url('./assets/bg3.jpeg') repeat-y fixed;
+  z-index: 1;
+  // height:100%;
+  max-width: 100vw;
+  // background: url('./assets/bg3.jpeg') repeat-y fixed;
   text-align: center;
   font-family:'Segoe UI', Tahoma, 'Geneva', 'Verdana', 'sans-serif';
-  text-shadow: $fontShadownColor 1px 0 0, $fontShadownColor 0 1px 0, $fontShadownColor -1px 0 0, $fontShadownColor 0 -1px 0;
+  // text-shadow: $fontShadownColor 1px 0 0, $fontShadownColor 0 1px 0, $fontShadownColor -1px 0 0, $fontShadownColor 0 -1px 0;
   padding: 15px 0 30px;
   position: absolute;
   top: 0;
@@ -820,10 +842,11 @@ ul,ol{
     outline: none;
   }
   .lv-selector-wrap{
-    background: rgba(51, 51, 51,.5);
+    // background: rgba(51, 51, 51,.5);
+    background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
+    // border: 1px solid #ccc;
     height: 24px;
     border-radius: 12px;
-    border-width: 0;
     display: flex;
     align-items: center;
   }
@@ -953,7 +976,7 @@ ul,ol{
     text-align: center;
   }
   .score-ul{
-    width: 76%;
+    width: 87%;
     transition: width 0.5s;
     // transition: padding-bottom 0.5s;
     &.music-show{
@@ -972,13 +995,15 @@ ul,ol{
       transition: height .5s,border-radius .5s;
       display: flex;
       justify-content: space-between;
-      background: rgba(68, 68, 68, .8);
+      // background: rgba(68, 68, 68, .8);
+      background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .2) 100%,);
       margin-bottom: 2px;
       // box-sizing: border-box;
-      border: 1px solid rgba(255,255,255,1);
+      border: 1px solid #ccc;
       border-radius: 4px 16px 4px 16px;
       &:nth-child(odd){
-        background: #333;
+        // background: #333;
+        background: linear-gradient(180deg, rgba(0, 0, 0, .6) 0%, rgba(0, 0, 0, .6) 49%, rgba(0, 0, 0, 0.8) 50%, rgba(0, 0, 0, .4) 100%,);
       }
       .label-wrap{
         position: relative;
@@ -1058,13 +1083,14 @@ ul,ol{
       .music-li{
         position: relative;
         box-sizing: border-box;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         padding-right:16px;
         width: 100%;
         height: 32px;
         // border: 1px solid #888;
         border-width: 2px 2px 2px 0;
-        background: rgba(49, 49, 49, 0.8);
+        // background: rgba(49, 49, 49, 0.8);
+        background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
         display: flex;
         justify-content: space-between;
         .wrap{
@@ -1084,31 +1110,43 @@ ul,ol{
             top: -1px;
             left: -16px;
             box-sizing: border-box;
-            // margin-right: 5px;
-            // border: 1px solid #fff;
             border-width: 2px;
-            border-radius: 6px 0 0 6px;
+            border-radius: 8px 0 0 8px;
             background: rgb(53, 52, 52);
-            &.FULL_COMBO{
+            &.FULL_COMBO,&.FULL_COMBO:after{
               background-image: linear-gradient(0deg, rgb(255, 224, 138), rgb(138, 255, 173), rgb(138, 222, 255), rgb(146, 138, 255), rgb(255, 138, 138),);
             }
-            &.EX_HARD_CLEAR{
+            &.EX_HARD_CLEAR,&.EX_HARD_CLEAR:after{
               background: rgb(255, 238, 0);
             }
-            &.HARD_CLEAR{
+            &.HARD_CLEAR,&.HARD_CLEAR:after{
               background: #fff;
             }
-            &.CLEAR{
+            &.CLEAR,&.CLEAR:after{
               background: rgb(0, 225, 255);
             }
-            &.EASY_CLEAR{
+            &.EASY_CLEAR,&.EASY_CLEAR:after{
               background: rgb(166, 255, 0);
             }
-            &.ASSIST_CLEAR{
+            &.ASSIST_CLEAR,&.ASSIST_CLEAR:after{
               background: rgb(183, 0, 255);
             }
-            &.FAILED{
+            &.FAILED,&.FAILED:after{
               background: rgb(180, 0, 0);
+            }
+            &:after{
+              content: '';
+              display: inline-block;
+              width: 16px;
+              height: 42px;
+              position: absolute;
+              top: 0;
+              left: 0;
+              box-sizing: border-box;
+              border-width: 2px;
+              border-radius: 6px 0 0 6px;
+              background: rgb(53, 52, 52);
+              filter: blur(4px);
             }
           }
           span{
@@ -1118,6 +1156,7 @@ ul,ol{
         .right-wrap{
           font-size: 12px;
           // border: 1px solid red;
+          align-items: center;
           .music-name{
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -1190,11 +1229,11 @@ ul,ol{
         }
         .music-li-cover{
           position: absolute;
-          top: -1px;
+          top: -2px;
           right: 0;
           z-index: 1;
-          width: 102%;
-          height: 42px;
+          width: 105%;
+          height: 44px;
         }
       }
     }

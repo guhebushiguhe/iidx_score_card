@@ -236,7 +236,7 @@ export default {
             opacity: 1;
             transition: opacity 0.5s;
             &.music-level{
-                width: 40px;
+                width: 34px;
                 display: flex;
                 justify-content: center;
                 background: rgba(0, 0, 0, .2);

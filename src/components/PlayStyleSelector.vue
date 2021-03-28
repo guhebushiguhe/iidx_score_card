@@ -71,11 +71,11 @@ export default {
 </script>
 <style lang="scss">
 .radio-wrap{
-    background: rgba(51, 51, 51,.5);
+    background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
+    // border: 1px solid #ccc;
     height: 24px;
     line-height: 24px;
     border-radius: 12px;
-    border-width: 0;
     padding: 0 10px;
     display: flex;
     align-items: center;
