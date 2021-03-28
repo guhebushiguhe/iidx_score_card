@@ -760,7 +760,7 @@ ul,ol{
   top: 0;
   left: 0;
   width: 100%;
-  height: 107%;
+  height: 100%;
   z-index: 0;
   border-width: 0;
 }
