@@ -1,10 +1,10 @@
 <template>
     <div :class="`${className} ${disabled?'':'able'}`">
-        <span>DJ-Level ↑↓</span>
-        <span>level ↑↓</span>
-        <span>Clear ↑↓</span>
-        <span>Name ↑↓</span>
-        <span>Time ↑↓</span>
+        <span class="sorter-option" @click="sortMusic('lamp')">Lamp <img :src="icon.sort" alt=""></span>
+        <span class="sorter-option" @click="sortMusic('level')">level <img :src="icon.sort" alt=""></span>
+        <span class="sorter-option" @click="sortMusic('grade')">Grade <img :src="icon.sort" alt=""></span>
+        <span class="sorter-option" @click="sortMusic('title')">Title <img :src="icon.sort" alt=""></span>
+        <span class="sorter-option" @click="sortMusic('time')">Time <img :src="icon.sort" alt=""></span>
     </div>
 </template>
 <script>
@@ -21,10 +21,17 @@ export default {
             required: false,
             default: false
         },
+        sortMusic: {
+            type: Function,
+            required: false,
+            default: ()=>{}
+        }
     },
     data() {
         return{
-
+            icon:{
+                sort: require('@/assets/sort.png'),
+            }
         }
     },
 }
@@ -44,8 +51,15 @@ export default {
     &.able{
         height: 24px;
     }
-    span{
+    .sorter-option{
+        cursor: pointer;
+        display: flex;
+        align-items: center;
         // padding: 0 10px;
+        img{
+            width: 15px;
+            height: 60%;
+        }
     }
 }
 </style>

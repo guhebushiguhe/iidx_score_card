@@ -1,5 +1,22 @@
 <template>
-    <div :class="`label-modal ${className} ${type}`" v-html="labelStr">label</div>
+    <div>
+        <div
+            :class="`label-modal ${className} ${type}`"
+            v-html="labelStr">
+        </div>
+        <ul
+            class="label-ul"
+            v-if="isMusicListShow"
+        >
+            <li
+                v-for="item in Object.keys(labelImg)"
+                :key="item"
+                class="label-li"
+            >
+                <img :src="labelImg[item]" alt="" @click="changeLabel(item)">
+            </li>
+        </ul>
+    </div>
 </template>
 <script>
 export default {
@@ -19,6 +36,16 @@ export default {
             type: String,
             required: false,
             default: 'default'
+        },
+        changeLabel:{
+            type: Function,
+            required: false,
+            default: ()=>{}
+        },
+        isMusicListShow: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
     data(){
@@ -81,21 +108,62 @@ export default {
 }
 </script>
 <style lang="scss">
-.label-modal{
-    height: 28px;
-    width: 97px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    &.small{
-        // padding-left: 10px;
-        width: 55px;
-        img{
-            height: 14px;
+    .label-modal{
+        height: 28px;
+        width: 97px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        &.small{
+            // padding-left: 10px;
+            width: 28px;
             width: 55px;
-            object-fit: cover;
+            img{
+                height: 14px;
+                width: 55px;
+                object-fit: cover;
+            }
         }
     }
+.label-wrap{
+    cursor: pointer;
+    position: relative;
+  .label-ul{
+    z-index: 2;
+    display: none;
+    position: absolute;
+    top: 27px;
+    left: 0;
+    width: 120px;
+    padding: 0 5px;
+    box-sizing: border-box;
+    background: rgb(74, 78, 80);
+    color: #fff;
+    border: 1px solid #ccc;
+    border-width: 0 1px 1px 1px;
+    .label-li{
+        position: relative;
+        height: 24px;
+        border-bottom: 1px solid #fff;
+        cursor: pointer;
+        img{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            height: 18px;
+            transform: translate(-50%,-50%);
+        }
+        &:hover{
+            img{
+                height: 24px;
+            }
+            background: rgb(120, 126, 129);
+        }
+    }
+  }
+  &:hover .label-ul{
+    display: block;
+  }
 }
 </style>

@@ -1,21 +1,32 @@
 <template>
-    <div :class="className">
+    <div :class="className" v-if="data && data.length>0">
         <ul class="music-ul">
             <li
                 class="music-li"
                 v-for="({_id,lamp,grade,music,charts}) in data"
                 :key="_id"
+                @touchstart="touchstart(music,charts)"
+                @touchend="touchend"
+                @mousedown="touchstart(music,charts)"
+                @mouseup="touchend"
             >
-                <div class="wrap left-wrap">
-                    <span :class="`lamp ${lamp}`"></span>
-                    <Score :num="charts.rating.toString()" :type="typeList[charts.difficulty]" label="music-level" />
-                    <Label :text="grade2Str(grade)" type="small" />
+                    <div class="wrap left-wrap">
+                        <span :class="`lamp ${lamp}`"></span>
+                        <Score :num="charts.rating.toString()" :type="typeList[charts.difficulty]" label="music-level" />
+                        <Label :text="grade2Str(grade)" type="small" />
+                    </div>
+                    <div class="wrap right-wrap">
+                        <span
+                            class="music-name"
+                        >{{music.title}}</span>
+                    </div>
+                <div class="main-wrap">
+                    <div class="grade-wrap">
+                        <div :class="`grade-score ${gradeColor(grade,lamp)}`" :style="gradeStyle(grade)"></div>
+                        <div class="grade-bg"></div>
+                    </div>
                 </div>
-                <div class="wrap right-wrap">
-                    <span
-                        class="music-name"
-                    >{{music.title}}</span>
-                </div>
+                <div class="music-li-cover" :style="{background: `url(${img.music_li_cover})`,backgroundSize: '100% 100%'}"></div>
             </li>
         </ul>
     </div>
@@ -34,7 +45,7 @@ export default {
         data:{
             type: Array,
             required: false,
-            default: []
+            default: ()=>[]
         },
     },
     components:{
@@ -43,18 +54,18 @@ export default {
     },
     data() {
         return {
+            touchTimer: null,
+            img:{
+                music_li_cover: require('@/assets/music_li_cover.png')
+            },
             typeList:{
                 BEGINNER: 'green',
                 NORMAL: 'default',
                 HYPER: 'yellow',
                 ANOTHER: 'down',
                 BLACK: 'black',
-            }
-        }
-    },
-    methods:{
-        grade2Str(grade){
-            const gradeList = [
+            },
+            gradeList: [
                 {
                 grade: 'MAX',
                 min: 1,
@@ -106,6 +117,11 @@ export default {
                 max: 0.2222
                 },
             ]
+        }
+    },
+    methods:{
+        grade2Str(grade){
+            const gradeList = this.gradeList
             let gradeStr = ''
             gradeList.some(item=>{
                 if(grade >= item.min && grade < item.max){
@@ -121,6 +137,44 @@ export default {
             const music_id = charts.music_id
             const link = `https://arcana.nu/iidx/27/music/${music_id}/${chart_id}` 
             window.open(link)
+        },
+        gradeStyle(grade){
+            return {
+                width: `${(grade-0)*100}%`,
+            }
+        },
+        gradeColor(grade,lamp){
+            const gradeList = this.gradeList
+            const colorful = lamp=='FULL_COMBO'?'colorful':''
+            let color = ''
+            gradeList.some(i=>{
+                if(grade>i.min && grade<=i.max){
+                    color = i.grade
+                    return true
+                }
+            })
+            return `${color} ${['MAX','MAX-','AAA','AA'].includes(color)?colorful:''}`
+        },
+        touchstart(music,charts){
+            clearTimeout(this.touchTimer)
+            this.touchTimer = setTimeout(()=>{
+                const playStyle = charts.play_style=='SINGLE'?'SP':'DP'
+                const difficulty = charts.difficulty=='BLACK'?'LEGGENDARIA':charts.difficulty
+                const rating = charts.rating
+                const copyStr = `${music.title} ${playStyle} ${difficulty} lv.${rating}`
+                // alert(`${music.title} ${playStyle} ${difficulty} lv.${rating}`)
+                this.$copyText(copyStr)
+                .then(res => {
+                    // alert("复制成功")
+                    this.$message.success(`复制成功 ${copyStr}`)
+                },err => {
+                    this.$message.error('复制失败')
+                    // alert("复制失败")
+                })
+            },1000)
+        },
+        touchend(){
+            clearTimeout(this.touchTimer)
         }
     }
 }

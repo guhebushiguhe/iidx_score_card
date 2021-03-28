@@ -1,5 +1,5 @@
 <template>
-    <div :class="`score-modal ${className} ${isActive} ${label}`" v-html="imgStr" @click.stop="showMusicList(label,data,type)">
+    <div :class="`score-modal ${className} ${isActive} ${label} ${disabled}`" v-html="imgStr" @click.stop="showMusicList(label,data,type)">
     </div>
 </template>
 
@@ -156,6 +156,9 @@ export default {
                         && this.activeLabel != ''
                         && this.activeType != ''
             return inactive?'inactive':''
+        },
+        disabled() {
+            return !this.data || this.data.length>0?'':'disabled'
         }
     },
     methods: {
@@ -202,25 +205,43 @@ export default {
 }
 </script>
 <style lang="scss">
-.score-modal{
-    height: 28px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    cursor: pointer;
-    opacity: 1;
-    transition: opacity 0.5s;
-    .up{
-        width: 24px !important;
+.score-box{
+    .score-ul{
+        .score-modal{
+            height: 28px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            cursor: pointer;
+            opacity: 1;
+            transition: opacity 0.5s;
+            .up{
+                width: 24px !important;
+            }
+            &.inactive{
+                height: 28px;
+                opacity: 0.2;
+            }
+            &.disabled{
+                cursor: default;
+            }
+        }
     }
-    &.inactive{
-        opacity: 0;
-    }
-    &.music-level{
-        width: 40px;
-        display: flex;
-        justify-content: center;
-        background: rgba(0, 0, 0, .2);
+    .music-ul{
+        .score-modal{
+            height: 28px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.5s;
+            &.music-level{
+                width: 40px;
+                display: flex;
+                justify-content: center;
+                background: rgba(0, 0, 0, .2);
+            }
+        }
     }
 }
 </style>

@@ -2,7 +2,7 @@
   <div id="app" ref="app">
     <div class="title-wrap">
       <!-- <p class="time">{{new Date().toLocaleString()}}<span v-html="'&nbsp;&nbsp;&nbsp;&nbsp;'"></span>{{version}}</p> -->
-      <div @click="capture"><img class="share-btn" :src="icon.share" alt=""></div>
+      <!-- <div @click="capture"><img class="share-btn" :src="icon.share" alt=""></div> -->
     </div>
     <div
       class="box profiles-box"
@@ -36,12 +36,12 @@
         :lv="lv"
         :change-lv="changeLv"
         class="lv-selector-wrap"
-        :disabled="isLoading || isMusicListShow"
+        :disabled="isLoading"
       />
       <PlayStyleSelector
         class="radio-wrap"
         :play-style="playStyle"
-        :disabled="isLoading || isMusicListShow"
+        :disabled="isLoading"
         :play-style-list="playStyleList"
         :change-play-style="playStyleChange"
       />
@@ -81,7 +81,7 @@
           :key="item.label"
           :class="`${activeLabel!='' && activeLabel!=item.label?'inactive':''} score-li`"
         >
-          <span class="label-wrap"><Label :text="item.label" /></span>
+          <span class="label-wrap"><Label :text="item.label" :change-label="changeLabel" :is-music-list-show="isMusicListShow" /></span>
           <span :class="`${newScores.length > 0?'score':''}`">
             <Score
               :num="item.value.toString()"
@@ -107,10 +107,14 @@
               :show-music-list="showMusicList"
             />
           </span>
+          <i :class="`back-btn ${isMusicListShow?'show':''}`" @click.stop="showMusicList('back')">
+            <img :src="icon.up" alt="">
+            </i>
         </li>
         <Sorter
           class="sorter"
           :disabled="!isMusicListShow"
+          :sortMusic="sortMusic"
         />
       </ul>
       <MusicList
@@ -170,6 +174,7 @@ export default {
       icon:{
         refresh: require('@/assets/refresh.png'),
         share: require('@/assets/share.png'),
+        up: require('@/assets/up.png'),
       },
       qpros: {
           _id: "XXXX",
@@ -257,12 +262,33 @@ export default {
         'EX_HARD_CLEAR',
         'HARD_CLEAR',
         'CLEAR',
-        'ASSIST_CLEAR',
         'EASY_CLEAR',
+        'ASSIST_CLEAR',
         'FAILED'
       ],
       lvList: ['1','2','3','4','5','6','7','8','9','10','11','12'],
-      musicListData: []
+      musicListData: [],
+      labelImg:{
+        'ALL': require('@/assets/clear/all_scores.png'),
+        FC: require('@/assets/clear/clear_full_combo.png'),
+        EXHC: require('@/assets/clear/clear_ex_hard.png'),
+        HC: require('@/assets/clear/clear_hard.png'),
+        NC: require('@/assets/clear/clear_normal.png'),
+        AC: require('@/assets/clear/clear_assist.png'),
+        EC: require('@/assets/clear/clear_easy.png'),
+        Failed: require('@/assets/clear/clear_failed.png'),
+        'CLEAR RATE': require('@/assets/clear/clear_rate.png'),
+        MAX: require('@/assets/djlevel/lv_max.png'),
+        'MAX-': require('@/assets/djlevel/lv_max-.png'),
+        AAA: require('@/assets/djlevel/lv_aaa.png'),
+        AA: require('@/assets/djlevel/lv_aa.png'),
+        A: require('@/assets/djlevel/lv_a.png'),
+        B: require('@/assets/djlevel/lv_b.png'),
+        C: require('@/assets/djlevel/lv_c.png'),
+        D: require('@/assets/djlevel/lv_d.png'),
+        E: require('@/assets/djlevel/lv_e.png'),
+        F: require('@/assets/djlevel/lv_f.png'),
+      }
     }
   },
   computed: {
@@ -273,8 +299,8 @@ export default {
           EX_HARD_CLEAR: 'EXHC',
           HARD_CLEAR: 'HC',
           CLEAR: 'NC',
-          ASSIST_CLEAR: 'AC',
           EASY_CLEAR: 'EC',
+          ASSIST_CLEAR: 'AC',
           FAILED: 'Failed',
           clearRate: 'CLEAR RATE',
           MAX: 'MAX',
@@ -314,17 +340,14 @@ export default {
     addName(name) {
       this.names.push(name)
       const yearTime = 365*24*60*60
-      // this.setCookie('names',this.names.join('|'),yearTime)
       localStorage.setItem('names',this.names.join('|'))
     },
     delName(name) {
       let newNames = [...this.names]
       this.names = newNames.filter(i=>i!=name)
-      // this.setCookie('names',this.names.join('|'))
       localStorage.setItem('names',this.names.join('|'))
     },
     getNames(){
-      // const nameStr = this.getCookie('names')
       const nameStr = localStorage.getItem('names')
       if(nameStr)this.names = nameStr.split('|')
     },
@@ -345,13 +368,10 @@ export default {
     async getProfiles() {
       this.isNameSelectShow = false
       this.newTime = null
-      this.isMusicListShow = false
-      this.activeLabel = ''
-      this.activeType = ''
       const names = this.names
       const djName = this.djName
       if (djName==''){
-        alert('请输入DJ NAME')
+        this.$message.warning('请输入DJ NAME')
         return
       }
       const lv = this.lv
@@ -393,6 +413,7 @@ export default {
           const timeB = new Date(b.access_time).getTime()
           return timeB-timeA
         })
+        this.$message.warning('存在同名账号，请选择账号继续')
         this.profiles = data._items
         return
       }
@@ -581,11 +602,87 @@ export default {
       this.playStyle=e.target.value
     },
     showMusicList(label,data,type) {
-      this.activeLabel = label==this.activeLabel?'':label
-      this.activeType = type
-      this.musicListData = data
-      this.isMusicListShow = this.activeLabel!=''
-      // console.log('data',data)
+      let musicListData = data
+      // 刷新进来的
+      if(!label && !data && !type){
+        const type = this.activeType
+        const label = this.activeLabel
+        if(!type || !label)return
+        const scores = type=="plus"?this.newScores:this.scores
+        musicListData = scores.filter(i=>i.label==label)[0].data
+      }else{
+        if(label=='back'){
+          // 后退按钮进来的
+          this.activeLabel = ''
+          this.activeType = ''
+          this.isMusicListShow = false
+        }else{
+          // 点击数字进来的
+          if(data.length<=0)return
+          this.activeLabel = label
+          this.activeType = type
+          this.isMusicListShow = true
+        }
+      }
+      this.musicListData = []
+      if(['','back'].includes(this.activeLabel))return
+      this.musicListData = musicListData
+    },
+    sortMusic(type){
+      let musicListData = this.musicListData
+      let firstId = ''
+      const lampCode = {
+        FULL_COMBO: 6,
+        EX_HARD_CLEAR: 5,
+        HARD_CLEAR: 4,
+        CLEAR: 3,
+        EASY_CLEAR: 2,
+        ASSIST_CLEAR: 1,
+        FAILED: 0,
+      }
+      switch (type){
+        case 'lamp':
+          firstId = musicListData[0].charts._id.toString()
+            this.musicListData = musicListData.sort((a,b)=>lampCode[b.lamp] - lampCode[a.lamp])
+          if(firstId == musicListData[0].charts._id){
+            this.musicListData = musicListData.sort((a,b)=>lampCode[a.lamp] - lampCode[b.lamp])
+            }
+          break
+        case 'level':
+          firstId = musicListData[0].charts._id.toString()
+            this.musicListData = musicListData.sort((a,b)=>b.charts.rating - a.charts.rating)
+          if(firstId == musicListData[0].charts._id){
+            this.musicListData = musicListData.sort((a,b)=>a.charts.rating - b.charts.rating)
+          }
+          break
+        case 'grade':
+          firstId = musicListData[0].charts._id.toString()
+            this.musicListData = musicListData.sort((a,b)=>b.grade - a.grade)
+          if(firstId == musicListData[0].charts._id){
+            this.musicListData = musicListData.sort((a,b)=>a.grade - b.grade)
+          }
+          break
+        case 'title':
+          firstId = musicListData[0].charts._id.toString()
+            this.musicListData = musicListData.sort((a,b)=>a.music.title.localeCompare(b.music.title, 'zh-CN', { numeric: true }))
+          if(firstId == musicListData[0].charts._id){
+            this.musicListData = musicListData.sort((a,b)=>b.music.title.localeCompare(a.music.title, 'zh-CN', { numeric: true }))
+          }
+          break
+        case 'time':
+          firstId = musicListData[0].charts._id.toString()
+            this.musicListData = musicListData.sort((a,b)=>new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+          if(firstId == musicListData[0].charts._id){
+            this.musicListData = musicListData.sort((a,b)=>new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+          }
+          break
+        default:
+          break
+      }
+    },
+    changeLabel(label){
+      this.activeLabel = label
+      this.showMusicList()
     }
   },
   watch: {
@@ -596,6 +693,10 @@ export default {
     playStyle(val,oldVal){
       if(val==oldVal || this.djName=='')return
       this.toSearch()
+    },
+    scores(val,oldVal){
+      if(val==oldVal || !this.isMusicListShow)return
+      this.showMusicList()
     }
   },
   mounted() {
@@ -634,7 +735,7 @@ ul,ol{
   list-style: none;
 }
 ::-webkit-scrollbar{
-  width: 0px;
+  width: 5px;
 }
 ::-webkit-scrollbar-thumb{
   background: #9ab5c2;
@@ -921,6 +1022,21 @@ ul,ol{
           width: 12px;
         }
       }
+      .back-btn{
+        width: 0;
+        overflow: hidden;
+        transition: width .5s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        &.show{
+          width: 50px;
+          cursor: pointer;
+        }
+        img{
+          height: 80%;
+        }
+      }
     }
     .inactive{
       height: 0;
@@ -940,12 +1056,13 @@ ul,ol{
     .music-ul{
       width: 90%;
       .music-li{
+        position: relative;
         box-sizing: border-box;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
         padding-right:16px;
         width: 100%;
         height: 32px;
-        border: 1px solid #888;
+        // border: 1px solid #888;
         border-width: 2px 2px 2px 0;
         background: rgba(49, 49, 49, 0.8);
         display: flex;
@@ -959,16 +1076,18 @@ ul,ol{
           // width: 60px;
           font-size: 12px;
           position: relative;
+          align-items: center;
           .lamp{
-            width: 10px;
-            height: 32px;
+            width: 16px;
+            height: 42px;
             position: absolute;
-            top: -2px;
-            left: -10px;
+            top: -1px;
+            left: -16px;
             box-sizing: border-box;
             // margin-right: 5px;
-            // border: 1px solid #888;
+            // border: 1px solid #fff;
             border-width: 2px;
+            border-radius: 6px 0 0 6px;
             background: rgb(53, 52, 52);
             &.FULL_COMBO{
               background-image: linear-gradient(0deg, rgb(255, 224, 138), rgb(138, 255, 173), rgb(138, 222, 255), rgb(146, 138, 255), rgb(255, 138, 138),);
@@ -1002,9 +1121,80 @@ ul,ol{
           .music-name{
             white-space: nowrap;
             text-overflow: ellipsis;
-            max-width: 247px;
+            width: 247px;
+            text-align: left;
             cursor: pointer;
           }
+        }
+        .main-wrap{
+          position: absolute;
+          bottom: -8px;
+          left: 0;
+          width: 100%;
+          height: 6px;
+          overflow: hidden;
+          .grade-wrap{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            .grade-bg{
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              width: 100%;
+              height: 6px;
+              background: rgba(0,0,0,.8);
+              overflow: hidden;
+            }
+            .grade-score{
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              height: 6px;
+              overflow: hidden;
+              z-index: 1;
+              // background: rgb(219, 25, 25);
+              &.MAX, &.MAX-, &.AAA{
+                background: linear-gradient(90deg, rgb(133,56,53) 0%, rgb(238,62,62) 30%, rgb(238,62,62) 100%);
+                &.colorful{
+                  background: linear-gradient(90deg, rgb(245,69,69), rgb(207,68,253), rgb(56,76,249), rgb(67,252,252), rgb(93,252,74), rgb(254,255,84), rgb(190,40,30), rgb(245,69,69));
+                }
+              }
+              &.AA{
+                background: linear-gradient(90deg, rgb(182, 119, 26) 0%, rgb(255, 166, 32) 30%, rgb(255, 166, 32) 100%);
+                &.colorful{
+                  background: linear-gradient(90deg, rgb(212, 211, 211) 0%, rgb(255, 255, 255) 30%, rgb(255, 255, 255) 100%);
+                }
+              }
+              &.A{
+                background: rgb(41, 185, 252);
+              }
+              &.B{
+                background: rgb(128, 219, 25);
+              }
+              &.C{
+                background: rgb(128, 219, 25);
+              }
+              &.D{
+                background: rgb(128, 219, 25);
+              }
+              &.E{
+                background: rgb(128, 219, 25);
+              }
+              &.F{
+                background: rgb(128, 219, 25);
+              }
+            }
+          }
+        }
+        .music-li-cover{
+          position: absolute;
+          top: -1px;
+          right: 0;
+          z-index: 1;
+          width: 102%;
+          height: 42px;
         }
       }
     }

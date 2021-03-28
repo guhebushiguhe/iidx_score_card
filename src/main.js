@@ -2,8 +2,14 @@ import Vue from 'vue'
 import router from '@/router'
 import App from './App.vue'
 import axios from '@/apis/apis'
+import VueClipboard from 'vue-clipboard2'
+import {
+  Message
+} from 'element-ui'
 
+Vue.prototype.$message = Message
 
+Vue.use(VueClipboard)
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
 Date.prototype.toLocaleString = function () {
