@@ -735,13 +735,14 @@ html,body,ul,ol,li,p,div,span,i,img,h1,h2,h3,h4,h5,h6,iframe{
 }
 html,body{
   // background: #333536;
-  background: url('./assets/bg3.jpeg') repeat fixed;
+  // background: url('./assets/bg3.jpeg') repeat fixed;
+  background: #3d1259;
   background-size: cover;
   color: $fontColor1;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   width: 100%;
   height: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 ul,ol{
   list-style: none;
