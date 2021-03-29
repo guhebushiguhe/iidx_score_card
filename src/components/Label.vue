@@ -58,6 +58,7 @@ export default {
                 NC: require('@/assets/clear/clear_normal.png'),
                 AC: require('@/assets/clear/clear_assist.png'),
                 EC: require('@/assets/clear/clear_easy.png'),
+                'NO PLAY': require('@/assets/clear/clear_no_play.png'),
                 Failed: require('@/assets/clear/clear_failed.png'),
                 'CLEAR RATE': require('@/assets/clear/clear_rate.png'),
                 MAX: require('@/assets/djlevel/lv_max.png'),

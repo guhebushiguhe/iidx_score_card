@@ -276,6 +276,7 @@ export default {
         NC: require('@/assets/clear/clear_normal.png'),
         AC: require('@/assets/clear/clear_assist.png'),
         EC: require('@/assets/clear/clear_easy.png'),
+        'NO PLAY': require('@/assets/clear/clear_no_play.png'),
         Failed: require('@/assets/clear/clear_failed.png'),
         'CLEAR RATE': require('@/assets/clear/clear_rate.png'),
         MAX: require('@/assets/djlevel/lv_max.png'),
@@ -301,6 +302,7 @@ export default {
           CLEAR: 'NC',
           EASY_CLEAR: 'EC',
           ASSIST_CLEAR: 'AC',
+          NO_PLAY: 'NO PLAY',
           FAILED: 'Failed',
           clearRate: 'CLEAR RATE',
           MAX: 'MAX',
@@ -564,6 +566,7 @@ export default {
       let res = {
         ALL_TEMP,
         ...LAMPS,
+        NO_PLAY,
         clearRate
       }
       gradeList.map(item=>{
@@ -708,7 +711,7 @@ export default {
     document.body.appendChild(bgIframe)
   },
   mounted() {
-    console.dir(document.getElementsByTagName('iframe')[0])
+    // console.dir(document.getElementsByTagName('iframe')[0])
     // document.getElementsByTagName('iframe')[0]['frameBorder']="0"
     const query = this.$route.query
     if(query.djName){
@@ -742,7 +745,12 @@ html,body{
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  // overflow: hidden;
+}
+@media screen and (max-device-width: 420px){
+  body{
+    overflow: hidden;
+  }
 }
 ul,ol{
   list-style: none;
@@ -751,10 +759,12 @@ ul,ol{
   width: 5px;
 }
 ::-webkit-scrollbar-thumb{
-  background: #9ab5c2;
+  background: #8689b2;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-track{
-  background: transparent;
+  background: rgba(0,0,0,.6);
+  border-radius: 2px;
 }
 .bg{
   position: absolute;
@@ -884,7 +894,7 @@ ul,ol{
   }
 }
 .profiles-box{
-  width: 100%;
+  width: 352px;
   // margin-bottom: 10px;
   padding: 30px 0;
   >p{
@@ -937,13 +947,14 @@ ul,ol{
         top: 38px;
         left: 10px;
         width: 130px;
-        background: #00426d;
+        background: rgba(30,30,30,.8);
         .names-li{
           font-size: 12px;
           line-height: 24px;
           text-align: left;
           text-indent: 0.5em;
           border-bottom: 1px solid #888;
+          background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
           display: flex;
           justify-content: space-between;
           .name{

@@ -3,6 +3,7 @@ import router from '@/router'
 import App from './App.vue'
 import axios from '@/apis/apis'
 import VueClipboard from 'vue-clipboard2'
+import '@/utils/appback.js'
 import {
   Message
 } from 'element-ui'

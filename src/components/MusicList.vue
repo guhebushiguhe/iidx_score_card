@@ -197,7 +197,7 @@ export default {
  50% { opacity: 0.7; }
  100% { opacity: 1.0; }
  }
-.FULL_COMBO, .EX_HARD_CLEAR, .HARD_CLEAR {
+.FULL_COMBO, .EX_HARD_CLEAR, .FAILED {
 -webkit-animation-name: blinker;
 -webkit-animation-duration: .2s;
 -webkit-animation-timing-function: linear;
