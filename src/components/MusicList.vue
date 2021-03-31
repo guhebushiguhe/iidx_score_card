@@ -182,22 +182,77 @@ export default {
 <style lang="scss">
 @-moz-keyframes blinker {  
  0% { opacity: 1.0; }
- 50% { opacity: 0.7; }
+ 25% { opacity: 0.7; }
+ 50% { opacity: 1.0; }
+ 75% { opacity: 0.7; }
  100% { opacity: 1.0; }
  }
 
 @-webkit-keyframes blinker {  
  0% { opacity: 1.0; }
- 50% { opacity: 0.7; }
+ 25% { opacity: 0.7; }
+ 50% { opacity: 1.0; }
+ 75% { opacity: 0.7; }
  100% { opacity: 1.0; }
  }
 
 @keyframes blinker {  
  0% { opacity: 1.0; }
- 50% { opacity: 0.7; }
+ 25% { opacity: 0.7; }
+ 50% { opacity: 1.0; }
+ 75% { opacity: 0.7; }
  100% { opacity: 1.0; }
  }
-.FULL_COMBO, .EX_HARD_CLEAR, .FAILED {
+
+@-moz-keyframes fc_color {  
+ 0% { background: rgb(255, 255, 255); opacity: 1.0; }
+ 25% { opacity: 0.7; }
+ 50% { background: rgb(255, 241, 49); opacity: 1.0; }
+ 75% { opacity: 0.7; }
+ 100% { background: rgb(255, 255, 255); opacity: 1.0; }
+ }
+
+@-webkit-keyframes fc_color {  
+ 0% { background: rgb(255, 255, 255); opacity: 1.0; }
+ 25% { opacity: 0.7; }
+ 50% { background: rgb(255, 241, 49); opacity: 1.0; }
+ 75% { opacity: 0.7; }
+ 100% { background: rgb(255, 255, 255); opacity: 1.0; }
+ }
+
+@keyframes fc_color {  
+ 0% { background: rgb(255, 255, 255); opacity: 1.0; }
+ 25% { opacity: 0.7; }
+ 50% { background: rgb(255, 241, 49); opacity: 1.0; }
+ 75% { opacity: 0.7; }
+ 100% { background: rgb(255, 255, 255); opacity: 1.0; }
+ }
+
+@-moz-keyframes exc_color {  
+ 0% { background: rgb(240, 30, 30); opacity: 1.0; }
+ 25% { opacity: 0.7; }
+ 50% { background: rgb(255, 241, 49); opacity: 1.0; }
+ 75% { opacity: 0.7; }
+ 100% { background: rgb(240, 30, 30); opacity: 1.0; }
+ }
+
+@-webkit-keyframes exc_color {  
+ 0% { background: rgb(240, 30, 30); opacity: 1.0; }
+ 25% { opacity: 0.7; }
+ 50% { background: rgb(255, 241, 49); opacity: 1.0; }
+ 75% { opacity: 0.7; }
+ 100% { background: rgb(240, 30, 30); opacity: 1.0; }
+ }
+
+@keyframes exc_color {  
+ 0% { background: rgb(240, 30, 30); opacity: 1.0; }
+ 25% { opacity: 0.7; }
+ 50% { background: rgb(255, 241, 49); opacity: 1.0; }
+ 75% { opacity: 0.7; }
+ 100% { background: rgb(240, 30, 30); opacity: 1.0; }
+ }
+
+.FAILED {
 -webkit-animation-name: blinker;
 -webkit-animation-duration: .2s;
 -webkit-animation-timing-function: linear;
@@ -213,7 +268,38 @@ export default {
  animation-timing-function: linear;
  animation-iteration-count: infinite;
 
- color: white;
+}
 
+.FULL_COMBO {
+-webkit-animation-name: fc_color;
+-webkit-animation-duration: .2s;
+-webkit-animation-timing-function: linear;
+-webkit-animation-iteration-count: infinite;
+
+-moz-animation-name: fc_color;
+-moz-animation-duration: .2s;
+-moz-animation-timing-function: linear;
+-moz-animation-iteration-count: infinite;
+
+ animation-name: fc_color;
+ animation-duration: .2s;
+ animation-timing-function: linear;
+ animation-iteration-count: infinite;
+}
+.EX_HARD_CLEAR {
+-webkit-animation-name: exc_color;
+-webkit-animation-duration: .2s;
+-webkit-animation-timing-function: linear;
+-webkit-animation-iteration-count: infinite;
+
+-moz-animation-name: exc_color;
+-moz-animation-duration: .2s;
+-moz-animation-timing-function: linear;
+-moz-animation-iteration-count: infinite;
+
+ animation-name: exc_color;
+ animation-duration: .2s;
+ animation-timing-function: linear;
+ animation-iteration-count: infinite;
 }
 </style>

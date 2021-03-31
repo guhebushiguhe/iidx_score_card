@@ -1126,10 +1126,11 @@ ul,ol{
             border-radius: 8px 0 0 8px;
             background: rgb(53, 52, 52);
             &.FULL_COMBO,&.FULL_COMBO:after{
-              background-image: linear-gradient(0deg, rgb(255, 224, 138), rgb(138, 255, 173), rgb(138, 222, 255), rgb(146, 138, 255), rgb(255, 138, 138),);
+              // background-image: linear-gradient(0deg, rgb(255, 224, 138), rgb(138, 255, 173), rgb(138, 222, 255), rgb(146, 138, 255), rgb(255, 138, 138),);
+              background: #fff;
             }
             &.EX_HARD_CLEAR,&.EX_HARD_CLEAR:after{
-              background: rgb(255, 238, 0);
+              background: rgb(255, 17, 0);
             }
             &.HARD_CLEAR,&.HARD_CLEAR:after{
               background: #fff;
@@ -1157,7 +1158,6 @@ ul,ol{
               box-sizing: border-box;
               border-width: 2px;
               border-radius: 6px 0 0 6px;
-              background: rgb(53, 52, 52);
               filter: blur(4px);
             }
           }
@@ -1221,20 +1221,8 @@ ul,ol{
               &.A{
                 background: rgb(41, 185, 252);
               }
-              &.B{
-                background: rgb(128, 219, 25);
-              }
-              &.C{
-                background: rgb(128, 219, 25);
-              }
-              &.D{
-                background: rgb(128, 219, 25);
-              }
-              &.E{
-                background: rgb(128, 219, 25);
-              }
-              &.F{
-                background: rgb(128, 219, 25);
+              &.B, &.C, &.D, &.E, &.F{
+                background: rgb(25, 219, 35);
               }
             }
           }
