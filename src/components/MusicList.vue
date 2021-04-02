@@ -1,25 +1,24 @@
 <template>
-    <div :class="className" v-if="data && data.length>0">
+    <div :class="`${className} ${musicUrl!=''?'short':''}`" v-if="data && data.length>0">
         <ul class="music-ul">
             <li
                 class="music-li"
-                v-for="({_id,lamp,grade,music,charts}) in data"
+                v-for="({_id,lamp,grade,music,charts,netease_ids}) in data"
                 :key="_id"
                 @touchstart="touchstart(music,charts)"
                 @touchend="touchend"
                 @mousedown="touchstart(music,charts)"
                 @mouseup="touchend"
             >
-                    <div class="wrap left-wrap">
-                        <span :class="`lamp ${lamp}`"></span>
-                        <Score :num="charts.rating.toString()" :type="typeList[charts.difficulty]" label="music-level" />
-                        <Label :text="grade2Str(grade)" type="small" />
-                    </div>
-                    <div class="wrap right-wrap">
-                        <span
-                            class="music-name"
-                        >{{music.title}}</span>
-                    </div>
+                <div class="wrap left-wrap">
+                    <span :class="`lamp ${lamp}`"></span>
+                    <Score :num="charts.rating.toString()" :type="typeList[charts.difficulty]" label="music-level" />
+                    <Label :text="grade2Str(grade)" type="small" />
+                </div>
+                <div class="wrap right-wrap">
+                    <span class="music-name">{{music.title}}</span>
+                    <span v-if="netease_ids.length" class="play-btn" @click="playSong(netease_ids)">▶</span>
+                </div>
                 <div class="main-wrap">
                     <div class="grade-wrap">
                         <div :class="`grade-score ${gradeColor(grade,lamp)}`" :style="gradeStyle(grade)"></div>
@@ -29,6 +28,10 @@
                 <div class="music-li-cover" :style="{background: `url(${img.music_li_cover})`,backgroundSize: '100% 100%'}"></div>
             </li>
         </ul>
+        <div class="audio-player-box" v-if="musicUrl!=''">
+            <audio ref="audio" class="audio-player" :src="musicUrl" @pause="audioPause" @play="audioPlay" controls autoplay loop >您的浏览器不支持 audio 标签</audio>
+            <img :src="img.down" alt="" class="down-btn" @click="hidePlayer">
+        </div>
     </div>
 </template>
 <script>
@@ -55,8 +58,12 @@ export default {
     data() {
         return {
             touchTimer: null,
+            musicUrl: '',
+            isAudioPlaying: false,
+            isPlayerShow: false,
             img:{
-                music_li_cover: require('@/assets/music_li_cover.png')
+                music_li_cover: require('@/assets/music_li_cover.png'),
+                down: require('@/assets/down.png')
             },
             typeList:{
                 BEGINNER: 'green',
@@ -175,6 +182,30 @@ export default {
         },
         touchend(){
             clearTimeout(this.touchTimer)
+        },
+        async playSong(ids){
+            const id = ids[0].id
+            const {data} = await this.$axios.getSongUrl(id)
+            this.musicUrl = data[0].url
+            this.isAudioPlaying = true
+            this.isPlayerShow = true
+        },
+        audioPlay() {
+            this.isAudioPlaying = true
+        },
+        audioPause() {
+            this.isAudioPlaying = false
+        },
+        hidePlayer() {
+            this.musicUrl = ''
+            this.isAudioPlaying = false
+            this.isPlayerShow = false
+        }
+    },
+    watch:{
+        data(val,oldVal){
+            if(val==oldVal)return
+            if(!this.data.length)this.hidePlayer()
         }
     }
 }

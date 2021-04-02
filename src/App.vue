@@ -138,6 +138,7 @@
 <script>
 import html2canvas from 'html2canvas'
 import '@/utils/canvas2image.js'
+import localJson from '@/utils/netease_id_list.js'
 import Score from '@/components/Score.vue'
 import Label from '@/components/Label.vue'
 import LvSelector from '@/components/LvSelector.vue'
@@ -474,8 +475,11 @@ export default {
       this.isLoading = false
       // 手动添加grade
       resData._items.map(item=>{
-        const {notes,play_style} = resData._related.charts.filter(i=>i._id==item.chart_id)[0]
+        const {notes,play_style} = resData._related.charts.filter(i=>i._id==item.chart_id && (i.play_style==this.playStyle || this.playStyle == 'ALL'))[0]
+        const music_title = resData._related.music.filter(i=>i._id==item.music_id)[0].title
+        const netease_ids = this.getNeteaseId(music_title)
         item.grade = item.ex_score / notes / 2
+        item.netease_ids = netease_ids
       })
       this.scoresData[id]=resData
       this.scores = this.parseScores(resData)
@@ -518,6 +522,61 @@ export default {
       }
 
       return newData
+    },
+    getNeteaseId(music_title){
+      function parseTitle(str){
+        return str
+              .replace(/\ /g,' ')
+              .replace(/\*/g,'')
+              .split(' ').filter(i=>i!=' ').join('')
+      }
+      const neteaseIdList = localJson.neteaseIdList
+      const parseMusicTitle = parseTitle(music_title)
+                              .replace(/\～/g,'~')
+                              .replace(/𝆑𝆑𝆑𝆑𝆑/g,'fffff')
+                              .replace(/间/g,'間')
+      let netease_ids = []
+      neteaseIdList.forEach(({id,title,artist})=>{
+        const match = parseTitle(title).match(parseMusicTitle)
+        if(match){
+          netease_ids.push({
+            id,
+            title,
+            artist
+          })
+        }
+      })
+      if (netease_ids.length>2){
+        netease_ids = []
+        neteaseIdList.forEach(({id,title,artist})=>{
+          const match = parseTitle(title) == parseMusicTitle ||
+                        parseTitle(title).match(parseMusicTitle) && 
+                        parseTitle(title).match(/(remix)(version)/ig)
+          if(match){
+            netease_ids.push({
+              id,
+              title,
+              artist
+            })
+          }
+        })
+      }
+      if (!netease_ids.length){
+        neteaseIdList.forEach(({id,title,artist})=>{
+          const match = parseTitle(title).match(parseMusicTitle.split('feat')[0].split('ft')[0].split('(')[0].split('-')[0])
+          if(match){
+            netease_ids.push({
+              id,
+              title,
+              artist
+            })
+          }
+        })
+      }
+      // if (netease_ids.length<=0)console.log('匹配不到歌名',music_title)
+      if (netease_ids.length>0)console.log('匹配')
+      // if (netease_ids.length>1)console.log('匹配多个',parseMusicTitle,netease_ids[1].title)
+      return netease_ids
     },
     parseScores(data) {
       const gradeList = this.gradeList
@@ -740,6 +799,7 @@ html,body{
   // background: #333536;
   // background: url('./assets/bg3.jpeg') repeat fixed;
   background: #3d1259;
+  // background-image: linear-gradient(180deg, #5b649b, #3d1259);
   background-size: cover;
   color: $fontColor1;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -1090,6 +1150,7 @@ ul,ol{
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    position: relative;
     .music-ul{
       width: 90%;
       .music-li{
@@ -1104,7 +1165,7 @@ ul,ol{
         // background: rgba(49, 49, 49, 0.8);
         background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         .wrap{
           display: flex;
           justify-content: space-between;
@@ -1167,14 +1228,23 @@ ul,ol{
         }
         .right-wrap{
           font-size: 12px;
+          box-sizing: border-box;
           // border: 1px solid red;
+          display: flex;
+          justify-content: space-between;
           align-items: center;
           .music-name{
             white-space: nowrap;
             text-overflow: ellipsis;
-            width: 247px;
+            width: 230px;
             text-align: left;
             cursor: pointer;
+          }
+          .play-btn{
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            z-index:2;
           }
         }
         .main-wrap{
@@ -1240,6 +1310,35 @@ ul,ol{
     &.show{
       overflow-y: auto;
       height: 540px;
+    }
+    &.short{
+      height: 500px;
+    }
+  }
+  div.audio-player-box{
+    box-sizing: border-box;
+    // border: 1px solid red;
+    position: fixed;
+    bottom: 16px;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background: #f1f3f4;
+    border-radius: 15px;
+    padding-right: 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 2;
+    .audio-player{
+      width: 90%;
+      height: 30px;
+      outline: none;
+    }
+    .down-btn{
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
     }
   }
   >.new-time{
