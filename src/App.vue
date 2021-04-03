@@ -485,13 +485,18 @@ export default {
       }while(_next)
       this.isLoading = false
       // 手动添加grade
+      // const netease_ids_list = {}
       resData._items.map(item=>{
         const {notes,play_style} = resData._related.charts.filter(i=>i._id==item.chart_id && (i.play_style==this.playStyle || this.playStyle == 'ALL'))[0]
-        const music_title = resData._related.music.filter(i=>i._id==item.music_id)[0].title
-        const netease_ids = this.getNeteaseId(music_title)
+        const{ title:music_title, _id:music_id } = resData._related.music.filter(i=>i._id==item.music_id)[0]
+        const netease_ids = this.getNeteaseId(music_title,music_id)
         item.grade = item.ex_score / notes / 2
         item.netease_ids = netease_ids
+        // if(!netease_ids_list[item.music_id]){
+        //   netease_ids_list[item.music_id] = netease_ids
+        // }
       })
+      // console.log(this.djName,netease_ids_list)
       this.scoresData[id]=resData
       this.scores = this.parseScores(resData)
       const newTimeData = this.newFilter(resData)
@@ -534,62 +539,65 @@ export default {
 
       return newData
     },
-    getNeteaseId(music_title){
-      const titleList = this.titleList
-      function replaceTitle(str){
-          return titleList[str] || str
-      }
-      function parseTitle(str){
-        return str
-              .replace(/\ /g,' ')
-              .replace(/[\*♡♥★☆♨・.！!？?:¡→～~〜◎-\s\(\)\;]/g,'')
-              .toLowerCase()
-      }
-      const neteaseIdList = localJson.neteaseIdList
-      const parseMusicTitle = parseTitle(replaceTitle(music_title))
-                              // .replace(/間/g,'间')
-      let netease_ids = []
-      neteaseIdList.forEach(({id,title,artist})=>{
-        const match = parseTitle(title).match(parseMusicTitle)
-        if(match){
-          netease_ids.push({
-            id,
-            title,
-            artist
-          })
-        }
-      })
-      if (netease_ids.length>2){
-        netease_ids = []
-        neteaseIdList.forEach(({id,title,artist})=>{
-          const match = parseTitle(title) == parseMusicTitle ||
-                        parseTitle(title).match(parseMusicTitle) && 
-                        parseTitle(title).match(/(remix)(version)/ig)
-          if(match){
-            netease_ids.push({
-              id,
-              title,
-              artist
-            })
-          }
-        })
-      }
-      if (!netease_ids.length){
-        neteaseIdList.forEach(({id,title,artist})=>{
-          const match = parseTitle(title).match(parseMusicTitle.split('feat')[0].split('ft')[0].split('(')[0])
-          if(match){
-            netease_ids.push({
-              id,
-              title,
-              artist
-            })
-          }
-        })
-      }
+    getNeteaseId(music_title,music_id){
+      const {neteaseIdListObj} = localJson
+      return neteaseIdListObj[music_id] || []
+
+      // const titleList = this.titleList
+      // function replaceTitle(str){
+      //     return titleList[str] || str
+      // }
+      // function parseTitle(str){
+      //   return str
+      //         .replace(/\ /g,' ')
+      //         .replace(/[\*♡♥★☆♨・.！!？?:¡→～~〜◎-\s\(\)\;]/g,'')
+      //         .toLowerCase()
+      // }
+      // const neteaseIdList = localJson.neteaseIdList
+      // const parseMusicTitle = parseTitle(replaceTitle(music_title))
+      //                         // .replace(/間/g,'间')
+      // let netease_ids = []
+      // neteaseIdList.forEach(({id,title,artist})=>{
+      //   const match = parseTitle(title).match(parseMusicTitle)
+      //   if(match){
+      //     netease_ids.push({
+      //       id,
+      //       title,
+      //       artist
+      //     })
+      //   }
+      // })
+      // if (netease_ids.length>2){
+      //   netease_ids = []
+      //   neteaseIdList.forEach(({id,title,artist})=>{
+      //     const match = parseTitle(title) == parseMusicTitle ||
+      //                   parseTitle(title).match(parseMusicTitle) && 
+      //                   parseTitle(title).match(/(remix)(version)/ig)
+      //     if(match){
+      //       netease_ids.push({
+      //         id,
+      //         title,
+      //         artist
+      //       })
+      //     }
+      //   })
+      // }
+      // if (!netease_ids.length){
+      //   neteaseIdList.forEach(({id,title,artist})=>{
+      //     const match = parseTitle(title).match(parseMusicTitle.split('feat')[0].split('ft')[0].split('(')[0])
+      //     if(match){
+      //       netease_ids.push({
+      //         id,
+      //         title,
+      //         artist
+      //       })
+      //     }
+      //   })
+      // }
       // if (netease_ids.length<=0)console.log('匹配不到歌名')
       // if (netease_ids.length>0)console.log('匹配')
       // if (netease_ids.length>1)console.log('匹配多个',parseMusicTitle,netease_ids[1].title)
-      return netease_ids
+      // return netease_ids
     },
     parseScores(data) {
       const gradeList = this.gradeList
@@ -1364,7 +1372,7 @@ ul,ol{
       .title-wrap{
         width: 100%;
         display: flex;
-        justify-content: start;
+        justify-content: flex-start;
         font-size: 18px;
         font-weight: 600;
         line-height: 22px;
