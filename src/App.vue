@@ -290,6 +290,16 @@ export default {
         D: require('@/assets/djlevel/lv_d.png'),
         E: require('@/assets/djlevel/lv_e.png'),
         F: require('@/assets/djlevel/lv_f.png'),
+      },
+      titleList:{
+        // arcana_title: netease_title
+        '牧神笛吹きて': '牧神笛吹き',
+        'ALFARSHEAR 双神威に廻る夢': 'ALFARSHEAR~双神威に廻る梦~',
+        'LETHEBOLG 〜双神威に斬り咲けり〜': 'LETHEBOLG~双神威に斩り咲けり~',
+        'ワルツ第17番 ト短調”大犬のワルツ”': 'ワルツ第17番 ト短調\"大犬のワルツ\" - (17号圆舞曲 G小调 “大犬圆舞曲”)',
+        'がっつり陰キャ!? 怪盗いいんちょの億劫^^;': 'がっつり陰キャ!? 怪盗いいんちょの億劫^^;',
+        '𝆑𝆑𝆑𝆑𝆑': 'fffff',
+        '仮想空間の旅人たち': '仮想空间の旅人たち'
       }
     }
   },
@@ -524,17 +534,19 @@ export default {
       return newData
     },
     getNeteaseId(music_title){
+      const titleList = this.titleList
+      function replaceTitle(str){
+          return titleList[str] || str
+      }
       function parseTitle(str){
         return str
               .replace(/\ /g,' ')
-              .replace(/\*/g,'')
-              .split(' ').filter(i=>i!=' ').join('')
+              .replace(/[\*♡♥★☆♨・.！!？?:¡→～~〜◎-\s\(\)\;]/g,'')
+              .toLowerCase()
       }
       const neteaseIdList = localJson.neteaseIdList
-      const parseMusicTitle = parseTitle(music_title)
-                              .replace(/\～/g,'~')
-                              .replace(/𝆑𝆑𝆑𝆑𝆑/g,'fffff')
-                              .replace(/间/g,'間')
+      const parseMusicTitle = parseTitle(replaceTitle(music_title))
+                              // .replace(/間/g,'间')
       let netease_ids = []
       neteaseIdList.forEach(({id,title,artist})=>{
         const match = parseTitle(title).match(parseMusicTitle)
@@ -563,7 +575,7 @@ export default {
       }
       if (!netease_ids.length){
         neteaseIdList.forEach(({id,title,artist})=>{
-          const match = parseTitle(title).match(parseMusicTitle.split('feat')[0].split('ft')[0].split('(')[0].split('-')[0])
+          const match = parseTitle(title).match(parseMusicTitle.split('feat')[0].split('ft')[0].split('(')[0])
           if(match){
             netease_ids.push({
               id,
@@ -573,8 +585,8 @@ export default {
           }
         })
       }
-      // if (netease_ids.length<=0)console.log('匹配不到歌名',music_title)
-      if (netease_ids.length>0)console.log('匹配')
+      // if (netease_ids.length<=0)console.log('匹配不到歌名')
+      // if (netease_ids.length>0)console.log('匹配')
       // if (netease_ids.length>1)console.log('匹配多个',parseMusicTitle,netease_ids[1].title)
       return netease_ids
     },
@@ -1236,6 +1248,7 @@ ul,ol{
           .music-name{
             white-space: nowrap;
             text-overflow: ellipsis;
+            overflow: hidden;
             width: 230px;
             text-align: left;
             cursor: pointer;
