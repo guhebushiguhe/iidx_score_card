@@ -2745,31 +2745,6 @@ const neteaseIdList = [
         "artist": "V.A."
     },
     {
-        "id": "562675739",
-        "title": "Tri-Boost Title BGM",
-        "artist": "V.A."
-    },
-    {
-        "id": "562675740",
-        "title": "Tri-Boost Entry BGM",
-        "artist": "V.A."
-    },
-    {
-        "id": "562675741",
-        "title": "Tri-Boost Battle BGM",
-        "artist": "日本ACG"
-    },
-    {
-        "id": "562675742",
-        "title": "Tri-Boost ベアガーデン BGM",
-        "artist": "V.A."
-    },
-    {
-        "id": "562675743",
-        "title": "Tri-Boost Thank you for Playing BGM",
-        "artist": "V.A."
-    },
-    {
         "id": "562675744",
         "title": "Graphic Melody (Long Version)",
         "artist": "V.A."

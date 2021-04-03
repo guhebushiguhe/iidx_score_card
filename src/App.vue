@@ -291,6 +291,7 @@ export default {
         E: require('@/assets/djlevel/lv_e.png'),
         F: require('@/assets/djlevel/lv_f.png'),
       },
+      audioData: [],
       titleList:{
         // arcana_title: netease_title
         '牧神笛吹きて': '牧神笛吹き',
@@ -1184,7 +1185,7 @@ ul,ol{
           line-height: 32px;
         }
         .left-wrap{
-          // width: 60px;
+          width: 91px;
           font-size: 12px;
           position: relative;
           align-items: center;
@@ -1245,11 +1246,15 @@ ul,ol{
           display: flex;
           justify-content: space-between;
           align-items: center;
+          flex: 1;
+          // width: 100%;
           .music-name{
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
             width: 230px;
+            // width: 90%;
+            // flex: 1;
             text-align: left;
             cursor: pointer;
           }
@@ -1257,6 +1262,7 @@ ul,ol{
             width: 28px;
             height: 28px;
             cursor: pointer;
+            outline: none;
             z-index:2;
           }
         }
@@ -1325,33 +1331,118 @@ ul,ol{
       height: 540px;
     }
     &.short{
-      height: 500px;
+      height: 460px;
     }
   }
   div.audio-player-box{
     box-sizing: border-box;
     // border: 1px solid red;
     position: fixed;
-    bottom: 16px;
-    left: 0;
-    width: 100%;
-    height: 30px;
+    bottom: -26px;
+    left: 50%;
+    width: 90%;
+    height: 72px;
+    transform: translateX(-50%);
     background: #f1f3f4;
+    // background: #333;
     border-radius: 15px;
-    padding-right: 10px;
+    padding-top: 5px;
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
     align-items: center;
     z-index: 2;
-    .audio-player{
-      width: 90%;
-      height: 30px;
-      outline: none;
+    .top-wrap{
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0 20px;
+      font-size: 12px;
+      line-height: 14px;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      .title-wrap{
+        width: 100%;
+        display: flex;
+        justify-content: start;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 22px;
+        .title{
+          max-width: 90%;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+        .more{
+          padding-left: 10px;
+          cursor: pointer;
+          position: relative;
+          &:hover .music-ids-ul{
+            display: block;
+          }
+          .music-ids-ul{
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-70%);
+            padding: 0 10px;
+            background: #f1f3f4;
+            box-shadow: 5px 5px 5px rgba(0,0,0,.4);
+            border-radius: 10px;
+            align-items: flex-start;
+            z-index: 3;
+            .music-ids-li{
+              font-size: 14px;
+              line-height: 20px;
+              max-width: 300px;
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              &:hover{
+                color: rgb(142, 27, 187);
+              }
+            }
+          }
+        }
+      }
+      .info{
+        display: flex;
+        align-items: center;
+        span{
+          padding-right: 20px;
+        }
+        .artist{
+          overflow: hidden;
+          max-width: 160px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
     }
-    .down-btn{
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
+    .bottom-wrap{
+      box-sizing: border-box;
+      // border: 1px solid red;
+      width: 100%;
+      height: 30px;
+      // background: #f1f3f4;
+      border-radius: 15px;
+      // padding-right: 10px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      .audio-player{
+        width: 100%;
+        height: 30px;
+        outline: none;
+      }
+      .down-btn{
+        width: 20px;
+        height: 20px;
+        padding-right: 10px;
+        cursor: pointer;
+      }
     }
   }
   >.new-time{

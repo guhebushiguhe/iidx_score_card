@@ -17,7 +17,7 @@
                 </div>
                 <div class="wrap right-wrap">
                     <span class="music-name">{{music.title}}</span>
-                    <span v-if="netease_ids.length" class="play-btn" @click="playSong(netease_ids)">▶</span>
+                    <span v-if="netease_ids.length" class="play-btn" @click="playSong(netease_ids,music)">▶</span>
                 </div>
                 <div class="main-wrap">
                     <div class="grade-wrap">
@@ -29,8 +29,35 @@
             </li>
         </ul>
         <div class="audio-player-box" v-if="musicUrl!=''">
-            <audio ref="audio" class="audio-player" :src="musicUrl" @pause="audioPause" @play="audioPlay" controls autoplay loop >您的浏览器不支持 audio 标签</audio>
-            <img :src="img.down" alt="" class="down-btn" @click="hidePlayer">
+            <div class="top-wrap">
+                <span class="title-wrap">
+                    <span class="title">{{ music.title }}</span>
+                    <span class="more" v-if="ids.length>1">···
+                        <ul class="music-ids-ul">
+                            <li
+                                class="music-ids-li"
+                                v-for="(item,key) in ids"
+                                :key="key"
+                                @click="changeUrl(item)"
+                            >
+                                {{ item.title }}
+                            </li>
+                        </ul>
+                    </span>
+                </span>
+                <span class="info">
+                    <span class="artist">
+                        Artist: {{ music.artist }}
+                    </span>
+                    <span class="folder">
+                        Folder: {{ music.folder }}
+                    </span>
+                </span>
+            </div>
+            <div class="bottom-wrap">
+                <audio ref="audio" class="audio-player" :src="musicUrl" @pause="audioPause" @play="audioPlay" controls autoplay loop >您的浏览器不支持 audio 标签</audio>
+                <img :src="img.down" alt="" class="down-btn" @click="hidePlayer">
+            </div>
         </div>
     </div>
 </template>
@@ -59,6 +86,8 @@ export default {
         return {
             touchTimer: null,
             musicUrl: '',
+            ids: [],
+            music: null,
             isAudioPlaying: false,
             isPlayerShow: false,
             img:{
@@ -183,10 +212,16 @@ export default {
         touchend(){
             clearTimeout(this.touchTimer)
         },
-        async playSong(ids){
+        async playSong(ids,music){
             const id = ids[0].id
             const {data} = await this.$axios.getSongUrl(id)
             this.musicUrl = data[0].url
+            this.music = {
+                title: ids[0].title,
+                artist: ids[0].artist,
+                folder: music.folder
+            }
+            this.ids = ids
             this.isAudioPlaying = true
             this.isPlayerShow = true
         },
@@ -198,8 +233,16 @@ export default {
         },
         hidePlayer() {
             this.musicUrl = ''
+            this.music = null
             this.isAudioPlaying = false
             this.isPlayerShow = false
+        },
+        async changeUrl(idData){
+            const { id, title, artist } = idData
+            const {data} = await this.$axios.getSongUrl(id)
+            this.musicUrl = data[0].url
+            this.music.title = title
+            this.music.artist = artist
         }
     },
     watch:{
