@@ -139,6 +139,7 @@
 import html2canvas from 'html2canvas'
 import '@/utils/canvas2image.js'
 import localJson from '@/utils/netease_id_list.js'
+// import arcana_data from '@/utils/arcana_music_list.js'
 import Score from '@/components/Score.vue'
 import Label from '@/components/Label.vue'
 import LvSelector from '@/components/LvSelector.vue'
@@ -164,7 +165,7 @@ export default {
       newTime: null,
       djName: '',
       lv: 'ALL',
-      playStyle: 'ALL',
+      playStyle: 'SINGLE',
       isLoading: false,
       isNameSelectShow: false,
       isMusicListShow: false,
@@ -193,10 +194,10 @@ export default {
       newScoresData:{},
       idsList:{},
       playStyleList: [
-        {
-          label: 'ALL',
-          value: 'ALL'
-        },
+        // {
+        //   label: 'ALL',
+        //   value: 'ALL'
+        // },
         {
           label: 'SP',
           value: 'SINGLE'
@@ -484,10 +485,55 @@ export default {
         pos = data._items[249]?data._items[249]._id:null
       }while(_next)
       this.isLoading = false
+
+      // 获取全量charts和music映射表
+      // let all_charts =  {}
+      // let all_music =  {}
+      // resData._related.charts.map(i=>{
+      //   if(i.play_style=="DOUBLE" && !all_charts[i._id]){
+      //     all_charts[i._id]=i
+      //   }
+      // })
+      // resData._related.music.map(i=>{
+      //   if(!all_music[i._id]){
+      //     all_music[i._id]=i
+      //   }
+      // })
+      // console.log(this.djName,'all_charts',Object.keys(all_charts).length,all_charts)
+      // console.log('all_music',Object.keys(all_music).length,all_music)
+      
+      // 轮询获取全曲charts
+      // const music_list = arcana_data.music_list
+      // const music_ids = Object.keys(music_list)
+      // let music_charts = {}
+
+      // music_ids.map(async i=>{
+      //   const {_items} = await this.$axios.getChartsByMusicId(i)
+      //   if(!music_charts[i]){
+      //     let music = music_list[i]
+      //     music.charts = _items
+      //     music_charts[i] = music
+      //   }
+      // })
+
+      // let i = 0
+      // do{
+      //   const {_items} = await this.$axios.getChartsByMusicId(music_ids[i])
+      //   if(!music_charts[music_ids[i]]){
+      //     let music = music_list[music_ids[i]]
+      //     music.charts = _items
+      //     music_charts[music_ids[i]] = music
+      //   }
+      //   i+=1
+      // }while(i<music_ids.length)
+      // console.log('music_charts',music_charts)
+
+
+
       // 手动添加grade
       // const netease_ids_list = {}
       resData._items.map(item=>{
-        const {notes,play_style} = resData._related.charts.filter(i=>i._id==item.chart_id && (i.play_style==this.playStyle || this.playStyle == 'ALL'))[0]
+        const {notes} = resData._related.charts.filter(i=>i._id==item.chart_id)[0]
         const{ title:music_title, _id:music_id } = resData._related.music.filter(i=>i._id==item.music_id)[0]
         const netease_ids = this.getNeteaseId(music_title,music_id)
         item.grade = item.ex_score / notes / 2
@@ -627,9 +673,9 @@ export default {
         musicList = musicList
       }else if(!lvList.includes(lv)){
         alert('lv不合法，请重新输入')
-        this.$$nextTick(()=>{
+        this.$nextTick(()=>{
           })
-        this.lv = 'ALL'
+        this.lv = 'SINGLE'
         return
       }else {
         musicList =  musicList.filter(({charts})=>charts.rating==lv)
@@ -798,7 +844,7 @@ export default {
       // 有搜索参数
       this.djName = query.djName
       this.lv = query.lv || 'ALL'
-      this.playStyle = query.playStyle || 'ALL'
+      this.playStyle = query.playStyle || 'SINGLE'
       this.getProfiles()
     }else{
       // 没有搜索参数

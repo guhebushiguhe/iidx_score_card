@@ -446,3 +446,59 @@ https://arcana.nu/iidx/27/profiles/${rival_id}/
 }
 ````
 
+#### 查看歌曲各难度
+
+- **api** /api/v1/iidx/27/charts/?music_id=${music_id}&omnimix=true
+
+- **method** GET
+
+- **query**
+
+  | KEY      | VALUE       | DESCRIPTION            |
+  | -------- | ----------- | ---------------------- |
+  | music_id | FpxOX_q5-Cf | 必填，歌曲\_id         |
+  | omnimix  | true        | 可选，就用true，查全曲 |
+
+- **response**
+
+  ```` json
+  {
+      _items: [
+          {
+              "_links": {
+                  "_self": "https://arcana.nu/api/v1/iidx/27/charts/GDwg2vhr47Z",
+                  "music": "https://arcana.nu/api/v1/iidx/27/music/FpxOX_q5-Cf"
+              },
+              "_id": "GDwg2vhr47Z",
+              "music_id": "FpxOX_q5-Cf",
+              "play_style": "DOUBLE",
+              "difficulty": "HYPER",
+              "rating": 9,
+              "notes": 973,
+              "bpm_min": 190,
+              "bpm_max": 190
+          },
+          ...
+      ],
+      _links:{
+          "_self": "https://arcana.nu/api/v1/iidx/27/charts/?music_id=FpxOX_q5-Cf&omnimix=true",
+          "_next": null
+      },
+  	_relates:{
+          "music": [
+              {
+                  "_links": {
+                      "_self": "https://arcana.nu/api/v1/iidx/27/music/FpxOX_q5-Cf"
+                  },
+                  "_id": "FpxOX_q5-Cf",
+                  "folder": 20,
+                  "title": "†渚の小悪魔ラヴリィ〜レイディオ†(IIDX EDIT)",
+                  "artist": "夏色ビキニのPrim",
+                  "genre": "Hi-CORE"
+              }
+          ]
+      }
+  }
+  ````
+
+  
