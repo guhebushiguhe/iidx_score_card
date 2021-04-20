@@ -1,5 +1,10 @@
 const neteaseIdList = [
     {
+        "id": "22681230",
+        "title": "fffff",
+        "artist": "BEMANI Sound Team"
+    },
+    {
         "id": "1459236969",
         "title": "VALKYRIAS -英雄誕生-",
         "artist": "Fernweh/HuΣeR"
@@ -19417,6 +19422,13 @@ const neteaseIdList = [
 ]
 
 const neteaseIdListObj = {
+    "D-gwp5o3B8q": [
+        {
+            "id": "22681230",
+            "title": "fffff",
+            "artist": "BEMANI Sound Team"
+        }
+    ],
     "Aw4woWoKS80": [
         {
             "id": "462612879",

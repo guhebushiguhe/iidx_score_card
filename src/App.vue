@@ -73,12 +73,13 @@
     <div class="box score-box">
       <p class="#9ab5c2" v-if="isLoading">加载中，请耐心等候···</p>
       <ul
-        v-if="scores.length>0 && !isLoading"
+        v-show="scores.length>0 && !isLoading"
         :class="`score-ul ${isMusicListShow?'music-show':''}`"
       >
         <li
           v-for="(item,index) in scores"
           :key="item.label"
+          :style="`{max-height: '${scoreLiMaxHeight}'}`"
           :class="`${activeLabel!='' && activeLabel!=item.label?'inactive':''} score-li`"
         >
           <span class="label-wrap"><Label :text="item.label" :change-label="changeLabel" :is-music-list-show="isMusicListShow" /></span>
@@ -215,48 +216,48 @@ export default {
         },
         {
           grade: 'MAX-',
-          min: 0.9445,
+          min: 0.94444445,
           max: 1
         },
         {
           grade: 'AAA',
-          min: 0.8888,
-          max: 0.9445
+          min: 0.88888888,
+          max: 0.94444445
         },
         {
           grade: 'AA',
-          min: 0.7777,
-          max: 0.8888
+          min: 0.77777777,
+          max: 0.88888888
         },
         {
           grade: 'A',
-          min: 0.6666,
-          max: 0.7777
+          min: 0.66666666,
+          max: 0.77777777
         },
         {
           grade: 'B',
-          min: 0.5555,
-          max: 0.6666
+          min: 0.55555555,
+          max: 0.66666666
         },
         {
           grade: 'C',
-          min: 0.4444,
-          max: 0.5555
+          min: 0.44444444,
+          max: 0.55555555
         },
         {
           grade: 'D',
-          min: 0.3333,
-          max: 0.4444
+          min: 0.33333333,
+          max: 0.44444444
         },
         {
           grade: 'E',
-          min: 0.2222,
-          max: 0.3333
+          min: 0.22222222,
+          max: 0.33333333
         },
         {
           grade: 'F',
           min: 0,
-          max: 0.2222
+          max: 0.22222222
         },
       ],
       lampList: [
@@ -330,6 +331,10 @@ export default {
           F: 'F',
         }
       },
+      scoreLiMaxHeight () {
+        const lisCount = this.scores.length
+        return (document.body.clientHeight - (198+30+21-(lisCount-1)*2))/lisCount + 'px'
+      }
   },
   methods: {
     capture() {
@@ -851,6 +856,9 @@ export default {
       this.$refs.nameInp.focus()
       this.getNames()
     }
+    const vHeight = document.body.clientHeight
+    const el_musicList = document.querySelector('.music-list')
+    el_musicList.style.maxHeight = vHeight - (260+30+21) + 'px'
   }
 }
 </script>
@@ -874,11 +882,11 @@ html,body{
   height: 100%;
   // overflow: hidden;
 }
-@media screen and (max-device-width: 420px){
-  body{
-    overflow: hidden;
-  }
-}
+// @media screen and (max-device-width: 420px){
+//   body{
+//     overflow: hidden;
+//   }
+// }
 ul,ol{
   list-style: none;
 }

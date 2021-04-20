@@ -1,5 +1,5 @@
 <template>
-    <div :class="`${className} ${musicUrl!=''?'short':''}`" v-if="data && data.length>0">
+    <div :class="`${className} ${musicUrl!=''?'short':''}`" v-show="data && data.length>0">
         <ul class="music-ul">
             <li
                 class="music-li"
@@ -109,50 +109,50 @@ export default {
                 },
                 {
                 grade: 'MAX-',
-                min: 0.9445,
+                min: 0.94444445,
                 max: 1
                 },
                 {
                 grade: 'AAA',
-                min: 0.8888,
-                max: 0.9445
+                min: 0.88888888,
+                max: 0.94444445
                 },
                 {
                 grade: 'AA',
-                min: 0.7777,
-                max: 0.8888
+                min: 0.77777777,
+                max: 0.88888888
                 },
                 {
                 grade: 'A',
-                min: 0.6666,
-                max: 0.7777
+                min: 0.66666666,
+                max: 0.77777777
                 },
                 {
                 grade: 'B',
-                min: 0.5555,
-                max: 0.6666
+                min: 0.55555555,
+                max: 0.66666666
                 },
                 {
                 grade: 'C',
-                min: 0.4444,
-                max: 0.5555
+                min: 0.44444444,
+                max: 0.55555555
                 },
                 {
                 grade: 'D',
-                min: 0.3333,
-                max: 0.4444
+                min: 0.33333333,
+                max: 0.44444444
                 },
                 {
                 grade: 'E',
-                min: 0.2222,
-                max: 0.3333
+                min: 0.22222222,
+                max: 0.33333333
                 },
                 {
                 grade: 'F',
                 min: 0,
-                max: 0.2222
+                max: 0.22222222
                 },
-            ]
+            ],
         }
     },
     methods:{
