@@ -40,9 +40,14 @@ function getSongUrl (id) {
     })
 }
 
+function getQpros (id) {
+    return axios.get(arcana_baseURL+'/api/v1/iidx/27/qpros/'+id)
+}
+
 export default {
     getProfiles,
     getScores,
     getChartsByMusicId,
-    getSongUrl
+    getSongUrl,
+    getQpros
 }

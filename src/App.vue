@@ -8,7 +8,7 @@
       class="box profiles-box"
     >
       <p>
-        <span>DJ</span> 
+        <!-- <span>DJ</span>  -->
         <span class="search-name-wrap">
           <div class="search-inp-wrap">
             <input class="searchInp" type="text" v-model="djName" @keypress.enter="toSearch"  @focus="isTyping = true" @blur="lossTyping" :disabled="isLoading" ref="nameInp">
@@ -25,11 +25,15 @@
         </span>
       </p>
       <p v-if="profile">
-        SP Rank: {{profile.sp.rank}}, Plays: {{profile.sp.plays}}, DJ Points: {{profile.sp.dj_points}}
+        SP {{profile.sp.rank || "__段"}}, DJP: {{profile.sp.dj_points}}
       </p>
       <p v-if="profile">
-        DP Rank: {{profile.dp.rank}}, Plays: {{profile.dp.plays}}, DJ Points: {{profile.dp.dj_points}}
+        DP {{profile.dp.rank || "__段"}}, DJP: {{profile.dp.dj_points}}
       </p>
+      <Qpros 
+        :qprosData="qprosData"
+        :bpm="bpm"
+      />
     </div>
     <div class="box search-box">
       <LvSelector
@@ -79,11 +83,18 @@
         <li
           v-for="(item,index) in scores"
           :key="item.label"
-          :style="`{max-height: '${scoreLiMaxHeight}'}`"
+          :style="{maxHeight: scoreLiMaxHeight+'px'}"
           :class="`${activeLabel!='' && activeLabel!=item.label?'inactive':''} score-li`"
         >
-          <span class="label-wrap"><Label :text="item.label" :change-label="changeLabel" :is-music-list-show="isMusicListShow" /></span>
-          <span :class="`${newScores.length > 0?'score':''}`">
+          <span
+            class="label-wrap"
+            :style="{marginTop: (scoreLiMaxHeight-28)/2+'px'}"
+          >
+            <Label :text="item.label" :change-label="changeLabel" :is-music-list-show="isMusicListShow" /></span>
+          <span
+            :class="`${newScores.length > 0?'score':''}`"
+            :style="{marginTop: (scoreLiMaxHeight-28)/2+'px'}"
+          >
             <Score
               :num="item.value.toString()"
               :type="`${item.label=='CLEAR RATE'?'target':'default'}`"
@@ -95,8 +106,9 @@
             />
             </span>
           <span
-          v-if="newScores.length > 0"
-          class="plus"
+            v-show="newScores.length > 0"
+            class="plus"
+            :style="{marginTop: (scoreLiMaxHeight-28)/2+'px'}"
           >
             <Score
               :num="parsePlus(newScores[index].value)"
@@ -121,6 +133,7 @@
       <MusicList
         :class="`${isMusicListShow?'show':''} music-list`" 
         :data="musicListData"
+        :set-bpm="setBpm"
       />
       <div class="new-time" v-if="newTime">新成绩：{{ `${newTime.startTime} - ${newTime.endTime}` }}</div>
     </div>
@@ -147,6 +160,7 @@ import LvSelector from '@/components/LvSelector.vue'
 import PlayStyleSelector from '@/components/PlayStyleSelector.vue'
 import MusicList from '@/components/MusicList.vue'
 import Sorter from '@/components/Sorter.vue'
+import Qpros from '@/components/Qpros.vue'
 export default {
   name: 'App',
   components: {
@@ -155,7 +169,8 @@ export default {
     LvSelector,
     PlayStyleSelector,
     MusicList,
-    Sorter
+    Sorter,
+    Qpros
   },
   data() {
     return {
@@ -178,15 +193,6 @@ export default {
         refresh: require('@/assets/refresh.png'),
         share: require('@/assets/share.png'),
         up: require('@/assets/up.png'),
-      },
-      qpros: {
-          _id: "XXXX",
-          _etag: "XXXX",
-          head: "XXXX",
-          hair: "XXXX",
-          hand: "XXXX",
-          face: "XXXX",
-          body: "XXXX"
       },
       scores: [],
       newScores: [],
@@ -303,7 +309,9 @@ export default {
         'がっつり陰キャ!? 怪盗いいんちょの億劫^^;': 'がっつり陰キャ!? 怪盗いいんちょの億劫^^;',
         '𝆑𝆑𝆑𝆑𝆑': 'fffff',
         '仮想空間の旅人たち': '仮想空间の旅人たち'
-      }
+      },
+      qprosData: null,
+      bpm: null,
     }
   },
   computed: {
@@ -332,8 +340,9 @@ export default {
         }
       },
       scoreLiMaxHeight () {
-        const lisCount = this.scores.length
-        return (document.body.clientHeight - (198+30+21-(lisCount-1)*2))/lisCount + 'px'
+        // const lisCount = this.scores.length
+        const lisCount = 20
+        return (document.body.clientHeight - (198+30+21+(lisCount-1)*2))/lisCount
       }
   },
   methods: {
@@ -400,6 +409,7 @@ export default {
       const id = idsList[djName] || null
       const scoresData = this.scoresData
       const newScoresData = this.newScoresData
+      this.qprosData = null
       if( idsList[djName] ){
         const _items = this.profilesData[id]
         this.getSingleProfile(_items)
@@ -437,10 +447,17 @@ export default {
         return
       }
       const _items = data['_items'][index]
+      const qprosData = await this.$axios.getQpros(_items._id)
+      this.qprosData = qprosData
       this.getSingleProfile(_items)
       this.getScores()
     },
-    getSingleProfile(_items) {
+    async getSingleProfile(_items) {
+      if(_items.qprosData){
+        this.qprosData = _items.qprosData
+      }else{
+        _items.qprosData = Object.freeze(this.qprosData) || null
+      }
       this.isNameSelectShow = false
       this.profiles = null
       this.profilesData[_items._id]=_items
@@ -816,6 +833,9 @@ export default {
     changeLabel(label){
       this.activeLabel = label
       this.showMusicList()
+    },
+    setBpm(bpm){
+      this.bpm = bpm
     }
   },
   watch: {
@@ -882,11 +902,11 @@ html,body{
   height: 100%;
   // overflow: hidden;
 }
-// @media screen and (max-device-width: 420px){
-//   body{
-//     overflow: hidden;
-//   }
-// }
+@media screen and (max-device-width: 420px){
+  body{
+    overflow: hidden;
+  }
+}
 ul,ol{
   list-style: none;
 }
@@ -973,20 +993,14 @@ ul,ol{
 .search-box{
   // margin-top: 20px;
   margin-bottom: 20px;
-  width: 80%;
+  box-sizing: border-box;
+  padding-left: 20px;
+  // padding-right: 35%;
+  // width: 100%;
+  width: 352px;
   display: flex;
-  justify-content: space-around;
+  justify-content: flex-start;
   align-items: flex-end;
-  .searchInp{
-    width: 100px;
-    margin-right: 15px;
-    background: #013765;
-    border: 1px solid #fff;
-    border-radius: 4px;
-    color: #fff;
-    text-indent: .3em;
-    outline: none;
-  }
   .lv-selector-wrap{
     // background: rgba(51, 51, 51,.5);
     background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
@@ -995,6 +1009,7 @@ ul,ol{
     border-radius: 12px;
     display: flex;
     align-items: center;
+    margin-right: 10px;
   }
 
 }
@@ -1031,13 +1046,14 @@ ul,ol{
 .profiles-box{
   width: 352px;
   // margin-bottom: 10px;
-  padding: 30px 0;
+  padding: 40px 0 20px;
+  position: relative;
   >p{
     width: 100%;
     box-sizing: border-box;
     // font-size: 14px;
     text-align: center;
-    // text-align: left;
+    text-align: left;
     padding: 0 20px;
     .search-name-wrap{
       padding: 0;
@@ -1057,7 +1073,7 @@ ul,ol{
           color: #fff;
           font-size: 30px;
           font-weight: 700;
-          text-indent: .3em;
+          // text-indent: .3em;
           outline: none;
         }
         .empty-text{
@@ -1127,7 +1143,8 @@ ul,ol{
     transition: width 0.5s;
     // transition: padding-bottom 0.5s;
     &.music-show{
-      width: 100%;
+      max-width: 100%;
+      width: 375px;
       padding-bottom: 10px;
       .score-li{
         border-radius: 0;
@@ -1218,7 +1235,8 @@ ul,ol{
     }
   }
   .music-list{
-    width: 100%;
+    max-width: 100%;
+    width: 375px;
     overflow: hidden;
     height: 0;
     transition: height 0.5s;
@@ -1241,6 +1259,9 @@ ul,ol{
         background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
         display: flex;
         justify-content: flex-start;
+        &:nth-last-of-type(1){
+          margin-bottom: 100px;
+        }
         .wrap{
           display: flex;
           justify-content: space-between;
@@ -1314,15 +1335,16 @@ ul,ol{
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
-            width: 230px;
+            width: 212px;
             // width: 90%;
             // flex: 1;
             text-align: left;
             cursor: pointer;
           }
           .play-btn{
-            width: 28px;
-            height: 28px;
+            width: 16px;
+            height: 16px;
+            margin: 6px;
             cursor: pointer;
             outline: none;
             z-index:2;
@@ -1393,14 +1415,15 @@ ul,ol{
       height: 540px;
     }
     &.short{
-      height: 460px;
+      // height: 460px;
     }
   }
   div.audio-player-box{
     box-sizing: border-box;
     // border: 1px solid red;
     position: fixed;
-    bottom: -26px;
+    bottom: 26px;
+    // bottom: -26px;
     left: 50%;
     width: 90%;
     height: 72px;

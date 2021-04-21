@@ -91,6 +91,9 @@ export default {
         display: inline-block;
         line-height: 24px;
         }
+        &:nth-of-type(0) {
+            padding: 0;
+        }
     }
     .radio-label{
         .active{

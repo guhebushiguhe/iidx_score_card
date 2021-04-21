@@ -1,5 +1,5 @@
 <template>
-    <div :class="`${className} ${musicUrl!=''?'short':''}`" v-show="data && data.length>0">
+    <div :class="`${className}`" v-show="data && data.length>0">
         <ul class="music-ul">
             <li
                 class="music-li"
@@ -16,8 +16,17 @@
                     <Label :text="grade2Str(grade)" type="small" />
                 </div>
                 <div class="wrap right-wrap">
-                    <span class="music-name">{{music.title}}</span>
-                    <span v-if="netease_ids.length" class="play-btn" @click="playSong(netease_ids,music)">▶</span>
+                    <span
+                        class="music-name"
+                        :style="{maxWidth:musicNameWidth+'px'}"
+                    >{{music.title}}</span>
+                    <img
+                        :src="playBtnSrc(music)"
+                        alt=""
+                        v-if="netease_ids.length"
+                        class="play-btn"
+                        @click="playSong(netease_ids,music,charts)"
+                    >
                 </div>
                 <div class="main-wrap">
                     <div class="grade-wrap">
@@ -31,7 +40,7 @@
         <div class="audio-player-box" v-if="musicUrl!=''">
             <div class="top-wrap">
                 <span class="title-wrap">
-                    <span class="title">{{ music.title }}</span>
+                    <span class="title">{{ playMusic.title }}</span>
                     <span class="more" v-if="ids.length>1">···
                         <ul class="music-ids-ul">
                             <li
@@ -47,10 +56,10 @@
                 </span>
                 <span class="info">
                     <span class="artist">
-                        Artist: {{ music.artist }}
+                        Artist: {{ playMusic.artist }}
                     </span>
                     <span class="folder">
-                        Folder: {{ music.folder }}
+                        Folder: {{ playMusic.folder }}
                     </span>
                 </span>
             </div>
@@ -77,6 +86,11 @@ export default {
             required: false,
             default: ()=>[]
         },
+        setBpm:{
+            type: Function,
+            required: false,
+            default: ()=>{}
+        }
     },
     components:{
         Score,
@@ -87,12 +101,15 @@ export default {
             touchTimer: null,
             musicUrl: '',
             ids: [],
-            music: null,
+            playMusic: null,
             isAudioPlaying: false,
             isPlayerShow: false,
             img:{
                 music_li_cover: require('@/assets/music_li_cover.png'),
-                down: require('@/assets/down.png')
+                down: require('@/assets/down.png'),
+                play: require('@/assets/play.png'),
+                playing: require('@/assets/playing.png'),
+                pause: require('@/assets/pause.png'),
             },
             typeList:{
                 BEGINNER: 'green',
@@ -155,6 +172,11 @@ export default {
             ],
         }
     },
+    computed:{ 
+      musicNameWidth(){
+        return document.body.clientWidth - (91+37+28+5)
+      }
+    },
     methods:{
         grade2Str(grade){
             const gradeList = this.gradeList
@@ -195,28 +217,50 @@ export default {
             clearTimeout(this.touchTimer)
             this.touchTimer = setTimeout(()=>{
                 const playStyle = charts.play_style=='SINGLE'?'SP':'DP'
-                const difficulty = charts.difficulty=='BLACK'?'LEGGENDARIA':charts.difficulty
+                // const difficulty = charts.difficulty=='BLACK'?'LEGGENDARIA':charts.difficulty
+                const diffLists = {
+                    BEGINNER: 'B',
+                    NORMAL: 'N',
+                    HYPER: 'H',
+                    ANOTHER: 'A',
+                    BLACK: 'L'
+                }
+                const difficulty = diffLists[charts.difficulty]
                 const rating = charts.rating
-                const copyStr = `${music.title} ${playStyle} ${difficulty} lv.${rating}`
-                // alert(`${music.title} ${playStyle} ${difficulty} lv.${rating}`)
+                const copyStr = `[${playStyle}${difficulty}${rating}] ${music.title}`
                 this.$copyText(copyStr)
                 .then(res => {
-                    // alert("复制成功")
                     this.$message.success(`复制成功 ${copyStr}`)
                 },err => {
                     this.$message.error('复制失败')
-                    // alert("复制失败")
                 })
             },1000)
         },
         touchend(){
             clearTimeout(this.touchTimer)
         },
-        async playSong(ids,music){
+        async playSong(ids,music,charts){
+            const playMusic = this.playMusic
+            const isAudioPlaying = this.isAudioPlaying
+            if(playMusic && music._id==playMusic._id){
+                const el_audio = document.querySelector('audio')
+                if(isAudioPlaying){
+                    this.audioPause()
+                    this.setBpm(null)
+                    el_audio.pause()
+                    return
+                }else{
+                    el_audio.play()
+                    this.setBpm(charts.bpm_max)
+                    this.audioPlay()
+                    return
+                }
+            }
             const id = ids[0].id
             const {data} = await this.$axios.getSongUrl(id)
             this.musicUrl = data[0].url
-            this.music = {
+            this.playMusic = {
+                _id: music._id,
                 title: ids[0].title,
                 artist: ids[0].artist,
                 folder: music.folder
@@ -224,6 +268,7 @@ export default {
             this.ids = ids
             this.isAudioPlaying = true
             this.isPlayerShow = true
+            this.setBpm(charts.bpm_max)
         },
         audioPlay() {
             this.isAudioPlaying = true
@@ -233,16 +278,27 @@ export default {
         },
         hidePlayer() {
             this.musicUrl = ''
-            this.music = null
+            this.playMusic = null
             this.isAudioPlaying = false
             this.isPlayerShow = false
+            this.setBpm(null)
         },
         async changeUrl(idData){
             const { id, title, artist } = idData
             const {data} = await this.$axios.getSongUrl(id)
             this.musicUrl = data[0].url
-            this.music.title = title
-            this.music.artist = artist
+            this.playMusic.title = title
+            this.playMusic.artist = artist
+        },
+        playBtnSrc(music){
+            const playMusic = this.playMusic
+            const img = this.img
+            const isAudioPlaying = this.isAudioPlaying
+            if(playMusic && music._id==playMusic._id){
+                return isAudioPlaying?img.playing:img.pause
+            }else{
+                return img.play
+            }
         }
     },
     watch:{
