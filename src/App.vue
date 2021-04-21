@@ -83,17 +83,17 @@
         <li
           v-for="(item,index) in scores"
           :key="item.label"
-          :style="{maxHeight: scoreLiMaxHeight+'px'}"
+          :style="{maxHeight: isMusicListShow?'9999px':scoreLiMaxHeight+'px'}"
           :class="`${activeLabel!='' && activeLabel!=item.label?'inactive':''} score-li`"
         >
           <span
             class="label-wrap"
-            :style="{marginTop: (scoreLiMaxHeight-28)/2+'px'}"
+            :style="{marginTop: isMusicListShow?'0px':spanMarginTop+'px'}"
           >
             <Label :text="item.label" :change-label="changeLabel" :is-music-list-show="isMusicListShow" /></span>
           <span
             :class="`${newScores.length > 0?'score':''}`"
-            :style="{marginTop: (scoreLiMaxHeight-28)/2+'px'}"
+            :style="{marginTop: isMusicListShow?'0px':spanMarginTop+'px'}"
           >
             <Score
               :num="item.value.toString()"
@@ -108,7 +108,7 @@
           <span
             v-show="newScores.length > 0"
             class="plus"
-            :style="{marginTop: (scoreLiMaxHeight-28)/2+'px'}"
+            :style="{marginTop: isMusicListShow?'0px':spanMarginTop+'px'}"
           >
             <Score
               :num="parsePlus(newScores[index].value)"
@@ -134,6 +134,7 @@
         :class="`${isMusicListShow?'show':''} music-list`" 
         :data="musicListData"
         :set-bpm="setBpm"
+        :music-list-max-height="musicListMaxHeight"
       />
       <div class="new-time" v-if="newTime">新成绩：{{ `${newTime.startTime} - ${newTime.endTime}` }}</div>
     </div>
@@ -310,6 +311,9 @@ export default {
         '𝆑𝆑𝆑𝆑𝆑': 'fffff',
         '仮想空間の旅人たち': '仮想空间の旅人たち'
       },
+      scoreLiMaxHeight: 9999,
+      musicListMaxHeight: 9999,
+      spanMarginTop: 0,
       qprosData: null,
       bpm: null,
     }
@@ -339,11 +343,6 @@ export default {
           F: 'F',
         }
       },
-      scoreLiMaxHeight () {
-        // const lisCount = this.scores.length
-        const lisCount = 20
-        return (document.body.clientHeight - (198+30+21+(lisCount-1)*2))/lisCount
-      }
   },
   methods: {
     capture() {
@@ -427,7 +426,6 @@ export default {
       this.scores = []
       this.isLoading = true
       const data = await this.$axios.getProfiles(djName)
-      let index = 0
       if(data._items.length<=0){
         this.isNameSelectShow = true
         this.isLoading = false
@@ -446,22 +444,23 @@ export default {
         this.profiles = data._items
         return
       }
-      const _items = data['_items'][index]
+      const _items = data['_items'][0]
       const qprosData = await this.$axios.getQpros(_items._id)
       this.qprosData = qprosData
-      this.getSingleProfile(_items)
+      await this.getSingleProfile(_items)
       this.getScores()
     },
     async getSingleProfile(_items) {
+      const {dj_name,iidx_id,sp,dp,_id,access_time} = _items
       if(_items.qprosData){
         this.qprosData = _items.qprosData
       }else{
+        if(!this.qprosData)this.qprosData = await this.$axios.getQpros(_items._id)
         _items.qprosData = Object.freeze(this.qprosData) || null
       }
       this.isNameSelectShow = false
       this.profiles = null
       this.profilesData[_items._id]=_items
-      const {dj_name,iidx_id,sp,dp,_id,access_time} = _items
       this.idsList[dj_name]=_id
       this.profile = {
         dj_name,
@@ -483,6 +482,7 @@ export default {
     async getScores() {
       this.isLoading = true
       const id = this.idsList[this.djName] || null
+      if(!id)return
       let _next = null
       let pos = null
       let resData = {
@@ -733,8 +733,8 @@ export default {
       })
       return scores
     },
-    continueGetProfile (_items) {
-      this.getSingleProfile(_items)
+    async continueGetProfile (_items) {
+      await this.getSingleProfile(_items)
       this.getScores()
     },
     parsePlus(val){
@@ -862,8 +862,6 @@ export default {
     document.body.appendChild(bgIframe)
   },
   mounted() {
-    // console.dir(document.getElementsByTagName('iframe')[0])
-    // document.getElementsByTagName('iframe')[0]['frameBorder']="0"
     const query = this.$route.query
     if(query.djName){
       // 有搜索参数
@@ -876,9 +874,14 @@ export default {
       this.$refs.nameInp.focus()
       this.getNames()
     }
-    const vHeight = document.body.clientHeight
-    const el_musicList = document.querySelector('.music-list')
-    el_musicList.style.maxHeight = vHeight - (260+30+21) + 'px'
+    this.scoreLiMaxHeight = (document.body.clientHeight - (198+30+21+(20-1)*2))/20
+    this.spanMarginTop = this.scoreLiMaxHeight<28?(this.scoreLiMaxHeight-28)/2+'px':'0px'
+    this.musicListMaxHeight = document.body.clientHeight - (259+30+21)
+    window.onresize=()=>{
+      this.scoreLiMaxHeight = (document.body.clientHeight - (198+30+21+(20-1)*2))/20
+      this.spanMarginTop = this.scoreLiMaxHeight<28?(this.scoreLiMaxHeight-28)/2+'px':'0px'
+      this.musicListMaxHeight = document.body.clientHeight - (259+30+21)
+    }
   }
 }
 </script>
@@ -1190,6 +1193,8 @@ ul,ol{
         .label-modal{
           img{
             height: 17px;
+            display: inline-block;
+            line-height: 24px;
           }
         }
       }

@@ -1,5 +1,9 @@
 <template>
-    <div :class="`${className}`" v-show="data && data.length>0">
+    <div
+        :class="`${className}`"
+        v-show="data && data.length>0"
+        :style="{maxHeight:musicListMaxHeight+'px'}"
+    >
         <ul class="music-ul">
             <li
                 class="music-li"
@@ -90,6 +94,11 @@ export default {
             type: Function,
             required: false,
             default: ()=>{}
+        },
+        musicListMaxHeight:{
+            type: Number,
+            required: false,
+            default: 9999
         }
     },
     components:{
