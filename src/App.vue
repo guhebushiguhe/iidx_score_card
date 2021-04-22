@@ -1,9 +1,5 @@
 <template>
   <div id="app" ref="app">
-    <div class="title-wrap">
-      <!-- <p class="time">{{new Date().toLocaleString()}}<span v-html="'&nbsp;&nbsp;&nbsp;&nbsp;'"></span>{{version}}</p> -->
-      <!-- <div @click="capture"><img class="share-btn" :src="icon.share" alt=""></div> -->
-    </div>
     <div
       class="box profiles-box"
     >
@@ -138,20 +134,10 @@
       />
       <div class="new-time" v-if="newTime">新成绩：{{ `${newTime.startTime} - ${newTime.endTime}` }}</div>
     </div>
-    <div class="cap-wrap" v-if="capURL" @click="capURL=null">
-      <div class="btn-wrap">
-        <p>长按图片分享图片，任意位置点击取消</p>
-        <p>或通过浏览器分享链接</p>
-      </div>
-      <div ref='capImg'>
-        <img class="cap-img" :src="capURL" alt="">
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
-import html2canvas from 'html2canvas'
 import '@/utils/canvas2image.js'
 import localJson from '@/utils/netease_id_list.js'
 // import arcana_data from '@/utils/arcana_music_list.js'
@@ -345,17 +331,6 @@ export default {
       },
   },
   methods: {
-    capture() {
-      const appRef = this.$refs.app
-      html2canvas(appRef,{
-        backgroundColor: '#333536',
-        useCORS: true,
-        dpi: 300,
-      }).then((canvas)=>{
-        let capURL = canvas.toDataURL(`${this.id||null}_scores/jpg`)
-        this.capURL = capURL
-      })
-    },
     lossTyping() {
       setTimeout(()=>{
         this.isTyping = false
@@ -895,7 +870,6 @@ html,body,ul,ol,li,p,div,span,i,img,h1,h2,h3,h4,h5,h6,iframe{
 }
 html,body{
   // background: #333536;
-  // background: url('./assets/bg3.jpeg') repeat fixed;
   background: #3d1259;
   // background-image: linear-gradient(180deg, #5b649b, #3d1259);
   background-size: cover;
@@ -951,48 +925,6 @@ ul,ol{
   flex-direction: column;
   align-items: center;
 }
-.cap-wrap{
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,.8);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  .btn-wrap{
-    width: 80%;
-    padding: 10px 0;
-    // display: flex;
-    // justify-content: space-around;
-  }
-  .cap-img{
-    border: 2px solid #fff;
-    width: 340px;
-  }
-}
-.title-wrap{
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  // justify-content: space-between;
-  .time{
-    width: 100%;
-    font-size: 14px;
-    text-align: left;
-    text-indent: 1em;
-    color: $fontColor1;
-  }
-  .share-btn{
-    width: 18px;
-    height: 18px;
-    padding-right: 10px;
-    // font-weight: 700;
-    cursor: pointer;
-  }
-}
 .search-box{
   // margin-top: 20px;
   margin-bottom: 20px;
@@ -1000,7 +932,8 @@ ul,ol{
   padding-left: 20px;
   // padding-right: 35%;
   // width: 100%;
-  width: 352px;
+  max-width: 100%;
+  width: 400px;
   display: flex;
   justify-content: flex-start;
   align-items: flex-end;
@@ -1132,8 +1065,8 @@ ul,ol{
   }
 }
 .score-box{
-  // width: 300px;
-  width: 100%;
+  width: 400px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1147,7 +1080,7 @@ ul,ol{
     // transition: padding-bottom 0.5s;
     &.music-show{
       max-width: 100%;
-      width: 375px;
+      width: 400px;
       padding-bottom: 10px;
       .score-li{
         border-radius: 0;
@@ -1241,7 +1174,7 @@ ul,ol{
   }
   .music-list{
     max-width: 100%;
-    width: 375px;
+    width: 400px;
     overflow: hidden;
     height: 0;
     transition: height 0.5s;
@@ -1340,7 +1273,7 @@ ul,ol{
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
-            width: 212px;
+            width: 227px;
             // width: 90%;
             // flex: 1;
             text-align: left;
@@ -1419,9 +1352,6 @@ ul,ol{
       overflow-y: auto;
       height: 540px;
     }
-    &.short{
-      // height: 460px;
-    }
   }
   div.audio-player-box{
     box-sizing: border-box;
@@ -1431,10 +1361,10 @@ ul,ol{
     // bottom: -26px;
     left: 50%;
     width: 90%;
-    height: 72px;
+    // height: 100px;
     transform: translateX(-50%);
-    background: #f1f3f4;
-    // background: #333;
+    // background: #f1f3f4;
+    background: #222;
     border-radius: 15px;
     padding-top: 5px;
     display: flex;
@@ -1447,7 +1377,8 @@ ul,ol{
       padding: 0 20px;
       font-size: 12px;
       line-height: 14px;
-      color: #333;
+      // color: #333;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -1461,8 +1392,10 @@ ul,ol{
         .title{
           max-width: 90%;
           overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
+          text-align: left;
+          margin-bottom: 5px;
+          // white-space: nowrap;
+          // text-overflow: ellipsis;
         }
         .more{
           padding-left: 10px;
@@ -1478,7 +1411,8 @@ ul,ol{
             left: 50%;
             transform: translateX(-70%);
             padding: 0 10px;
-            background: #f1f3f4;
+            // background: #f1f3f4;
+            background: #222;
             box-shadow: 5px 5px 5px rgba(0,0,0,.4);
             border-radius: 10px;
             align-items: flex-start;
@@ -1490,8 +1424,10 @@ ul,ol{
               overflow: hidden;
               white-space: nowrap;
               text-overflow: ellipsis;
+              color: #bbb;
               &:hover{
-                color: rgb(142, 27, 187);
+                color: #fff;
+                // color: rgb(142, 27, 187);
               }
             }
           }
@@ -1515,7 +1451,7 @@ ul,ol{
       box-sizing: border-box;
       // border: 1px solid red;
       width: 100%;
-      height: 30px;
+      // height: 30px;
       // background: #f1f3f4;
       border-radius: 15px;
       // padding-right: 10px;
@@ -1526,6 +1462,39 @@ ul,ol{
         width: 100%;
         height: 30px;
         outline: none;
+        display: none;
+      }
+      .player-wrap{
+        width: 160px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .cover-wrap{
+          width: 32px;
+          height: 32px;
+          img{
+            width: 100%;
+            height: 100%;
+          }
+        }
+        .time{
+          color: #888;
+          font-size: 28px;
+          line-height: 28px;
+          font-weight: 700;
+          vertical-align: text-top;
+          &.playing{
+            color: #fff;
+          }
+        }
+        .play-btn{
+          width: 28px;
+          height: 28px;
+          margin: 6px;
+          cursor: pointer;
+          outline: none;
+          z-index:2;
+        }
       }
       .down-btn{
         width: 20px;

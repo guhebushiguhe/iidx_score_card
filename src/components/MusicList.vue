@@ -25,7 +25,7 @@
                         :style="{maxWidth:musicNameWidth+'px'}"
                     >{{music.title}}</span>
                     <img
-                        :src="playBtnSrc(music)"
+                        :src="playBtnSrc(music,'list')"
                         alt=""
                         v-if="netease_ids.length"
                         class="play-btn"
@@ -69,6 +69,18 @@
             </div>
             <div class="bottom-wrap">
                 <audio ref="audio" class="audio-player" :src="musicUrl" @pause="audioPause" @play="audioPlay" controls autoplay loop >您的浏览器不支持 audio 标签</audio>
+                <div class='player-wrap'>
+                    <div class="cover-wrap">
+                        <img :src="img.disc" alt="">
+                    </div>
+                    <span :class="`time ${isAudioPlaying?'playing':''}`">{{currentTimeStr}}</span>
+                    <img
+                        :src="playBtnSrc(playMusic || {_id:''},'player')"
+                        alt=""
+                        class="play-btn"
+                        @click="togglePlay"
+                    >
+                </div>
                 <img :src="img.down" alt="" class="down-btn" @click="hidePlayer">
             </div>
         </div>
@@ -119,6 +131,7 @@ export default {
                 play: require('@/assets/play.png'),
                 playing: require('@/assets/playing.png'),
                 pause: require('@/assets/pause.png'),
+                disc: require('@/assets/disc.png'),
             },
             typeList:{
                 BEGINNER: 'green',
@@ -179,12 +192,20 @@ export default {
                 max: 0.22222222
                 },
             ],
+            musicNameWidth: 9999,
+            currentTime: 0,
+            playerTimer: null,
         }
     },
-    computed:{ 
-      musicNameWidth(){
-        return document.body.clientWidth - (91+37+28+5)
-      }
+    computed:{
+        currentTimeStr () {
+            const currentTime = this.currentTime
+            let mm = parseInt(currentTime/60)
+            let ss = parseInt(currentTime)%60
+            if(mm.toString().length==1)mm = '0'+mm
+            if(ss.toString().length==1)ss = '0'+ss
+            return `${mm}:${ss}`
+        }
     },
     methods:{
         grade2Str(grade){
@@ -252,24 +273,19 @@ export default {
             const playMusic = this.playMusic
             const isAudioPlaying = this.isAudioPlaying
             if(playMusic && music._id==playMusic._id){
-                const el_audio = document.querySelector('audio')
                 if(isAudioPlaying){
                     this.audioPause()
-                    this.setBpm(null)
-                    el_audio.pause()
-                    return
                 }else{
-                    el_audio.play()
-                    this.setBpm(charts.bpm_max)
                     this.audioPlay()
-                    return
                 }
+                return
             }
             const id = ids[0].id
             const {data} = await this.$axios.getSongUrl(id)
             this.musicUrl = data[0].url
             this.playMusic = {
                 _id: music._id,
+                bpm: charts.bpm_max,
                 title: ids[0].title,
                 artist: ids[0].artist,
                 folder: music.folder
@@ -279,11 +295,35 @@ export default {
             this.isPlayerShow = true
             this.setBpm(charts.bpm_max)
         },
+        togglePlay(){
+            const playMusic = this.playMusic
+            const isAudioPlaying = this.isAudioPlaying
+            if(!playMusic)return
+            if(isAudioPlaying){
+                this.audioPause()
+            }else{
+                this.audioPlay()
+            }
+        },
         audioPlay() {
+            const el_audio = document.querySelector('audio')
             this.isAudioPlaying = true
+            el_audio.play()
+            this.currentTime = el_audio.currentTime
+            clearInterval(this.playerTimer)
+            this.playerTimer=null
+            this.playerTimer=setInterval(()=>{
+                this.currentTime = document.querySelector('audio').currentTime
+            },1000)
+            this.setBpm(this.playMusic.bpm)
         },
         audioPause() {
+            const el_audio = document.querySelector('audio')
             this.isAudioPlaying = false
+            this.setBpm(null)
+            el_audio.pause()
+            clearInterval(this.playerTimer)
+            this.playerTimer = null
         },
         hidePlayer() {
             this.musicUrl = ''
@@ -299,16 +339,29 @@ export default {
             this.playMusic.title = title
             this.playMusic.artist = artist
         },
-        playBtnSrc(music){
+        playBtnSrc(music,type){
             const playMusic = this.playMusic
             const img = this.img
             const isAudioPlaying = this.isAudioPlaying
+            if(type=='player'){
+                return isAudioPlaying?img.pause:img.play
+            }
             if(playMusic && music._id==playMusic._id){
                 return isAudioPlaying?img.playing:img.pause
             }else{
                 return img.play
             }
         }
+    },
+    mounted(){
+        this.musicNameWidth = document.body.clientWidth - (91+37+28+5)
+        window.onresize = ()=>{
+            this.musicNameWidth = document.body.clientWidth - (91+37+28+5)
+        }
+    },
+    beforeDestroy(){
+        clearInterval(this.playerTimer)
+        this.playerTimer = null
     },
     watch:{
         data(val,oldVal){
