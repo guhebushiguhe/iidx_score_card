@@ -41,47 +41,82 @@
                 <div class="music-li-cover" :style="{background: `url(${img.music_li_cover})`,backgroundSize: '100% 100%'}"></div>
             </li>
         </ul>
-        <div class="audio-player-box" v-if="musicUrl!=''">
-            <div class="top-wrap">
-                <span class="title-wrap">
-                    <span class="title">{{ playMusic.title }}</span>
-                    <span class="more" v-if="ids.length>1">···
-                        <ul class="music-ids-ul">
-                            <li
-                                class="music-ids-li"
-                                v-for="(item,key) in ids"
-                                :key="key"
-                                @click="changeUrl(item)"
-                            >
-                                {{ item.title }}
-                            </li>
-                        </ul>
+        <div class="audio-player-box" v-if="musicUrl!='' && playMusic">
+            <div class="total-wrap">
+                <div class="top-wrap">
+                    <span class="title-wrap">
+                        <span class="title">{{ playMusic.title }}</span>
+                        <span class="more" v-if="ids.length>1">···
+                            <ul class="music-ids-ul">
+                                <li
+                                    class="music-ids-li"
+                                    v-for="(item,key) in ids"
+                                    :key="key"
+                                    @click="changeUrl(item)"
+                                >
+                                    {{ item.title }}
+                                </li>
+                            </ul>
+                        </span>
                     </span>
-                </span>
-                <span class="info">
-                    <span class="artist">
-                        Artist: {{ playMusic.artist }}
+                    <span class="info">
+                        <span class="artist">
+                            Artist: {{ playMusic.artist }}
+                        </span>
+                        <span class="folder">
+                            Folder: {{ playMusic.folder }}
+                        </span>
                     </span>
-                    <span class="folder">
-                        Folder: {{ playMusic.folder }}
-                    </span>
-                </span>
-            </div>
-            <div class="bottom-wrap">
-                <audio ref="audio" class="audio-player" :src="musicUrl" @pause="audioPause" @play="audioPlay" controls autoplay loop >您的浏览器不支持 audio 标签</audio>
-                <div class='player-wrap'>
-                    <div class="cover-wrap">
-                        <img :src="img.disc" alt="">
-                    </div>
-                    <span :class="`time ${isAudioPlaying?'playing':''}`">{{currentTimeStr}}</span>
-                    <img
-                        :src="playBtnSrc(playMusic || {_id:''},'player')"
-                        alt=""
-                        class="play-btn"
-                        @click="togglePlay"
-                    >
                 </div>
-                <img :src="img.down" alt="" class="down-btn" @click="hidePlayer">
+                <div class="bottom-wrap">
+                    <audio
+                        ref="audio"
+                        class="audio-player"
+                        :src="musicUrl"
+                        crossOrigin="anonymous"
+                        @pause="audioPause"
+                        @play="audioPlay"
+                        controls
+                        autoplay
+                        loop
+                    >您的浏览器不支持 audio 标签</audio>
+                    <div class='player-wrap'>
+                        <div class="cover-wrap" :style="{animationPlayState: `${isAudioPlaying?'running':'paused'}`}">
+                            <img :src="playMusic.picUrl || img.cover" alt="" class="cover">
+                            <img :src="img.disc" alt="" class="disc">
+                        </div>
+                        <span :class="`time ${isAudioPlaying?'playing':''}`">{{currentTimeStr}}</span>
+                        <img
+                            :src="playBtnSrc(playMusic || {_id:''},'player')"
+                            alt=""
+                            class="play-btn"
+                            @click="togglePlay"
+                        >
+                    </div>
+                    <img :src="img.down" alt="" class="down-btn" @click="hidePlayer">
+                </div>
+                <av-bars
+                    ref-link="audio"
+                    class="audio-visual"
+                    caps-color="#FFF"
+                    :bar-color="['rgba(255,255,255,0)', 'rgba(255,255,255,.05)', 'rgba(255,255,255,.1)']"
+                    :bar-width="10"
+                    :bar-space="2"
+                    :canv-width="400"
+                    :canv-height="90"
+                    :caps-height="2"
+                ></av-bars>
+                <div
+                    class="time-line"
+                    :style="{width: `${currentTime/duration*100}%`}"
+                >
+                    <div
+                        class="time-handle"
+                        :style="{left: timeBarLeft+'px'}"
+                        @mousedown.stop="handleStartChangeCurrentTime"
+                        @touchstart.stop="handleStartChangeCurrentTime"
+                    ></div>
+                </div>
             </div>
         </div>
     </div>
@@ -132,6 +167,7 @@ export default {
                 playing: require('@/assets/playing.png'),
                 pause: require('@/assets/pause.png'),
                 disc: require('@/assets/disc.png'),
+                cover: require('@/assets/cover.jpg'),
             },
             typeList:{
                 BEGINNER: 'green',
@@ -194,6 +230,9 @@ export default {
             ],
             musicNameWidth: 9999,
             currentTime: 0,
+            duration: 0,
+            toCurrentTime: 0,
+            timeMoveAble: false,
             playerTimer: null,
         }
     },
@@ -205,6 +244,13 @@ export default {
             if(mm.toString().length==1)mm = '0'+mm
             if(ss.toString().length==1)ss = '0'+ss
             return `${mm}:${ss}`
+        },
+        timeBarLeft () {
+            const timeMoveAble = this.timeMoveAble
+            const app = document.querySelector('#app')
+            return timeMoveAble
+            ?this.toCurrentTime / this.duration * app.offsetWidth
+            :this.currentTime / this.duration * app.offsetWidth
         }
     },
     methods:{
@@ -283,8 +329,11 @@ export default {
             const id = ids[0].id
             const {data} = await this.$axios.getSongUrl(id)
             this.musicUrl = data[0].url
+            const {songs} = await this.$axios.getSongDetails(id)
+            const picUrl = songs[0].al.picUrl
             this.playMusic = {
                 _id: music._id,
+                picUrl,
                 bpm: charts.bpm_max,
                 title: ids[0].title,
                 artist: ids[0].artist,
@@ -310,11 +359,12 @@ export default {
             this.isAudioPlaying = true
             el_audio.play()
             this.currentTime = el_audio.currentTime
+            this.duration = el_audio.duration
             clearInterval(this.playerTimer)
             this.playerTimer=null
             this.playerTimer=setInterval(()=>{
                 this.currentTime = document.querySelector('audio').currentTime
-            },1000)
+            },100)
             this.setBpm(this.playMusic.bpm)
         },
         audioPause() {
@@ -351,6 +401,33 @@ export default {
             }else{
                 return img.play
             }
+        },
+        handleStartChangeCurrentTime(){
+            this.timeMoveAble = true
+        },
+        handleMoveChangeCurrentTime(){
+            if(!this.timeMoveAble)return
+            const duration = this.duration
+            const currentWidth = document.querySelector('.time-line').offsetWidth
+            const appWidth = document.querySelector('#app').offsetWidth
+            const appLeft = document.querySelector('#app').offsetLeft
+            const el_timeHandle = document.querySelector('.time-handle')
+            // this.toCurrentTime = currentWidth / appWidth * duration
+            const touch = event.touch ? event.touch[0] : event
+            console.log(touch.clientX)
+            const diffX = touch.clientX - el_timeHandle.offsetLeft - appLeft + appWidth/2
+            // console.log(touch.clientX,el_timeHandle.target.offsetLeft,appLeft)
+            const newLeft = el_timeHandle.offsetLeft + diffX
+            el_timeHandle.style.left = newLeft + 3 + 'px'
+            this.toCurrentTime = newLeft/ appWidth * duration
+        },
+        handleEndChangeCurrentTime(){
+            if(!this.timeMoveAble)return
+            console.log(this.toCurrentTime)
+            this.timeMoveAble = false
+            const el_audio = document.querySelector('audio')
+            el_audio.currentTime = this.toCurrentTime-0
+            this.currentTime = this.toCurrentTime-0
         }
     },
     mounted(){
@@ -358,6 +435,10 @@ export default {
         window.onresize = ()=>{
             this.musicNameWidth = document.body.clientWidth - (91+37+28+5)
         }
+        document.onmousemove = this.handleMoveChangeCurrentTime
+        document.ontouchmove = this.handleMoveChangeCurrentTime
+        document.onmouseup = this.handleEndChangeCurrentTime
+        document.touchend = this.handleEndChangeCurrentTime
     },
     beforeDestroy(){
         clearInterval(this.playerTimer)

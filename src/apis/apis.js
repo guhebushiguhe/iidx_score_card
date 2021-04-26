@@ -22,7 +22,6 @@ function getScores (id,pos) {
     }
     })
 }
-
 function getChartsByMusicId (music_id) {
     return axios.get(arcana_baseURL+`/api/v1/iidx/27/charts/`,{
         params:{
@@ -30,6 +29,9 @@ function getChartsByMusicId (music_id) {
             omnimix: true,
         }
     })
+}
+function getQpros (id) {
+    return axios.get(arcana_baseURL+'/api/v1/iidx/27/qpros/'+id)
 }
 
 function getSongUrl (id) {
@@ -39,15 +41,17 @@ function getSongUrl (id) {
         }
     })
 }
-
-function getQpros (id) {
-    return axios.get(arcana_baseURL+'/api/v1/iidx/27/qpros/'+id)
+function getSongDetails (id) {
+    return axios.get(netease_baseURL+'/song/detail?ids='+id)
 }
+
+
 
 export default {
     getProfiles,
     getScores,
     getChartsByMusicId,
+    getQpros,
     getSongUrl,
-    getQpros
+    getSongDetails,
 }

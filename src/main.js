@@ -4,6 +4,7 @@ import App from './App.vue'
 import axios from '@/apis/apis'
 import VueClipboard from 'vue-clipboard2'
 import '@/utils/appback.js'
+import AudioVisual from 'vue-audio-visual'
 import {
   Message
 } from 'element-ui'
@@ -11,6 +12,7 @@ import {
 Vue.prototype.$message = Message
 
 Vue.use(VueClipboard)
+Vue.use(AudioVisual)
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
 Date.prototype.toLocaleString = function () {
