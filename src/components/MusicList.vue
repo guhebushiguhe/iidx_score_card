@@ -41,11 +41,17 @@
                 <div class="music-li-cover" :style="{background: `url(${img.music_li_cover})`,backgroundSize: '100% 100%'}"></div>
             </li>
         </ul>
-        <div class="audio-player-box" v-if="musicUrl!='' && playMusic">
+        <div
+            class="audio-player-box"
+            :class="musicUrl!=''?'show':''"
+            @touchstart="handlePlayerTouchStart"
+            @touchmove="handlePlayerTouchMove"
+            @touchend="handlePlayerTouchEnd"
+        >
             <div class="total-wrap">
                 <div class="top-wrap">
                     <span class="title-wrap">
-                        <span class="title">{{ playMusic.title }}</span>
+                        <span class="title">{{ playMusic?playMusic.title:'' }}</span>
                         <span class="more" v-if="ids.length>1">···
                             <ul class="music-ids-ul">
                                 <li
@@ -61,10 +67,13 @@
                     </span>
                     <span class="info">
                         <span class="artist">
-                            Artist: {{ playMusic.artist }}
+                            Artist: {{ playMusic?playMusic.artist:'' }}
                         </span>
                         <span class="folder">
-                            Folder: {{ playMusic.folder }}
+                            Folder: {{ playMusic?playMusic.folder:'' }}
+                        </span>
+                        <span class="bpm">
+                            BPM: {{ playMusic?playMusic.bpm:'' }}
                         </span>
                     </span>
                 </div>
@@ -82,10 +91,10 @@
                     >您的浏览器不支持 audio 标签</audio>
                     <div class='player-wrap'>
                         <div class="cover-wrap" :style="{animationPlayState: `${isAudioPlaying?'running':'paused'}`}">
-                            <img :src="playMusic.picUrl || img.cover" alt="" class="cover">
+                            <img :src="playMusic?(playMusic.picUrl || img.cover):null" alt="" class="cover">
                             <img :src="img.disc" alt="" class="disc">
                         </div>
-                        <span :class="`time ${isAudioPlaying?'playing':''}`">{{currentTimeStr}}</span>
+                        <span :class="`time ${isAudioPlaying?'playing':''}`">{{timeMoveAble ? toCurrentTimeStr : currentTimeStr}}</span>
                         <img
                             :src="playBtnSrc(playMusic || {_id:''},'player')"
                             alt=""
@@ -234,6 +243,8 @@ export default {
             toCurrentTime: 0,
             timeMoveAble: false,
             playerTimer: null,
+            touchPosX: null,
+            touchStartX: null,
         }
     },
     computed:{
@@ -241,6 +252,14 @@ export default {
             const currentTime = this.currentTime
             let mm = parseInt(currentTime/60)
             let ss = parseInt(currentTime)%60
+            if(mm.toString().length==1)mm = '0'+mm
+            if(ss.toString().length==1)ss = '0'+ss
+            return `${mm}:${ss}`
+        },
+        toCurrentTimeStr () {
+            const toCurrentTime = this.toCurrentTime
+            let mm = parseInt(toCurrentTime/60)
+            let ss = parseInt(toCurrentTime)%60
             if(mm.toString().length==1)mm = '0'+mm
             if(ss.toString().length==1)ss = '0'+ss
             return `${mm}:${ss}`
@@ -331,10 +350,14 @@ export default {
             this.musicUrl = data[0].url
             const {songs} = await this.$axios.getSongDetails(id)
             const picUrl = songs[0].al.picUrl
+            const bpm = charts.bpm_min != charts.bpm_max
+                        ?`${charts.bpm_min} - ${charts.bpm_max}`
+                        :charts.bpm_min
             this.playMusic = {
                 _id: music._id,
                 picUrl,
-                bpm: charts.bpm_max,
+                maxbpm: charts.bpm_max,
+                bpm,
                 title: ids[0].title,
                 artist: ids[0].artist,
                 folder: music.folder
@@ -365,7 +388,7 @@ export default {
             this.playerTimer=setInterval(()=>{
                 this.currentTime = document.querySelector('audio').currentTime
             },100)
-            this.setBpm(this.playMusic.bpm)
+            if(this.playMusic)this.setBpm(this.playMusic.maxbpm)
         },
         audioPause() {
             const el_audio = document.querySelector('audio')
@@ -406,28 +429,51 @@ export default {
             this.timeMoveAble = true
         },
         handleMoveChangeCurrentTime(){
-            if(!this.timeMoveAble)return
+            if(!this.timeMoveAble || this.touchPosX)return
             const duration = this.duration
             const currentWidth = document.querySelector('.time-line').offsetWidth
             const appWidth = document.querySelector('#app').offsetWidth
             const appLeft = document.querySelector('#app').offsetLeft
             const el_timeHandle = document.querySelector('.time-handle')
-            // this.toCurrentTime = currentWidth / appWidth * duration
-            const touch = event.touch ? event.touch[0] : event
-            console.log(touch.clientX)
+            const touch = event.touches ? event.touches[0] : event
             const diffX = touch.clientX - el_timeHandle.offsetLeft - appLeft + appWidth/2
-            // console.log(touch.clientX,el_timeHandle.target.offsetLeft,appLeft)
             const newLeft = el_timeHandle.offsetLeft + diffX
             el_timeHandle.style.left = newLeft + 3 + 'px'
             this.toCurrentTime = newLeft/ appWidth * duration
         },
         handleEndChangeCurrentTime(){
             if(!this.timeMoveAble)return
-            console.log(this.toCurrentTime)
+            // console.log(this.toCurrentTime)
             this.timeMoveAble = false
             const el_audio = document.querySelector('audio')
             el_audio.currentTime = this.toCurrentTime-0
             this.currentTime = this.toCurrentTime-0
+            this.toCurrentTime = null
+        },
+        handlePlayerTouchStart(){
+            this.touchPosX = event.touches[0].clientX
+            this.touchStartX = document.querySelector('.time-line').offsetWidth
+        },
+        handlePlayerTouchMove(){
+            if(!this.touchPosX)return
+            const touch = event.touches[0]
+            const touchDiffX = touch.clientX - this.touchPosX
+            if(Math.abs(touchDiffX) < 10 && !this.toCurrentTime)return
+            this.timeMoveAble = true
+            const duration = this.duration
+            const appWidth = document.querySelector('#app').offsetWidth
+            const el_timeHandle = document.querySelector('.time-handle')
+            let newLeft = this.touchStartX + 2*touchDiffX
+            if(newLeft < 0)newLeft = 0
+            if(newLeft > appWidth)newLeft = appWidth
+            el_timeHandle.style.left = newLeft + 3 + 'px'
+            this.toCurrentTime = newLeft/ appWidth * duration
+        },
+        handlePlayerTouchEnd(){
+            if(!this.touchPosX)return
+            this.handleEndChangeCurrentTime()
+            this.touchPosX = null
+            this.touchStartX = null
         }
     },
     mounted(){
@@ -438,7 +484,7 @@ export default {
         document.onmousemove = this.handleMoveChangeCurrentTime
         document.ontouchmove = this.handleMoveChangeCurrentTime
         document.onmouseup = this.handleEndChangeCurrentTime
-        document.touchend = this.handleEndChangeCurrentTime
+        document.ontouchend = this.handleEndChangeCurrentTime
     },
     beforeDestroy(){
         clearInterval(this.playerTimer)

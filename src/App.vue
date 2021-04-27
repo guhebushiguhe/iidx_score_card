@@ -850,11 +850,11 @@ export default {
       this.getNames()
     }
     this.scoreLiMaxHeight = (document.body.clientHeight - (198+30+21+(20-1)*2))/20
-    this.spanMarginTop = this.scoreLiMaxHeight<28?(this.scoreLiMaxHeight-28)/2+'px':'0px'
+    this.spanMarginTop = this.scoreLiMaxHeight<28?(this.scoreLiMaxHeight-28)/2:0
     this.musicListMaxHeight = document.body.clientHeight - (259+30+21)
     window.onresize=()=>{
       this.scoreLiMaxHeight = (document.body.clientHeight - (198+30+21+(20-1)*2))/20
-      this.spanMarginTop = this.scoreLiMaxHeight<28?(this.scoreLiMaxHeight-28)/2+'px':'0px'
+      this.spanMarginTop = this.scoreLiMaxHeight<28?(this.scoreLiMaxHeight-28)/2:0
       this.musicListMaxHeight = document.body.clientHeight - (259+30+21)
     }
   }
@@ -910,6 +910,7 @@ ul,ol{
 #app {
   z-index: 1;
   // height:100%;
+  overflow: hidden;
   max-width: 100vw;
   // background: url('./assets/bg3.jpeg') repeat-y fixed;
   text-align: center;
@@ -1198,7 +1199,7 @@ ul,ol{
         display: flex;
         justify-content: flex-start;
         &:nth-last-of-type(1){
-          margin-bottom: 100px;
+          margin-bottom: 120px;
         }
         .wrap{
           display: flex;
@@ -1356,26 +1357,21 @@ ul,ol{
   div.audio-player-box{
     user-select:none;
     box-sizing: border-box;
-    // border: 1px solid red;
     position: fixed;
-    // bottom: 26px;
-    // left: 50%;
-    // width: 90%;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 160px;
-    // padding-top: 90px;
-    background: linear-gradient(to bottom,rgba(0,0,0,0) 0%,rgba(0,0,0,.7) 30%,rgba(0,0,0,.9) 100%);
-    // transform: translateX(-50%);
-    // background: #f1f3f4;
-    // background: #222;
-    // border-radius: 15px;
-    // padding-top: 5px;
+    height: 0;
+    overflow: hidden;
+    background: linear-gradient(to bottom,rgba(0,0,0,0) 0%,rgba(0,0,0,.8) 20%,rgba(0,0,0,1) 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
     z-index: 2;
+    transition: height .2s;
+    &.show{
+      height: 180px;
+    }
     .total-wrap{
       width: 100%;
       position: absolute;
@@ -1421,13 +1417,9 @@ ul,ol{
               bottom: 100%;
               right: -20px;
               box-sizing: border-box;
-              // transform: translateX(-70%);
               padding: 0 20px;
-              // background: #f1f3f4;
-              // background: #222;
               background: rgba(0,0,0,.8);
               box-shadow: 5px 5px 5px rgba(0,0,0,.4);
-              // border-radius: 10px;
               align-items: flex-start;
               z-index: 3;
               .music-ids-li{
@@ -1451,7 +1443,7 @@ ul,ol{
           display: flex;
           align-items: center;
           span{
-            padding-right: 20px;
+            padding-right: 10px;
           }
           .artist{
             overflow: hidden;
@@ -1463,15 +1455,15 @@ ul,ol{
       }
       .bottom-wrap{
         box-sizing: border-box;
-        padding: 15px 0 10px;
+        padding: 15px 0 15px;
         // border: 1px solid red;
-        width: 100%;
+        // width: 100%;
         // height: 30px;
         // background: #f1f3f4;
         border-radius: 15px;
         // padding-right: 10px;
         display: flex;
-        justify-content: space-around;
+        justify-content: center;
         align-items: center;
         .audio-player{
           width: 100%;
@@ -1481,6 +1473,7 @@ ul,ol{
         }
         .player-wrap{
           width: 180px;
+          margin-right: 30px;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -1507,8 +1500,8 @@ ul,ol{
             -moz-animation-fill-mode : forwards;
             -moz-animation-play-state: paused;
             .cover{
-              width: 60%;
-              height: 60%;
+              width: 55%;
+              height: 55%;
               position: absolute;
               top: 50%;
               left: 50%;
@@ -1521,7 +1514,6 @@ ul,ol{
               position: absolute;
               top: 0;
               left: 0;
-
             }
           }
           .time{
@@ -1560,7 +1552,7 @@ ul,ol{
       }
       .time-line{
         position: absolute;
-        bottom: 3px;
+        bottom: 6px;
         left: 0;
         height: 3px;
         background: #99a0ff;
