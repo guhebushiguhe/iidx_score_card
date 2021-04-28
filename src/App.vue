@@ -820,13 +820,15 @@ export default {
       // console.log(this.musicListData)
       // console.log('filterScore',type,val)
       if(!val)return
-      this.musicListData.map(item=>{
+      let musicListData = []
+      this.musicListData.forEach(item=>{
         item.show = true
+        musicListData.push(item)
       })
       Object.keys(val).map(i=>{
         if(i=='searchVal'){
           const reg = new RegExp(`(${val[i]})`,'ig')
-          this.musicListData.map(item=>{
+          musicListData.map(item=>{
             item.show = item.show && (
               !!item.music.title.match(reg)
               || !!item.music.artist.match(reg)
@@ -835,7 +837,7 @@ export default {
           })
         }
         if(i=='folderFilterVal'){
-          this.musicListData.map(item=>{
+          musicListData.map(item=>{
             item.show = item.show && (
               item.music.folder == val[i]
               || val[i]==-1
@@ -843,6 +845,7 @@ export default {
           })
         }
       })
+      this.musicListData = musicListData
     }
   },
   watch: {
@@ -942,6 +945,7 @@ ul,ol{
 #app {
   z-index: 1;
   // height:100%;
+  min-height: 724px;
   overflow: hidden;
   max-width: 100vw;
   // background: url('./assets/bg3.jpeg') repeat-y fixed;

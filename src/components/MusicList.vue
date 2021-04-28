@@ -5,11 +5,11 @@
         :style="{maxHeight:musicListMaxHeight+'px'}"
     >
         <ul class="music-ul">
+            <div class="topEmpty" :style="{height: topEmptyHeight+'px'}"></div>
             <li
                 class="music-li"
-                v-for="({_id,show,lamp,grade,music,charts,netease_ids}) in data"
+                v-for="({_id,lamp,grade,music,charts,netease_ids}) in dataActive"
                 :key="_id"
-                v-show="show"
                 @touchstart="touchstart(music,charts)"
                 @touchend="touchend"
                 @mousedown="touchstart(music,charts)"
@@ -41,6 +41,7 @@
                 </div>
                 <div class="music-li-cover" :style="{background: `url(${img.music_li_cover})`,backgroundSize: '100% 100%'}"></div>
             </li>
+            <div class="bottomEmpty" :style="{height: bottomEmptyHeight+'px'}"></div>
         </ul>
         <div
             class="audio-player-box"
@@ -246,6 +247,10 @@ export default {
             playerTimer: null,
             touchPosX: null,
             touchStartX: null,
+            dataActive: null,
+            topEmptyHeight: 0,
+            bottomEmptyHeight: 0,
+            focusIndex: null
         }
     },
     computed:{
@@ -271,7 +276,43 @@ export default {
             return timeMoveAble
             ?this.toCurrentTime / this.duration * app.offsetWidth
             :this.currentTime / this.duration * app.offsetWidth
-        }
+        },
+        // activeIndex(){
+        //     const data = this.data
+        //     const data_show = data.filter(i=>i.show)
+        //     const viewLimit = 50
+        //     const ulPaddingBottom = 0
+        //     const el_musicList = document.querySelector('.music-list')
+        //     const musicListHeight = el_musicList?el_musicList.offsetHeight:0
+        //     const ulMaxScrollTop = data_show.length*42-10+ulPaddingBottom-musicListHeight
+        //     const scrollTop = el_musicList?el_musicList.scrollTop:0
+        //     const focusIndex = parseInt(scrollTop/ulMaxScrollTop)
+        //     let firstIndex = 0
+        //     let lastIndex = 99
+        //     if(focusIndex>=viewLimit){
+        //         firstIndex = focusIndex-focusIndex%viewLimit
+        //         lastIndex = firstIndex+viewLimit-1<=ulMaxScrollTop?firstIndex+viewLimit-1:ulMaxScrollTop
+        //     }
+        //     return {
+        //         firstIndex,
+        //         lastIndex
+        //     }
+        // },
+        // dataActive(){
+        //     const data = this.data
+        //     const data_show = data.filter(i=>i.show)
+        //     const firstIndex = this.activeIndex.firstIndex
+        //     const lastIndex = this.activeIndex.lastIndex
+        //     const data_active = data_show.filter((i,index)=>index>=firstIndex && index<=lastIndex)
+        //     return data_active
+        // },
+        // emptyHeight(){
+        //     const ulPaddingBottom = 0
+        //     return {
+        //         topEmptyHeight: this.activeIndex.firstIndex*42,
+        //         bottomEmptyHeight: this.activeIndex.lastIndex*42+ulPaddingBottom
+        //     }
+        // }
     },
     methods:{
         grade2Str(grade){
@@ -436,7 +477,7 @@ export default {
             const appWidth = document.querySelector('#app').offsetWidth
             const appLeft = document.querySelector('#app').offsetLeft
             const el_timeHandle = document.querySelector('.time-handle')
-            const touch = event.touches ? event.touches[0] : event
+            const touch = window.event.touches ? window.event.touches[0] : window.event
             const diffX = touch.clientX - el_timeHandle.offsetLeft - appLeft + appWidth/2
             const newLeft = el_timeHandle.offsetLeft + diffX
             el_timeHandle.style.left = newLeft + 3 + 'px'
@@ -475,6 +516,38 @@ export default {
             this.handleEndChangeCurrentTime()
             this.touchPosX = null
             this.touchStartX = null
+        },
+        setDataActive_emptyHeight(){
+            const data = this.data
+            if(!data)return
+            const data_show = data.filter(i=>i.show)
+            const data_length = data_show.length
+            const viewLimit = 20
+            const ulPaddingBottom = 120
+            const el_musicList = document.querySelector('.music-list')
+            const musicListHeight = el_musicList?el_musicList.offsetHeight:0
+            const ulMaxScrollTop = data_length*42-10+ulPaddingBottom-musicListHeight
+            const scrollTop = el_musicList?el_musicList.scrollTop:0
+            const focusIndex = Math.floor(scrollTop/ulMaxScrollTop*data_length)
+            if(this.focusIndex == focusIndex && this.focusIndex!=0)return
+            this.focusIndex = focusIndex
+            // console.log('scrollTop',scrollTop)
+            let firstIndex = 0
+            let lastIndex = viewLimit*3-1
+            if(focusIndex>=viewLimit){
+                firstIndex = focusIndex-focusIndex%viewLimit-viewLimit
+            }
+            lastIndex = firstIndex+viewLimit*3-1<=ulMaxScrollTop?firstIndex+viewLimit*3-1:data_length-1
+            if(focusIndex+viewLimit*2-1>=data_length){
+                firstIndex = data_length-viewLimit*3
+                lastIndex = data_length-1
+            }
+            // console.log('focusIndex',focusIndex,'firstIndex',firstIndex,'lastIndex',lastIndex)
+            const data_active = data_show.filter((i,index)=>index>=firstIndex && index<=lastIndex)
+            this.dataActive = data_active
+            this.topEmptyHeight = firstIndex*42
+            this.bottomEmptyHeight = (data_length-1-lastIndex)*42+ulPaddingBottom
+            // this.bottomEmptyHeight = bottomEmptyHeight>=0?bottomEmptyHeight:0
         }
     },
     mounted(){
@@ -486,6 +559,9 @@ export default {
         document.ontouchmove = this.handleMoveChangeCurrentTime
         document.onmouseup = this.handleEndChangeCurrentTime
         document.ontouchend = this.handleEndChangeCurrentTime
+        this.setDataActive_emptyHeight()
+        const el = document.querySelector('.music-list')
+        if(el)el.addEventListener('scroll',this.setDataActive_emptyHeight)
     },
     beforeDestroy(){
         clearInterval(this.playerTimer)
@@ -494,7 +570,14 @@ export default {
     watch:{
         data(val,oldVal){
             if(val==oldVal)return
-            if(!this.data.length)this.hidePlayer()
+            if(!this.data.length){
+                this.hidePlayer()
+            }else{
+                this.focusIndex = null
+                this.setDataActive_emptyHeight()
+                const el = document.querySelector('.music-list')
+                if(el)el.addEventListener('scroll',this.setDataActive_emptyHeight)
+            }
         }
     }
 }
@@ -649,9 +732,9 @@ export default {
         background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
         display: flex;
         justify-content: flex-start;
-        &:nth-last-of-type(1){
-          margin-bottom: 120px;
-        }
+        // &:nth-last-of-type(1){
+        //   margin-bottom: 120px;
+        // }
         .wrap{
           display: flex;
           justify-content: space-between;

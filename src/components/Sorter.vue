@@ -16,6 +16,11 @@
                     @keypress.enter="filterScore(scoreFilterVal)"
                 >
                 <span
+                    class="del-btn"
+                    @click="resetSearchInp"
+                    v-show="searchVal!=''"
+                >×</span>
+                <span
                     class="search-btn"
                     @click="filterScore(scoreFilterVal)"
                 >搜索</span>
@@ -212,6 +217,10 @@ export default {
         handleChangeFolderValue(item){
             this.folderFilterStr = item
             this.filterScore(this.scoreFilterVal)
+        },
+        resetSearchInp(){
+            this.searchVal = ''
+            this.filterScore(this.scoreFilterVal)
         }
     },
     watch:{
@@ -223,12 +232,14 @@ export default {
                     value: -1,
                     label: 'All Folder',
                 }
+            }else{
+                this.filterScore(this.scoreFilterVal)
             }
         },
-        musicListData(val,oldVal){
-            if(val==oldVal)return
-            this.filterScore(this.scoreFilterVal)
-        }
+        // musicListData(val,oldVal){
+        //     if(val==oldVal)return
+        //     this.filterScore(this.scoreFilterVal)
+        // }
     }
 }
 </script>
@@ -275,6 +286,7 @@ export default {
         justify-content: space-between;
         position: relative;
         .search{
+            position: relative;
             input{
                 width: 160px;
                 height: 22px;
@@ -286,6 +298,17 @@ export default {
                 color: #fff;
                 text-indent: .5em;
                 margin-right: 10px;
+            }
+            .del-btn{
+                width: 22px;
+                height: 22px;
+                font-size: 14px;
+                line-height: 22px;
+                color: #fff;
+                position: absolute;
+                top: 0;
+                left: 138px;
+                cursor: pointer;
             }
             .search-btn{
                 cursor: pointer;
