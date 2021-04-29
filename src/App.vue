@@ -774,42 +774,43 @@ export default {
       switch (type){
         case 'lamp':
           firstId = musicListData[0].charts._id.toString()
-            this.musicListData = musicListData.sort((a,b)=>lampCode[b.lamp] - lampCode[a.lamp])
+            this.musicListData.sort((a,b)=>lampCode[b.lamp] - lampCode[a.lamp])
           if(firstId == musicListData[0].charts._id){
-            this.musicListData = musicListData.sort((a,b)=>lampCode[a.lamp] - lampCode[b.lamp])
+            this.musicListData.sort((a,b)=>lampCode[a.lamp] - lampCode[b.lamp])
             }
           break
         case 'level':
           firstId = musicListData[0].charts._id.toString()
-            this.musicListData = musicListData.sort((a,b)=>b.charts.rating - a.charts.rating)
+            this.musicListData.sort((a,b)=>b.charts.rating - a.charts.rating)
           if(firstId == musicListData[0].charts._id){
-            this.musicListData = musicListData.sort((a,b)=>a.charts.rating - b.charts.rating)
+            this.musicListData.sort((a,b)=>a.charts.rating - b.charts.rating)
           }
           break
         case 'grade':
           firstId = musicListData[0].charts._id.toString()
-            this.musicListData = musicListData.sort((a,b)=>b.grade - a.grade)
+            this.musicListData.sort((a,b)=>b.grade - a.grade)
           if(firstId == musicListData[0].charts._id){
-            this.musicListData = musicListData.sort((a,b)=>a.grade - b.grade)
+            this.musicListData.sort((a,b)=>a.grade - b.grade)
           }
           break
         case 'title':
           firstId = musicListData[0].charts._id.toString()
-            this.musicListData = musicListData.sort((a,b)=>a.music.title.localeCompare(b.music.title, 'zh-CN', { numeric: true }))
+            this.musicListData.sort((a,b)=>a.music.title.localeCompare(b.music.title, 'zh-CN', { numeric: true }))
           if(firstId == musicListData[0].charts._id){
-            this.musicListData = musicListData.sort((a,b)=>b.music.title.localeCompare(a.music.title, 'zh-CN', { numeric: true }))
+            this.musicListData.sort((a,b)=>b.music.title.localeCompare(a.music.title, 'zh-CN', { numeric: true }))
           }
           break
         case 'time':
           firstId = musicListData[0].charts._id.toString()
-            this.musicListData = musicListData.sort((a,b)=>new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+            this.musicListData.sort((a,b)=>new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
           if(firstId == musicListData[0].charts._id){
-            this.musicListData = musicListData.sort((a,b)=>new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+            this.musicListData.sort((a,b)=>new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
           }
           break
         default:
           break
       }
+      this.musicListData = JSON.parse(JSON.stringify(this.musicListData))
     },
     changeLabel(label){
       this.activeLabel = label
@@ -850,6 +851,10 @@ export default {
       this.musicListData = musicListData
     },
     parseMapData(){
+      const cityArr=[
+          ['上海', '河北', '山西', '内蒙古', '辽宁', '吉林','黑龙江',  '江苏', '浙江', '安徽', '福建', '江西', '山东','河南', '湖北', '湖南', '广东', '广西', '海南', '四川', '贵州', '云南', '西藏', '陕西', '甘肃', '青海', '宁夏', '新疆', '北京', '天津', '重庆', '香港', '澳门', '台湾'],
+          ['shanghai', 'hebei','shanxi','neimenggu','liaoning','jilin','heilongjiang','jiangsu','zhejiang','anhui','fujian','jiangxi','shandong','henan','hubei','hunan','guangdong','guangxi','hainan','sichuan','guizhou','yunnan','xizang','shanxi1','gansu','qinghai','ningxia','xinjiang', 'beijing', 'tianjin', 'chongqing', 'xianggang', 'aomen', 'taiwan']
+      ];
       let resJson = []
       mapJson.features.map(i=>{
         const {properties,...rest} = i
