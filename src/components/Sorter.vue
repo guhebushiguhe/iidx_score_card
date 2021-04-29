@@ -234,6 +234,7 @@ export default {
                 }
             }else{
                 this.filterScore(this.scoreFilterVal)
+                document.querySelector('.music-list').scrollTop = 0
             }
         },
         // musicListData(val,oldVal){

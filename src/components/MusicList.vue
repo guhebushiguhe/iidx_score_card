@@ -576,6 +576,7 @@ export default {
                 this.focusIndex = null
                 this.setDataActive_emptyHeight()
                 const el = document.querySelector('.music-list')
+                el.scrollTop = 0
                 if(el)el.addEventListener('scroll',this.setDataActive_emptyHeight)
             }
         }

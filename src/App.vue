@@ -143,6 +143,8 @@
 import '@/utils/canvas2image.js'
 import localJson from '@/utils/netease_id_list.js'
 // import arcana_data from '@/utils/arcana_music_list.js'
+// import mapJson from '@/utils/map/china.json'
+// import courtNo_list from '@/utils/courtNo_list.json'
 import Score from '@/components/Score.vue'
 import Label from '@/components/Label.vue'
 import LvSelector from '@/components/LvSelector.vue'
@@ -846,6 +848,25 @@ export default {
         }
       })
       this.musicListData = musicListData
+    },
+    parseMapData(){
+      let resJson = []
+      mapJson.features.map(i=>{
+        const {properties,...rest} = i
+        const searchName = properties.name
+        // const reg = new RegExp(`(${searchName})(高级人民法院)$`,'g')
+        const reg = new RegExp(`(?=.*${searchName})(?=.*高级人民法院)^.*`)
+        const resArr = courtNo_list.filter(i=>
+          reg.test(i.court_name)
+        )
+        if(resArr.length != 1){
+          console.log(searchName,resArr)
+        }else{
+          properties.courtNo = resArr[0].court_id
+        }
+        resJson.push({properties,...rest})
+      })
+      console.log('resJson',resJson)
     }
   },
   watch: {
@@ -860,7 +881,7 @@ export default {
     scores(val,oldVal){
       if(val==oldVal || !this.isMusicListShow)return
       this.showMusicList()
-    }
+    },
   },
   created(){
     const bgIframe = document.createElement('iframe')
@@ -872,6 +893,7 @@ export default {
     document.body.appendChild(bgIframe)
   },
   mounted() {
+    // this.parseMapData()
     const query = this.$route.query
     if(query.djName){
       // 有搜索参数
