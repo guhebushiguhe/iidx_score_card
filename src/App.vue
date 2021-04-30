@@ -144,7 +144,10 @@ import '@/utils/canvas2image.js'
 import localJson from '@/utils/netease_id_list.js'
 // import arcana_data from '@/utils/arcana_music_list.js'
 // import mapJson from '@/utils/map/china.json'
-// import courtNo_list from '@/utils/courtNo_list.json'
+import courtNo_list from '@/utils/courtNo_list.json'
+import axios from 'axios'
+
+
 import Score from '@/components/Score.vue'
 import Label from '@/components/Label.vue'
 import LvSelector from '@/components/LvSelector.vue'
@@ -850,28 +853,154 @@ export default {
       })
       this.musicListData = musicListData
     },
-    parseMapData(){
-      const cityArr=[
-          ['上海', '河北', '山西', '内蒙古', '辽宁', '吉林','黑龙江',  '江苏', '浙江', '安徽', '福建', '江西', '山东','河南', '湖北', '湖南', '广东', '广西', '海南', '四川', '贵州', '云南', '西藏', '陕西', '甘肃', '青海', '宁夏', '新疆', '北京', '天津', '重庆', '香港', '澳门', '台湾'],
-          ['shanghai', 'hebei','shanxi','neimenggu','liaoning','jilin','heilongjiang','jiangsu','zhejiang','anhui','fujian','jiangxi','shandong','henan','hubei','hunan','guangdong','guangxi','hainan','sichuan','guizhou','yunnan','xizang','shanxi1','gansu','qinghai','ningxia','xinjiang', 'beijing', 'tianjin', 'chongqing', 'xianggang', 'aomen', 'taiwan']
-      ];
-      let resJson = []
-      mapJson.features.map(i=>{
+    async parseMapData(){
+      // const cityArr=[
+      //     ['上海', '河北', '山西', '内蒙古', '辽宁', '吉林','黑龙江',  '江苏', '浙江', '安徽', '福建', '江西', '山东','河南', '湖北', '湖南', '广东', '广西', '海南', '四川', '贵州', '云南', '西藏', '陕西', '甘肃', '青海', '宁夏', '新疆', '北京', '天津', '重庆', '香港', '澳门', '台湾'],
+      //     ['shanghai', 'hebei','shanxi','neimenggu','liaoning','jilin','heilongjiang','jiangsu','zhejiang','anhui','fujian','jiangxi','shandong','henan','hubei','hunan','guangdong','guangxi','hainan','sichuan','guizhou','yunnan','xizang','shanxi1','gansu','qinghai','ningxia','xinjiang', 'beijing', 'tianjin', 'chongqing', 'xianggang', 'aomen', 'taiwan']
+      // ];
+      const cityObj = {
+        "上海": "shanghai",
+        "河北": "hebei",
+        "山西": "shanxi",
+        "内蒙古": "neimenggu",
+        "辽宁": "liaoning",
+        "吉林": "jilin",
+        "黑龙江": "heilongjiang",
+        "江苏": "jiangsu",
+        "浙江": "zhejiang",
+        "安徽": "anhui",
+        "福建": "fujian",
+        "江西": "jiangxi",
+        "山东": "shandong",
+        "河南": "henan",
+        "湖北": "hubei",
+        "湖南": "hunan",
+        "广东": "guangdong",
+        "广西": "guangxi",
+        "海南": "hainan",
+        "四川": "sichuan",
+        "贵州": "guizhou",
+        "云南": "yunnan",
+        "西藏": "xizang",
+        "陕西": "shanxi1",
+        "甘肃": "gansu",
+        "青海": "qinghai",
+        "宁夏": "ningxia",
+        "新疆": "xinjiang",
+        "北京": "beijing",
+        "天津": "tianjin",
+        "重庆": "chongqing",
+        "香港": "xianggang",
+        "澳门": "aomen",
+        "台湾": "taiwan"
+    }
+      function saveAs(obj,filename){//chrome,火狐等现代浏览器保存文本框内容
+          var a=document.createElement('a');
+          a.setAttribute('href','data:text/html;gb2312,'+JSON.stringify(obj));
+          a.setAttribute('download',filename);
+          a.setAttribute('target','_blank');
+          a.style.display="none";
+          document.body.appendChild(a);
+          a.click();
+      } 
+
+      // 全国数据准备
+      const mapJson = await axios.get('./map/china.json')
+      let newChinaFeatures = []
+      let provsJson = {}
+      let citysJson = {}
+      mapJson.features.map(async i=>{
+        // 省级匹配
         const {properties,...rest} = i
         const searchName = properties.name
-        // const reg = new RegExp(`(${searchName})(高级人民法院)$`,'g')
-        const reg = new RegExp(`(?=.*${searchName})(?=.*高级人民法院)^.*`)
-        const resArr = courtNo_list.filter(i=>
-          reg.test(i.court_name)
-        )
-        if(resArr.length != 1){
-          console.log(searchName,resArr)
-        }else{
-          properties.courtNo = resArr[0].court_id
+        let provCourtNo = null
+        if(!['香港','澳门','台湾'].includes(searchName)){
+          const reg = new RegExp(`(?=.*${searchName})(?=.*高级人民法院)^.*`)
+          const resArr = courtNo_list.filter(c=>
+            reg.test(c.court_name)
+          )
+          if(resArr.length != 1){
+            console.log('省级匹配错误',searchName,resArr)
+          }else{
+            provCourtNo = resArr[0].court_id
+            if(!properties.courtNo){//忽略已匹配的地区
+              properties.courtNo = provCourtNo
+            }
+          }
+          newChinaFeatures.push({properties,...rest})
+          // 市级匹配
+          function parseSearchName(name){
+            const replaceWords = ['自治区','自治县','市','区','县']
+            let nameStr = name
+            replaceWords.forEach(w=>{
+              const reg = new RegExp(`(${w})`,'g')
+              nameStr = nameStr.replace(reg,'')
+            })
+            return nameStr
+          }
+          if(provCourtNo && searchName == '浙江'){
+            const resProvince = await axios.get(`./map/json/province/${cityObj[searchName]}.json`)
+            let newProvFeatures = []
+            resProvince.features.map(async p=>{
+                let cityCourtNo = null
+                const {properties,...rest} = p
+                const searchName = properties.name
+                const reg = new RegExp(`(?=.*${searchName}).*`)
+                const resArr = courtNo_list.filter(c=>
+                  reg.test(parseSearchName(c.court_name)) && c.p_id == provCourtNo
+                )
+                if(resArr.length != 1){
+                  console.log('市级匹配错误',searchName,resArr,'provCourtNo',provCourtNo)
+                }else{
+                  if(!properties.courtNo){//忽略已匹配的地区
+                    cityCourtNo = resArr[0].court_id
+                    properties.courtNo = cityCourtNo
+                  }
+                }
+                newProvFeatures.push({properties,...rest})
+                // 区级匹配
+                if(cityCourtNo && p.id){
+                  const resCity = await axios.get(`./map/json/citys/${p.id}.json`)
+                  let newCityFeatures = []
+                  resCity.features.map(async p=>{
+                      const {properties,...rest} = p
+                      const searchName = properties.name
+                      const reg = new RegExp(`(?=.*${searchName}).*`)
+                      const resArr = courtNo_list.filter(c=>
+                        reg.test(parseSearchName(c.court_name)) && c.p_id == cityCourtNo
+                      )
+                      if(resArr.length != 1){
+                        console.log('区级匹配错误',searchName,resArr,'cityCourtNo',cityCourtNo)
+                      }else{
+                        if(!properties.courtNo){//忽略已匹配的地区
+                          properties.courtNo = resArr[0].court_id
+                        }
+                      }
+                      newCityFeatures.push({properties,...rest})
+                      // 区级匹配
+                      
+                  })
+                  const {features,...rest}  = resCity
+                  citysJson[searchName] = {...rest,"features":newCityFeatures}
+                }
+
+
+
+            })
+            const {features,...rest}  = resProvince
+            provsJson[searchName] = {...rest,"features":newProvFeatures}
+          }
         }
-        resJson.push({properties,...rest})
       })
-      console.log('resJson',resJson)
+      console.log('provsJson',provsJson)
+      console.log('citysJson',citysJson)
+      const {features,...rest}  = mapJson
+      const chinaJson = {...rest,"features":newChinaFeatures}
+      // 省级下载
+      // console.log('chinaJson',chinaJson)
+      // if(confirm('是否下载JSON')){
+      //   saveAs(chinaJson,'china.json')
+      // }
     }
   },
   watch: {
@@ -898,7 +1027,7 @@ export default {
     document.body.appendChild(bgIframe)
   },
   mounted() {
-    // this.parseMapData()
+    this.parseMapData()
     const query = this.$route.query
     if(query.djName){
       // 有搜索参数
