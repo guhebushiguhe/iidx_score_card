@@ -9,11 +9,22 @@
             v-if="isMusicListShow"
         >
             <li
-                v-for="item in Object.keys(labelImg)"
+                v-for="item in quickLabelList"
                 :key="item"
                 class="label-li"
             >
                 <img :src="labelImg[item]" alt="" @click="changeLabel(item)">
+            </li>
+        </ul>
+        <ul
+            class="clear-rate-style-ul"
+            v-if="text=='CLEAR RATE' && !isMusicListShow"
+        >
+            <li
+                v-for="item in clearRateStyleList"
+                :key="item"
+            >
+                <img :src="labelImg[item]" alt="" @click="changeClearRateStyle(item)">
             </li>
         </ul>
     </div>
@@ -46,6 +57,16 @@ export default {
             type: Boolean,
             required: false,
             default: false
+        },
+        clearRateStyle: {
+            type: String,
+            required: false,
+            default: 'assistClearRate',
+        },
+        changeClearRateStyle: {
+            type: Function,
+            required: false,
+            default: ()=>{}
         }
     },
     data(){
@@ -60,7 +81,13 @@ export default {
                 EC: require('@/assets/clear/clear_easy.png'),
                 'NO PLAY': require('@/assets/clear/clear_no_play.png'),
                 Failed: require('@/assets/clear/clear_failed.png'),
-                'CLEAR RATE': require('@/assets/clear/clear_rate.png'),
+                // 'CLEAR RATE': require('@/assets/clear/clear_rate.png'),
+                'assistClearRate': require('@/assets/clear/assist_clear_rate.png'),
+                'easyClearRate': require('@/assets/clear/easy_clear_rate.png'),
+                'normalClearRate': require('@/assets/clear/normal_clear_rate.png'),
+                'hardClearRate': require('@/assets/clear/hard_clear_rate.png'),
+                'exHardClearRate': require('@/assets/clear/ex_hard_clear_rate.png'),
+                'fullComboRate': require('@/assets/clear/full_combo_rate.png'),
                 MAX: require('@/assets/djlevel/lv_max.png'),
                 'MAX-': require('@/assets/djlevel/lv_max-.png'),
                 AAA: require('@/assets/djlevel/lv_aaa.png'),
@@ -72,6 +99,27 @@ export default {
                 E: require('@/assets/djlevel/lv_e.png'),
                 F: require('@/assets/djlevel/lv_f.png'),
             },
+            quickLabelList:[
+                'ALL',
+                'FC',
+                'EXHC',
+                'HC',
+                'NC',
+                'AC',
+                'EC',
+                'NO PLAY',
+                'Failed',
+                'MAX',
+                'MAX-',
+                'AAA',
+                'AA',
+                'A',
+                'B',
+                'C',
+                'D',
+                'E',
+                'F',
+            ],
             lvList:{
                 'lv.1': "1",
                 'lv.2': "2",
@@ -87,18 +135,30 @@ export default {
                 'lv.12': "12",
                 'lv.ALL': "ALL",
             },
-            labelStr: ''
+            labelStr: '',
+            clearRateStyleList: [
+                'assistClearRate',
+                'easyClearRate',
+                'normalClearRate',
+                'hardClearRate',
+                'exHardClearRate',
+                'fullComboRate',
+            ]
         }
     },
     methods: {
         text2img(text){
-            const source =  this.labelImg[text]
+            const source =  text=='CLEAR RATE'?this.labelImg[this.clearRateStyle]:this.labelImg[text]
             let labelStr = `<img src="${source}" alt="" />`
             return labelStr
         },
     },
     watch:{
         text(val,oldVal){
+            if(val==oldVal)return
+            this.labelStr = this.text2img(this.text)
+        },
+        clearRateStyle(val,oldVal){
             if(val==oldVal)return
             this.labelStr = this.text2img(this.text)
         }
@@ -163,7 +223,29 @@ export default {
         }
     }
   }
-  &:hover .label-ul{
+  .clear-rate-style-ul{
+    z-index: 2;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    transform: translateX(-10px);
+    width: 120px;
+    padding: 0 5px;
+    box-sizing: border-box;
+    // background: rgb(74, 78, 80);
+    background: rgba(30,30,30,.9);
+    color: #fff;
+    border: 1px solid #ccc;
+    border-width: 0 1px 1px 1px;
+    li{
+        position: relative;
+        height: 24px;
+        border-bottom: 1px solid #fff;
+        cursor: pointer;
+    }
+  }
+  &:hover .label-ul,&:hover .clear-rate-style-ul{
     display: block;
   }
 }

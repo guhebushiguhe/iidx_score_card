@@ -20,10 +20,13 @@
                     <Score :num="charts.rating.toString()" :type="typeList[charts.difficulty]" label="music-level" />
                     <Label :text="grade2Str(grade)" type="small" />
                 </div>
-                <div class="wrap right-wrap">
+                <div
+                  class="wrap right-wrap"
+                  :style="{maxWidth:musicNameWidth+'px'}"
+                >
                     <span
                         class="music-name"
-                        :style="{maxWidth:musicNameWidth+'px'}"
+                        :style="{transform:`scaleX(${musicNameScaleX(music.title)})`}"
                     >{{music.title}}</span>
                     <img
                         :src="playBtnSrc(music,'list')"
@@ -36,7 +39,15 @@
                 <div class="main-wrap">
                     <div class="grade-wrap">
                         <div :class="`grade-score ${gradeColor(grade,lamp)}`" :style="gradeStyle(grade)"></div>
-                        <div class="grade-bg"></div>
+                        <div class="grade-bg">
+                          <i></i>
+                          <i></i>
+                          <i></i>
+                          <i></i>
+                          <i></i>
+                          <i></i>
+                          <i></i>
+                        </div>
                     </div>
                 </div>
                 <div class="music-li-cover" :style="{background: `url(${img.music_li_cover})`,backgroundSize: '100% 100%'}"></div>
@@ -277,42 +288,6 @@ export default {
             ?this.toCurrentTime / this.duration * app.offsetWidth
             :this.currentTime / this.duration * app.offsetWidth
         },
-        // activeIndex(){
-        //     const data = this.data
-        //     const data_show = data.filter(i=>i.show)
-        //     const viewLimit = 50
-        //     const ulPaddingBottom = 0
-        //     const el_musicList = document.querySelector('.music-list')
-        //     const musicListHeight = el_musicList?el_musicList.offsetHeight:0
-        //     const ulMaxScrollTop = data_show.length*42-10+ulPaddingBottom-musicListHeight
-        //     const scrollTop = el_musicList?el_musicList.scrollTop:0
-        //     const focusIndex = parseInt(scrollTop/ulMaxScrollTop)
-        //     let firstIndex = 0
-        //     let lastIndex = 99
-        //     if(focusIndex>=viewLimit){
-        //         firstIndex = focusIndex-focusIndex%viewLimit
-        //         lastIndex = firstIndex+viewLimit-1<=ulMaxScrollTop?firstIndex+viewLimit-1:ulMaxScrollTop
-        //     }
-        //     return {
-        //         firstIndex,
-        //         lastIndex
-        //     }
-        // },
-        // dataActive(){
-        //     const data = this.data
-        //     const data_show = data.filter(i=>i.show)
-        //     const firstIndex = this.activeIndex.firstIndex
-        //     const lastIndex = this.activeIndex.lastIndex
-        //     const data_active = data_show.filter((i,index)=>index>=firstIndex && index<=lastIndex)
-        //     return data_active
-        // },
-        // emptyHeight(){
-        //     const ulPaddingBottom = 0
-        //     return {
-        //         topEmptyHeight: this.activeIndex.firstIndex*42,
-        //         bottomEmptyHeight: this.activeIndex.lastIndex*42+ulPaddingBottom
-        //     }
-        // }
     },
     methods:{
         grade2Str(grade){
@@ -545,22 +520,41 @@ export default {
             // console.log('focusIndex',focusIndex,'firstIndex',firstIndex,'lastIndex',lastIndex)
             const data_active = data_show.filter((i,index)=>index>=firstIndex && index<=lastIndex)
             this.dataActive = data_active
-            this.topEmptyHeight = firstIndex*42
+            this.topEmptyHeight = firstIndex*42>0?firstIndex*42:0
             this.bottomEmptyHeight = (data_length-1-lastIndex)*42+ulPaddingBottom
             // this.bottomEmptyHeight = bottomEmptyHeight>=0?bottomEmptyHeight:0
+        },
+        musicNameScaleX(title){
+          let titleLength = 0
+          for(let i = 0; i < title.length; i++){
+            let charCode = title.charCodeAt(i)
+            if((charCode>=0 && charCode<=64) || (charCode>=91 && charCode<=133)){
+              titleLength++
+            }else if(charCode>=65 && charCode<=90 && charCode!=73 && charCode!=73 && charCode!=105 && charCode!=108 ){
+              titleLength+=1.3
+            }else if(charCode == 73 || charCode==105 || charCode==108){
+              // I l i
+              titleLength+=0.8
+            }else{
+              titleLength+=1.7
+            }
+          }
+          return titleLength>21?21/titleLength:1
         }
     },
     mounted(){
-        this.musicNameWidth = document.body.clientWidth - (91+37+28+5)
+        this.musicNameWidth = document.body.clientWidth - (91+37+12)
         window.onresize = ()=>{
-            this.musicNameWidth = document.body.clientWidth - (91+37+28+5)
+            this.musicNameWidth = document.body.clientWidth - (91+37+12)
         }
         document.onmousemove = this.handleMoveChangeCurrentTime
         document.ontouchmove = this.handleMoveChangeCurrentTime
         document.onmouseup = this.handleEndChangeCurrentTime
         document.ontouchend = this.handleEndChangeCurrentTime
         this.setDataActive_emptyHeight()
+        this.focusIndex = null
         const el = document.querySelector('.music-list')
+        el.scrollTop = 0
         if(el)el.addEventListener('scroll',this.setDataActive_emptyHeight)
     },
     beforeDestroy(){
@@ -574,10 +568,14 @@ export default {
                 this.hidePlayer()
             }else{
                 this.focusIndex = null
+                this.topEmptyHeight = 0
                 this.setDataActive_emptyHeight()
-                const el = document.querySelector('.music-list')
-                el.scrollTop = 0
-                if(el)el.addEventListener('scroll',this.setDataActive_emptyHeight)
+                setTimeout(()=>{
+                  document.querySelector('.music-list').scrollTop = 0
+                  this.setDataActive_emptyHeight()
+                },0)
+                // console.log('scrollTop',el.scrollTop)
+                // if(el)el.addEventListener('scroll',this.setDataActive_emptyHeight)
             }
         }
     }
@@ -611,7 +609,8 @@ export default {
 @-moz-keyframes fc_color {  
  0% { background: rgb(255, 255, 255); opacity: 1.0; }
  25% { opacity: 0.7; }
- 50% { background: rgb(255, 241, 49); opacity: 1.0; }
+ 40% { background: rgb(255, 251, 189); opacity: 1.0; }
+ 60% { background: rgb(189, 247, 255); opacity: 1.0; }
  75% { opacity: 0.7; }
  100% { background: rgb(255, 255, 255); opacity: 1.0; }
  }
@@ -619,7 +618,8 @@ export default {
 @-webkit-keyframes fc_color {  
  0% { background: rgb(255, 255, 255); opacity: 1.0; }
  25% { opacity: 0.7; }
- 50% { background: rgb(255, 241, 49); opacity: 1.0; }
+ 40% { background: rgb(255, 251, 189); opacity: 1.0; }
+ 60% { background: rgb(189, 247, 255); opacity: 1.0; }
  75% { opacity: 0.7; }
  100% { background: rgb(255, 255, 255); opacity: 1.0; }
  }
@@ -627,7 +627,8 @@ export default {
 @keyframes fc_color {  
  0% { background: rgb(255, 255, 255); opacity: 1.0; }
  25% { opacity: 0.7; }
- 50% { background: rgb(255, 241, 49); opacity: 1.0; }
+ 40% { background: rgb(255, 251, 189); opacity: 1.0; }
+ 60% { background: rgb(189, 247, 255); opacity: 1.0; }
  75% { opacity: 0.7; }
  100% { background: rgb(255, 255, 255); opacity: 1.0; }
  }
@@ -635,7 +636,7 @@ export default {
 @-moz-keyframes exc_color {  
  0% { background: rgb(240, 30, 30); opacity: 1.0; }
  25% { opacity: 0.7; }
- 50% { background: rgb(255, 241, 49); opacity: 1.0; }
+ 50% { background: rgb(248, 217, 158); opacity: 1.0; }
  75% { opacity: 0.7; }
  100% { background: rgb(240, 30, 30); opacity: 1.0; }
  }
@@ -643,7 +644,7 @@ export default {
 @-webkit-keyframes exc_color {  
  0% { background: rgb(240, 30, 30); opacity: 1.0; }
  25% { opacity: 0.7; }
- 50% { background: rgb(255, 241, 49); opacity: 1.0; }
+ 50% { background: rgb(248, 217, 158); opacity: 1.0; }
  75% { opacity: 0.7; }
  100% { background: rgb(240, 30, 30); opacity: 1.0; }
  }
@@ -651,7 +652,7 @@ export default {
 @keyframes exc_color {  
  0% { background: rgb(240, 30, 30); opacity: 1.0; }
  25% { opacity: 0.7; }
- 50% { background: rgb(255, 241, 49); opacity: 1.0; }
+ 50% { background: rgb(248, 217, 158); opacity: 1.0; }
  75% { opacity: 0.7; }
  100% { background: rgb(240, 30, 30); opacity: 1.0; }
  }
@@ -723,14 +724,14 @@ export default {
       .music-li{
         position: relative;
         box-sizing: border-box;
-        margin-bottom: 10px;
-        padding-right:16px;
+        // margin-bottom: 10px;
+        padding-right:8px;
         width: 100%;
-        height: 32px;
+        height: 41px;
         // border: 1px solid #888;
         border-width: 2px 2px 2px 0;
         // background: rgba(49, 49, 49, 0.8);
-        background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
+        // background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
         display: flex;
         justify-content: flex-start;
         // &:nth-last-of-type(1){
@@ -746,37 +747,50 @@ export default {
           font-size: 12px;
           position: relative;
           align-items: center;
+          // transform: translateY(-4px);
           .lamp{
             width: 16px;
-            height: 42px;
+            height: 40px;
             position: absolute;
-            top: -1px;
+            top: 0;
             left: -16px;
             box-sizing: border-box;
             border-width: 2px;
             border-radius: 8px 0 0 8px;
-            background: rgb(53, 52, 52);
-            &.FULL_COMBO,&.FULL_COMBO:after{
-              // background-image: linear-gradient(0deg, rgb(255, 224, 138), rgb(138, 255, 173), rgb(138, 222, 255), rgb(146, 138, 255), rgb(255, 138, 138),);
+            // background: rgb(53, 52, 52);
+            z-index: -1;
+            &.FULL_COMBO{
+              background: transparent;
+            }
+            &.FULL_COMBO:after{
               background: #fff;
             }
-            &.EX_HARD_CLEAR,&.EX_HARD_CLEAR:after{
+            &.EX_HARD_CLEAR,{
+              background: transparent;
+            }
+            &.EX_HARD_CLEAR:after{
               background: rgb(255, 17, 0);
             }
             &.HARD_CLEAR,&.HARD_CLEAR:after{
-              background: #fff;
+              background: rgb(236, 236, 236);
             }
             &.CLEAR,&.CLEAR:after{
-              background: rgb(0, 225, 255);
+              background: rgb(92, 236, 255);
             }
             &.EASY_CLEAR,&.EASY_CLEAR:after{
-              background: rgb(166, 255, 0);
+              background: rgb(203, 255, 106);
             }
             &.ASSIST_CLEAR,&.ASSIST_CLEAR:after{
-              background: rgb(183, 0, 255);
+              background: rgb(211, 98, 255);
             }
             &.FAILED,&.FAILED:after{
               background: rgb(180, 0, 0);
+            }
+            &.NO_PLAY{
+              background: rgb(50, 50, 50);
+            }
+            &.NO_PLAY:after{
+              display: none;
             }
             &:after{
               content: '';
@@ -789,11 +803,31 @@ export default {
               box-sizing: border-box;
               border-width: 2px;
               border-radius: 6px 0 0 6px;
-              filter: blur(4px);
+              filter: blur(6px);
             }
           }
           span{
             padding-right: 5px;
+          }
+          .score-modal{
+              height: 28px;
+              display: flex;
+              justify-content: flex-end;
+              align-items: center;
+              opacity: 1;
+              transition: opacity 0.5s;
+              transform: translateY(-2px);
+              &.music-level{
+                  width: 34px;
+                  display: flex;
+                  justify-content: center;
+                  // background: rgba(0, 0, 0, .2);
+              }
+          }
+          .label-modal{
+            &.small{
+              transform: translateY(-3px);
+            }
           }
         }
         .right-wrap{
@@ -805,15 +839,28 @@ export default {
           align-items: center;
           flex: 1;
           // width: 100%;
+          transform: translateY(-3px);
+          position: relative;
+          width: 256px;
+          height: 40px;
           .music-name{
+            font-family: 'DFGPOPMix-W5';
+            transform-origin: 0;
             white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            width: 227px;
+            // text-overflow: ellipsis;
+            // overflow: hidden;
+            // width: 227px;
+            font-size: 18px;
+            color: #ddd;
             // width: 90%;
             // flex: 1;
             text-align: left;
             cursor: pointer;
+            // background-image: linear-gradient(to bottom,rgb(255,255,255),rgb(120,120,120));
+            // -webkit-background-clip: text;
+            // -moz-background-clip: text;
+            // -webkit-text-fill-color: transparent;
+            // -moz-text-fill-color: transparent;
           }
           .play-btn{
             width: 16px;
@@ -822,14 +869,18 @@ export default {
             cursor: pointer;
             outline: none;
             z-index:2;
+            position: absolute;
+            top: 38%;
+            right: 0;
+            transform: translateY(-50%);
           }
         }
         .main-wrap{
           position: absolute;
-          bottom: -8px;
+          bottom: 2px;
           left: 0;
-          width: 100%;
-          height: 6px;
+          width: 99%;
+          height: 3px;
           overflow: hidden;
           .grade-wrap{
             position: absolute;
@@ -842,8 +893,39 @@ export default {
               left: 0;
               width: 100%;
               height: 6px;
-              background: rgba(0,0,0,.8);
+              background: rgba(100,100,100,.8);
+              // background: transparent;
               overflow: hidden;
+              i{
+                width: 1px;
+                height: 100%;
+                z-index: 2;
+                background: #000;
+                position: absolute;
+                top: 0;
+                transform: translateX(-1px);
+              }
+              :nth-of-type(1){
+                left: 22.2222%;
+              }
+              :nth-of-type(2){
+                left: 33.3333%;
+              }
+              :nth-of-type(3){
+                left: 44.4444%;
+              }
+              :nth-of-type(4){
+                left: 55.5555%;
+              }
+              :nth-of-type(5){
+                left: 66.6666%;
+              }
+              :nth-of-type(6){
+                left: 77.7777%;
+              }
+              :nth-of-type(7){
+                left: 88.8888%;
+              }
             }
             .grade-score{
               position: absolute;
@@ -878,7 +960,7 @@ export default {
           position: absolute;
           top: -2px;
           right: 0;
-          z-index: 1;
+          z-index: -1;
           width: 105%;
           height: 44px;
         }

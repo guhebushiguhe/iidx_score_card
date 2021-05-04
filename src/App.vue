@@ -86,7 +86,14 @@
             class="label-wrap"
             :style="{marginTop: isMusicListShow?'0px':spanMarginTop+'px'}"
           >
-            <Label :text="item.label" :change-label="changeLabel" :is-music-list-show="isMusicListShow" /></span>
+            <Label
+              :text="item.label"
+              :change-label="changeLabel"
+              :is-music-list-show="isMusicListShow"
+              :clear-rate-style="clearRateStyle"
+              :change-clear-rate-style="changeClearRateStyle"
+            />
+          </span>
           <span
             :class="`${newScores.length > 0?'score':''}`"
             :style="{marginTop: isMusicListShow?'0px':spanMarginTop+'px'}"
@@ -140,12 +147,14 @@
 </template>
 
 <script>
+import '@/assets/font/font.css'
 import '@/utils/canvas2image.js'
 import localJson from '@/utils/netease_id_list.js'
 // import arcana_data from '@/utils/arcana_music_list.js'
+
 // import mapJson from '@/utils/map/china.json'
-import courtNo_list from '@/utils/courtNo_list.json'
-import axios from 'axios'
+// import courtNo_list from '@/utils/courtNo_list.json'
+// import axios from 'axios'
 
 
 import Score from '@/components/Score.vue'
@@ -271,28 +280,6 @@ export default {
       ],
       lvList: ['1','2','3','4','5','6','7','8','9','10','11','12'],
       musicListData: [],
-      labelImg:{
-        'ALL': require('@/assets/clear/all_scores.png'),
-        FC: require('@/assets/clear/clear_full_combo.png'),
-        EXHC: require('@/assets/clear/clear_ex_hard.png'),
-        HC: require('@/assets/clear/clear_hard.png'),
-        NC: require('@/assets/clear/clear_normal.png'),
-        AC: require('@/assets/clear/clear_assist.png'),
-        EC: require('@/assets/clear/clear_easy.png'),
-        'NO PLAY': require('@/assets/clear/clear_no_play.png'),
-        Failed: require('@/assets/clear/clear_failed.png'),
-        'CLEAR RATE': require('@/assets/clear/clear_rate.png'),
-        MAX: require('@/assets/djlevel/lv_max.png'),
-        'MAX-': require('@/assets/djlevel/lv_max-.png'),
-        AAA: require('@/assets/djlevel/lv_aaa.png'),
-        AA: require('@/assets/djlevel/lv_aa.png'),
-        A: require('@/assets/djlevel/lv_a.png'),
-        B: require('@/assets/djlevel/lv_b.png'),
-        C: require('@/assets/djlevel/lv_c.png'),
-        D: require('@/assets/djlevel/lv_d.png'),
-        E: require('@/assets/djlevel/lv_e.png'),
-        F: require('@/assets/djlevel/lv_f.png'),
-      },
       audioData: [],
       titleList:{
         // arcana_title: netease_title
@@ -309,6 +296,15 @@ export default {
       spanMarginTop: 0,
       qprosData: null,
       bpm: null,
+      clearRateStyle: 'assistClearRate',
+      clearRateStyleList: [
+        'assistClearRate',
+        'easyClearRate',
+        'normalClearRate',
+        'hardClearRate',
+        'exHardClearRate',
+        'fullComboRate',
+      ]
     }
   },
   computed: {
@@ -692,7 +688,25 @@ export default {
       const { FAILED } = LAMPS
       const NO_PLAY = musicList.filter(item=>item.status == 'NO_PLAY')
       const ALL_TEMP = musicList
-      const clearRate = ALL_TEMP.length<=0?'----':((ALL_TEMP.length - FAILED.length - NO_PLAY.length)/ALL_TEMP.length*100).toFixed(2)+'%'
+      let clearRate = ''
+      if(this.clearRateStyle == 'assistClearRate'){
+        clearRate = ALL_TEMP.length<=0?'----':((ALL_TEMP.length - FAILED.length - NO_PLAY.length)/ALL_TEMP.length*100).toFixed(2)+'%'
+      }
+      if(this.clearRateStyle == 'easyClearRate'){
+        clearRate = ALL_TEMP.length<=0?'----':((ALL_TEMP.length - FAILED.length - NO_PLAY.length - LAMPS['ASSIST_CLEAR'].length)/ALL_TEMP.length*100).toFixed(2)+'%'
+      }
+      if(this.clearRateStyle == 'normalClearRate'){
+        clearRate = ALL_TEMP.length<=0?'----':((ALL_TEMP.length - FAILED.length - NO_PLAY.length - LAMPS['ASSIST_CLEAR'].length - LAMPS['EASY_CLEAR'].length)/ALL_TEMP.length*100).toFixed(2)+'%'
+      }
+      if(this.clearRateStyle == 'hardClearRate'){
+        clearRate = ALL_TEMP.length<=0?'----':((ALL_TEMP.length - FAILED.length - NO_PLAY.length - LAMPS['ASSIST_CLEAR'].length - LAMPS['EASY_CLEAR'].length - LAMPS['CLEAR'].length)/ALL_TEMP.length*100).toFixed(2)+'%'
+      }
+      if(this.clearRateStyle == 'exHardClearRate'){
+        clearRate = ALL_TEMP.length<=0?'----':((ALL_TEMP.length - FAILED.length - NO_PLAY.length - LAMPS['ASSIST_CLEAR'].length - LAMPS['EASY_CLEAR'].length - LAMPS['CLEAR'].length - LAMPS['HARD_CLEAR'].length)/ALL_TEMP.length*100).toFixed(2)+'%'
+      }
+      if(this.clearRateStyle == 'fullComboRate'){
+        clearRate = ALL_TEMP.length<=0?'----':(LAMPS['FULL_COMBO'].length/ALL_TEMP.length*100).toFixed(2)+'%'
+      }
 
       let res = {
         ALL_TEMP,
@@ -853,6 +867,37 @@ export default {
       })
       this.musicListData = musicListData
     },
+    changeClearRateStyle(style){
+      this.clearRateStyle = style
+      localStorage.setItem('clearRateStyle',style)
+      
+      let LAMPS = {}
+      this.scores.forEach(i=>{
+        LAMPS[i.label] = i.value
+      })
+      let clearRate = ''
+      if(style == 'assistClearRate'){
+        clearRate = LAMPS['ALL']<=0?'----':((LAMPS['ALL'] - LAMPS['Failed'] - LAMPS['NO PLAY'])/LAMPS['ALL']*100).toFixed(2)+'%'
+      }
+      if(style == 'easyClearRate'){
+        clearRate = LAMPS['ALL']<=0?'----':((LAMPS['ALL'] - LAMPS['Failed'] - LAMPS['NO PLAY'] - LAMPS['AC'])/LAMPS['ALL']*100).toFixed(2)+'%'
+      }
+      if(style == 'normalClearRate'){
+        clearRate = LAMPS['ALL']<=0?'----':((LAMPS['ALL'] - LAMPS['Failed'] - LAMPS['NO PLAY'] - LAMPS['AC'] - LAMPS['EC'])/LAMPS['ALL']*100).toFixed(2)+'%'
+      }
+      if(style == 'hardClearRate'){
+        clearRate = LAMPS['ALL']<=0?'----':((LAMPS['ALL'] - LAMPS['Failed'] - LAMPS['NO PLAY'] - LAMPS['AC'] - LAMPS['EC'] - LAMPS['NC'])/LAMPS['ALL']*100).toFixed(2)+'%'
+      }
+      if(style == 'exHardClearRate'){
+        clearRate = LAMPS['ALL']<=0?'----':((LAMPS['ALL'] - LAMPS['Failed'] - LAMPS['NO PLAY'] - LAMPS['AC'] - LAMPS['EC'] - LAMPS['NC'] - LAMPS['HC'])/LAMPS['ALL']*100).toFixed(2)+'%'
+      }
+      if(style == 'fullComboRate'){
+        clearRate = LAMPS['ALL']<=0?'----':(LAMPS['FC']/LAMPS['ALL']*100).toFixed(2)+'%'
+      }
+      this.scores.forEach(i=>{
+        if(i.label=='CLEAR RATE')i.value = clearRate
+      })
+    },
     async parseMapData(){
       // const cityArr=[
       //     ['上海', '河北', '山西', '内蒙古', '辽宁', '吉林','黑龙江',  '江苏', '浙江', '安徽', '福建', '江西', '山东','河南', '湖北', '湖南', '广东', '广西', '海南', '四川', '贵州', '云南', '西藏', '陕西', '甘肃', '青海', '宁夏', '新疆', '北京', '天津', '重庆', '香港', '澳门', '台湾'],
@@ -905,17 +950,31 @@ export default {
       } 
 
       // 全国数据准备
-      const mapJson = await axios.get('./map/china.json')
+      // const mapJson = await axios.get('./map/china.json')
+      const mapJson = await axios.get('/datav/areas_v2/bound/100000_full.json',{
+        headers:{
+          accept:'application/json, text/javascript, */*; q=0.01',
+        }
+      })
       let newChinaFeatures = []
       let provsJson = {}
       let citysJson = {}
+      function parseSearchName(name){
+        const replaceWords = ['特别行政区','自治区','自治县']
+        let nameStr = name
+        replaceWords.forEach(w=>{
+          const reg = new RegExp(`(${w})`,'g')
+          nameStr = nameStr.replace(reg,'')
+        })
+        return nameStr
+      }
       mapJson.features.map(async i=>{
         // 省级匹配
         const {properties,...rest} = i
         const searchName = properties.name
         let provCourtNo = null
-        if(!['香港','澳门','台湾'].includes(searchName)){
-          const reg = new RegExp(`(?=.*${searchName})(?=.*高级人民法院)^.*`)
+        if(!['香港','澳门','台湾'].includes(parseSearchName(searchName)) && searchName!=''){
+          const reg = new RegExp(`(?=.*${parseSearchName(searchName)})(?=.*高级人民法院)^.*`)
           const resArr = courtNo_list.filter(c=>
             reg.test(c.court_name)
           )
@@ -923,54 +982,62 @@ export default {
             console.log('省级匹配错误',searchName,resArr)
           }else{
             provCourtNo = resArr[0].court_id
-            if(!properties.courtNo){//忽略已匹配的地区
-              properties.courtNo = provCourtNo
+            if(!properties.courtNo){
+              properties.courtNo = []
             }
+            properties.courtNo.push(provCourtNo)
           }
           newChinaFeatures.push({properties,...rest})
           // 市级匹配
-          function parseSearchName(name){
-            const replaceWords = ['自治区','自治县','市','区','县']
-            let nameStr = name
-            replaceWords.forEach(w=>{
-              const reg = new RegExp(`(${w})`,'g')
-              nameStr = nameStr.replace(reg,'')
-            })
-            return nameStr
-          }
-          if(provCourtNo && searchName == '浙江'){
-            const resProvince = await axios.get(`./map/json/province/${cityObj[searchName]}.json`)
+          if(provCourtNo){
+            // const resProvince = await axios.get(`./map/json/province/${cityObj[searchName]}.json`)
+            const resProvince = await axios.get(`/datav/areas_v2/bound/${i.properties.adcode}_full.json`)
             let newProvFeatures = []
-            resProvince.features.map(async p=>{
+            let resFeatures = resProvince.features
+            let isMunicipality = false
+            // 如果是直辖市
+            if(resProvince.features[0].properties.level=='district'){
+              resFeatures = [i]
+              console.log('resFeatures',resFeatures)
+              isMunicipality = true
+            }
+            resFeatures.map(async p=>{
                 let cityCourtNo = null
                 const {properties,...rest} = p
-                const searchName = properties.name
-                const reg = new RegExp(`(?=.*${searchName}).*`)
-                const resArr = courtNo_list.filter(c=>
-                  reg.test(parseSearchName(c.court_name)) && c.p_id == provCourtNo
-                )
-                if(resArr.length != 1){
-                  console.log('市级匹配错误',searchName,resArr,'provCourtNo',provCourtNo)
+                const searchName = parseSearchName(properties.name)
+                const reg = new RegExp(`(?=.*${searchName})(?=.*中级人民法院)^.*`)
+                const resArr = courtNo_list.filter(c=>{
+                  const p_id = isMunicipality
+                              ?courtNo_list.find(c1=>c1.court_id==c.p_id).p_id
+                              :c.p_id
+                  return reg.test(parseSearchName(c.court_name)) && p_id == provCourtNo
+                })
+                if(resArr.length != 1 && !isMunicipality){
+                  console.log('市级匹配错误',searchName,resArr,'isMunicipality',isMunicipality,'provCourtNo',provCourtNo)
                 }else{
-                  if(!properties.courtNo){//忽略已匹配的地区
-                    cityCourtNo = resArr[0].court_id
-                    properties.courtNo = cityCourtNo
+                  if(!properties.courtNo){
+                    properties.courtNo = []
                   }
+                  resArr.forEach(r=>{
+                    properties.courtNo.push(r.court_id)
+                  })
+                  if(resArr.length == 1)cityCourtNo = resArr[0].court_id
                 }
                 newProvFeatures.push({properties,...rest})
                 // 区级匹配
-                if(cityCourtNo && p.id){
-                  const resCity = await axios.get(`./map/json/citys/${p.id}.json`)
+                if(cityCourtNo && p.properties.adcode){
+                  // const resCity = await axios.get(`./map/json/citys/${p.id}.json`)
+                  const resCity = await axios.get(`/datav/areas_v2/bound/${p.properties.adcode}_full.json`)
                   let newCityFeatures = []
                   resCity.features.map(async p=>{
                       const {properties,...rest} = p
-                      const searchName = properties.name
+                      const searchName = parseSearchName(properties.name)
                       const reg = new RegExp(`(?=.*${searchName}).*`)
                       const resArr = courtNo_list.filter(c=>
-                        reg.test(parseSearchName(c.court_name)) && c.p_id == cityCourtNo
+                        reg.test(c.court_name) && c.p_id == cityCourtNo
                       )
                       if(resArr.length != 1){
-                        console.log('区级匹配错误',searchName,resArr,'cityCourtNo',cityCourtNo)
+                        console.log('区级匹配错误',searchName,resArr,'properties.name',properties.name,'searchName',searchName,'cityCourtNo',cityCourtNo)
                       }else{
                         if(!properties.courtNo){//忽略已匹配的地区
                           properties.courtNo = resArr[0].court_id
@@ -994,8 +1061,14 @@ export default {
       })
       console.log('provsJson',provsJson)
       console.log('citysJson',citysJson)
+      let districtCount = 0
+      setTimeout(()=>{
+        Object.values(citysJson).forEach(i=>{i.features.forEach(j=>{districtCount++})})
+        console.log('基层法院数',districtCount)
+      },10000)
       const {features,...rest}  = mapJson
       const chinaJson = {...rest,"features":newChinaFeatures}
+      // console.log('chinaJson',chinaJson)
       // 省级下载
       // console.log('chinaJson',chinaJson)
       // if(confirm('是否下载JSON')){
@@ -1027,7 +1100,8 @@ export default {
     document.body.appendChild(bgIframe)
   },
   mounted() {
-    this.parseMapData()
+    // this.parseMapData()
+    this.clearRateStyle = localStorage.getItem('clearRateStyle') || 'assistClearRate'
     const query = this.$route.query
     if(query.djName){
       // 有搜索参数

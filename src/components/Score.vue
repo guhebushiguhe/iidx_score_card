@@ -1,5 +1,9 @@
 <template>
-    <div :class="`score-modal ${className} ${isActive} ${label} ${disabled}`" v-html="imgStr" @click.stop="showMusicList(label,data,type)">
+    <div
+        :class="`score-modal ${className} ${isActive} ${label} ${disabled}`"
+        v-html="imgStr"
+        @click.stop="showMusicList(label,data,type)"
+    >
     </div>
 </template>
 
@@ -224,22 +228,6 @@ export default {
             }
             &.disabled{
                 cursor: default;
-            }
-        }
-    }
-    .music-ul{
-        .score-modal{
-            height: 28px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            opacity: 1;
-            transition: opacity 0.5s;
-            &.music-level{
-                width: 34px;
-                display: flex;
-                justify-content: center;
-                background: rgba(0, 0, 0, .2);
             }
         }
     }
