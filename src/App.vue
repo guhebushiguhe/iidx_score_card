@@ -153,8 +153,8 @@ import localJson from '@/utils/netease_id_list.js'
 // import arcana_data from '@/utils/arcana_music_list.js'
 
 // import mapJson from '@/utils/map/china.json'
-// import courtNo_list from '@/utils/courtNo_list.json'
-// import axios from 'axios'
+import courtNo_list from '@/utils/courtNo_list.json'
+import axios from 'axios'
 
 
 import Score from '@/components/Score.vue'
@@ -947,7 +947,10 @@ export default {
           a.style.display="none";
           document.body.appendChild(a);
           a.click();
-      } 
+      }
+      // 统计错误日志
+      let cityErrsCount = 0
+      let strictErrsCount = 0
 
       // 全国数据准备
       // const mapJson = await axios.get('./map/china.json')
@@ -959,8 +962,9 @@ export default {
       let newChinaFeatures = []
       let provsJson = {}
       let citysJson = {}
-      function parseSearchName(name){
-        const replaceWords = ['特别行政区','自治区','自治县']
+      function parseSearchName(name,strict = false){
+        let replaceWords = ['特别行政区','自治区','自治县']
+        if(strict)replaceWords = ['特别行政区','自治区','自治县','省','市','区','县']
         let nameStr = name
         replaceWords.forEach(w=>{
           const reg = new RegExp(`(${w})`,'g')
@@ -973,23 +977,36 @@ export default {
         const {properties,...rest} = i
         const searchName = properties.name
         let provCourtNo = null
-        if(!['香港','澳门','台湾'].includes(parseSearchName(searchName)) && searchName!=''){
+        if(!['香港','澳门','台湾'].includes(parseSearchName(searchName,true)) && searchName!=''){
           const reg = new RegExp(`(?=.*${parseSearchName(searchName)})(?=.*高级人民法院)^.*`)
-          const resArr = courtNo_list.filter(c=>
+          let resArr = courtNo_list.filter(c=>
             reg.test(c.court_name)
           )
+          if(searchName == '新疆维吾尔自治区'){
+            resArr = [
+              {
+                  "court_id": "4050",
+                  "p_id": "0000",
+                  "court_level_code": "V00",
+                  "court_name": "新疆维吾尔自治区高级人民法院",
+                  "aj_code": "新",
+                  "gj_id": 4050,
+                  "gjrmfy": "新疆"
+              },
+            ]
+          }
           if(resArr.length != 1){
             console.log('省级匹配错误',searchName,resArr)
           }else{
             provCourtNo = resArr[0].court_id
             if(!properties.courtNo){
-              properties.courtNo = []
+              properties.courtNo = provCourtNo
             }
-            properties.courtNo.push(provCourtNo)
           }
+          properties['allMatched']=true
           newChinaFeatures.push({properties,...rest})
           // 市级匹配
-          if(provCourtNo){
+          // if(provCourtNo){
             // const resProvince = await axios.get(`./map/json/province/${cityObj[searchName]}.json`)
             const resProvince = await axios.get(`/datav/areas_v2/bound/${i.properties.adcode}_full.json`)
             let newProvFeatures = []
@@ -998,34 +1015,49 @@ export default {
             // 如果是直辖市
             if(resProvince.features[0].properties.level=='district'){
               resFeatures = [i]
-              console.log('resFeatures',resFeatures)
+              // console.log('resFeatures',resFeatures)
               isMunicipality = true
             }
             resFeatures.map(async p=>{
                 let cityCourtNo = null
                 const {properties,...rest} = p
-                const searchName = parseSearchName(properties.name)
+                const searchName = isMunicipality
+                                    ?parseSearchName(properties.name,true)
+                                    :parseSearchName(properties.name)
                 const reg = new RegExp(`(?=.*${searchName})(?=.*中级人民法院)^.*`)
                 const resArr = courtNo_list.filter(c=>{
-                  const p_id = isMunicipality
-                              ?courtNo_list.find(c1=>c1.court_id==c.p_id).p_id
-                              :c.p_id
+                  const p_id = c.p_id
                   return reg.test(parseSearchName(c.court_name)) && p_id == provCourtNo
                 })
                 if(resArr.length != 1 && !isMunicipality){
-                  console.log('市级匹配错误',searchName,resArr,'isMunicipality',isMunicipality,'provCourtNo',provCourtNo)
+                  let errMsg = '中级法院匹配错误!'
+                  if(resArr.length){
+                    errMsg += '————存在多个匹配法院，请人工甄别！('
+                    errMsg += resArr.map(f=>f.court_name).join(',')
+                    errMsg += ')'
+                  }
+                  if(!resArr.length && provCourtNo){
+                    const upperCourt = courtNo_list.find(c=>c.court_id==provCourtNo).court_name
+                    errMsg += `————行政区域等级变更，匹配不到上级（${upperCourt}）`
+                  }
+                  if(!resArr.length && !provCourtNo){
+                    errMsg += '————直辖市'
+                  }
+                  cityErrsCount ++
+                  i.properties['allMatched']=false
+                  console.log(searchName,errMsg)
+                  // console.log('市级匹配错误',searchName,resArr,'provCourtNo',provCourtNo)
                 }else{
                   if(!properties.courtNo){
-                    properties.courtNo = []
+                    cityCourtNo = resArr[0].court_id
+                    properties.courtNo = cityCourtNo
                   }
-                  resArr.forEach(r=>{
-                    properties.courtNo.push(r.court_id)
-                  })
-                  if(resArr.length == 1)cityCourtNo = resArr[0].court_id
                 }
+                if(isMunicipality)cityCourtNo = provCourtNo
                 newProvFeatures.push({properties,...rest})
                 // 区级匹配
-                if(cityCourtNo && p.properties.adcode){
+                // if(cityCourtNo && p.properties.adcode){
+                if(p.properties.adcode){
                   // const resCity = await axios.get(`./map/json/citys/${p.id}.json`)
                   const resCity = await axios.get(`/datav/areas_v2/bound/${p.properties.adcode}_full.json`)
                   let newCityFeatures = []
@@ -1033,47 +1065,107 @@ export default {
                       const {properties,...rest} = p
                       const searchName = parseSearchName(properties.name)
                       const reg = new RegExp(`(?=.*${searchName}).*`)
-                      const resArr = courtNo_list.filter(c=>
-                        reg.test(c.court_name) && c.p_id == cityCourtNo
-                      )
+                      const resArr = courtNo_list.filter(c=>{
+                        let p_id = null
+                        if(isMunicipality){
+                          p_id = courtNo_list.find(c1=>c1.court_id==c.p_id)
+                                  ?courtNo_list.find(c1=>c1.court_id==c.p_id).p_id
+                                  :null
+                        }else{
+                          p_id = c.p_id
+                        }
+                        return reg.test(c.court_name) && p_id == cityCourtNo
+                      })
                       if(resArr.length != 1){
-                        console.log('区级匹配错误',searchName,resArr,'properties.name',properties.name,'searchName',searchName,'cityCourtNo',cityCourtNo)
+                        let errMsg = '基层法院匹配错误!'
+                        if(resArr.length){
+                          errMsg += '————存在多个匹配法院，请人工甄别！('
+                          errMsg += resArr.map(f=>f.court_name).join(',')
+                          errMsg += ')'
+                        }
+                        if(!resArr.length && cityCourtNo){
+                          const upperCourt = courtNo_list.find(c=>c.court_id==cityCourtNo).court_name
+                          errMsg += `————行政区域等级变更，匹配不到上级（${upperCourt}）`
+                        }
+                        if(!resArr.length && !cityCourtNo){
+                          errMsg += '————直辖市、县，无法自动匹配所属中院'
+                        }
+                        strictErrsCount ++
+                        i.properties['allMatched']=false
+                        console.log(searchName,errMsg)
+                        // console.log('区级匹配错误',searchName,resArr,'cityCourtNo',cityCourtNo)
                       }else{
                         if(!properties.courtNo){//忽略已匹配的地区
                           properties.courtNo = resArr[0].court_id
                         }
                       }
                       newCityFeatures.push({properties,...rest})
-                      // 区级匹配
-                      
                   })
                   const {features,...rest}  = resCity
-                  citysJson[searchName] = {...rest,"features":newCityFeatures}
+                  citysJson[p.properties.adcode] = {...rest,"features":newCityFeatures}
                 }
 
 
 
             })
             const {features,...rest}  = resProvince
-            provsJson[searchName] = {...rest,"features":newProvFeatures}
-          }
+            provsJson[i.properties.adcode] = {...rest,"features":newProvFeatures}
+          // }
         }
       })
       console.log('provsJson',provsJson)
       console.log('citysJson',citysJson)
-      let districtCount = 0
-      setTimeout(()=>{
-        Object.values(citysJson).forEach(i=>{i.features.forEach(j=>{districtCount++})})
-        console.log('基层法院数',districtCount)
-      },10000)
+      // let districtCount = 0
+      // setTimeout(()=>{
+      //   Object.values(citysJson).forEach(i=>{i.features.forEach(j=>{districtCount++})})
+      //   console.log('基层法院数',districtCount)
+      // },10000)
       const {features,...rest}  = mapJson
       const chinaJson = {...rest,"features":newChinaFeatures}
-      // console.log('chinaJson',chinaJson)
-      // 省级下载
+      console.log('chinaJson',chinaJson)
+
+      // 统计结果
+      setTimeout(()=>{
+        const provsMatched = chinaJson.features.filter(i=>i.properties.allMatched).map(j=>j.properties.name)
+        const provsUnmatched = chinaJson.features.filter(i=>!i.properties.allMatched).map(j=>j.properties.name)
+        console.log(`中级法院匹配错误：${cityErrsCount}`)
+        console.log(`基层法院匹配错误：${strictErrsCount}`)
+        console.log(`${provsMatched.length}个省份完全匹配各层法院（不含专门法院），分别是${provsMatched.toString()}`)
+        console.log(`${provsUnmatched.length}个省份无法完全匹配各层法院，分别是${provsUnmatched.toString()}`)
+      },15000)
+
+
+      // 全国下载
       // console.log('chinaJson',chinaJson)
       // if(confirm('是否下载JSON')){
       //   saveAs(chinaJson,'china.json')
       // }
+
+      // 省级下载
+      // setTimeout(()=>{
+      //   let count = 0
+      //   Object.keys(provsJson).map(i=>{
+      //       let delay = count*100
+      //       setTimeout(()=>{
+      //         saveAs(provsJson[i],`${i}.json`)
+      //       },delay)
+      //       count++
+      //   })
+      // },10000)
+
+      // 市级下载
+      // setTimeout(()=>{
+      //   let count = 0
+      //   Object.keys(citysJson).map(i=>{
+      //       let delay = count*100
+      //       setTimeout(()=>{
+      //         saveAs(citysJson[i],`${i}.json`)
+      //       },delay)
+      //       count++
+      //   })
+      // },10000)
+
+
     }
   },
   watch: {
@@ -1100,7 +1192,7 @@ export default {
     document.body.appendChild(bgIframe)
   },
   mounted() {
-    // this.parseMapData()
+    this.parseMapData()
     this.clearRateStyle = localStorage.getItem('clearRateStyle') || 'assistClearRate'
     const query = this.$route.query
     if(query.djName){
