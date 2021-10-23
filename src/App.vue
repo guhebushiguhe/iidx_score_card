@@ -1,5 +1,40 @@
 <template>
   <div id="app" ref="app">
+    <!-- <div class="extra-conf-wrap">
+      <img class="common-btn setting-btn" :src="icon.setting" alt="设置" @click="showSettingModal">
+    </div> -->
+    <!-- <div class="config-modal" v-if="isSettingModalShow">
+      <img class="common-btn close-btn" :src="icon.close" alt="关闭" @click="closeSettingModal">
+      <div class="title">设置</div>
+      <div class="content-wrap">
+        <div class="row">
+          <div class="label">游戏:</div>
+          <input type="text" v-model="globalConfig.game" disabled>
+        </div>
+        <div class="row">
+          <div class="label">版本:</div>
+          <input type="text" v-model="globalConfig.version">
+        </div>
+      </div>
+      <div class="btn-wrap">
+        <button @click="handleSetGlobalConfig">确认</button>
+        <button @click="closeSettingModal">取消</button>
+      </div>
+    </div> -->
+    <div class="config-modal" v-if="isSettingModalShow">
+      <div class="title">选择版本</div>
+      <div class="content-wrap">
+        <div class="version-list">
+          <div class="version-item" v-for="(item,index) in versionList" :key="index" @click="handleChangeGlobalConfig(item.code)">
+            <img :class="`version-img ${globalConfig.version === item.code ? 'active' : ''}`" :src="item.src" :alt="item.name">
+          </div>
+        </div>
+      </div>
+      <div class="btn-wrap">
+        <img :src="icon.submit" alt="submit-btn" @click="handleSetGlobalConfig" />
+        <img :src="icon.close" alt="close-btn" @click="closeSettingModal" />
+      </div>
+    </div>
     <div
       class="box profiles-box"
     >
@@ -32,18 +67,18 @@
       />
     </div>
     <div class="box search-box">
+      <img class="index-version-img" :src="currentGameLogoSrc" alt="version-logo" @click="showSettingModal">
+      <PlayStyleSelector
+        :play-style="playStyle"
+        :disabled="isLoading"
+        :play-style-list="playStyleList"
+        :change-play-style="playStyleChange"
+      />
       <LvSelector
         :lv="lv"
         :change-lv="changeLv"
         class="lv-selector-wrap"
         :disabled="isLoading"
-      />
-      <PlayStyleSelector
-        class="radio-wrap"
-        :play-style="playStyle"
-        :disabled="isLoading"
-        :play-style-list="playStyleList"
-        :change-play-style="playStyleChange"
       />
     </div>
     <div
@@ -178,6 +213,38 @@ export default {
   data() {
     return {
       version: 'IIDX速查工具v1.03',
+      isSettingModalShow: false,
+      globalConfig: {
+        game: 'iidx',
+        version: '27'
+      },
+      versionList: [
+        {
+          code: '28',
+          name: 'beatmania IIDX 28 BISTROVER',
+          src: require('@/assets/gameLogo/ldj_28_logo.png')
+        },
+        {
+          code: '27',
+          name: 'beatmania IIDX 27 HEROIC VERSE',
+          src: require('@/assets/gameLogo/ldj_27_logo.png')
+        },
+        {
+          code: '26',
+          name: 'beatmania IIDX 26 Rootage',
+          src: require('@/assets/gameLogo/ldj_26_logo.png')
+        },
+        {
+          code: '25',
+          name: 'beatmania IIDX 25 CANNON BALLERS',
+          src: require('@/assets/gameLogo/ldj_25_logo.png')
+        },
+        {
+          code: '24',
+          name: 'beatmania IIDX 24 SINOBUZ',
+          src: require('@/assets/gameLogo/ldj_24_logo.png')
+        },
+      ],
       names: [],
       isTyping: false,
       capURL: null,
@@ -196,6 +263,9 @@ export default {
         refresh: require('@/assets/refresh.png'),
         share: require('@/assets/share.png'),
         up: require('@/assets/up.png'),
+        setting: require('@/assets/icon-setting.png'),
+        close: require('@/assets/icon-close.png'),
+        submit: require('@/assets/icon-submit.png'),
       },
       scores: [],
       newScores: [],
@@ -308,30 +378,36 @@ export default {
     }
   },
   computed: {
-      labelList () {
-        return {
-          ALL_TEMP:'ALL',
-          FULL_COMBO: 'FC',
-          EX_HARD_CLEAR: 'EXHC',
-          HARD_CLEAR: 'HC',
-          CLEAR: 'NC',
-          EASY_CLEAR: 'EC',
-          ASSIST_CLEAR: 'AC',
-          NO_PLAY: 'NO PLAY',
-          FAILED: 'Failed',
-          clearRate: 'CLEAR RATE',
-          MAX: 'MAX',
-          'MAX-': 'MAX-',
-          AAA: 'AAA',
-          AA: 'AA',
-          A: 'A',
-          B: 'B',
-          C: 'C',
-          D: 'D',
-          E: 'E',
-          F: 'F',
-        }
-      },
+    labelList () {
+      return {
+        ALL_TEMP:'ALL',
+        FULL_COMBO: 'FC',
+        EX_HARD_CLEAR: 'EXHC',
+        HARD_CLEAR: 'HC',
+        CLEAR: 'NC',
+        EASY_CLEAR: 'EC',
+        ASSIST_CLEAR: 'AC',
+        NO_PLAY: 'NO PLAY',
+        FAILED: 'Failed',
+        clearRate: 'CLEAR RATE',
+        MAX: 'MAX',
+        'MAX-': 'MAX-',
+        AAA: 'AAA',
+        AA: 'AA',
+        A: 'A',
+        B: 'B',
+        C: 'C',
+        D: 'D',
+        E: 'E',
+        F: 'F',
+      }
+    },
+    currentGameLogoSrc () {
+      const versionList = this.versionList
+      const globalConfig = this.globalConfig
+      const verItem = versionList.find(i=>i.code===globalConfig.version)
+      return verItem ? verItem.src : ''
+    }
   },
   methods: {
     lossTyping() {
@@ -898,6 +974,28 @@ export default {
         if(i.label=='CLEAR RATE')i.value = clearRate
       })
     },
+    showSettingModal(){
+      // 首页设置窗口
+      this.isSettingModalShow = !this.isSettingModalShow
+    },
+    closeSettingModal(){
+      this.isSettingModalShow = false
+      this.getGlobalConfig()
+    },
+    getGlobalConfig(){
+      const globalConfigStr = localStorage.getItem('globalConfig')
+      if(!globalConfigStr)return
+      this.globalConfig = JSON.parse(globalConfigStr)
+    },
+    handleChangeGlobalConfig(version){
+      this.globalConfig.version = version
+    },
+    handleSetGlobalConfig(){
+      const globalConfigStr = JSON.stringify(this.globalConfig)
+      localStorage.setItem('globalConfig',globalConfigStr)
+      // this.$store.commit('setGlobalConfig',this.globalConfig)
+      location.reload()
+    },
     async parseMapData(){
       // const cityArr=[
       //     ['上海', '河北', '山西', '内蒙古', '辽宁', '吉林','黑龙江',  '江苏', '浙江', '安徽', '福建', '江西', '山东','河南', '湖北', '湖南', '广东', '广西', '海南', '四川', '贵州', '云南', '西藏', '陕西', '甘肃', '青海', '宁夏', '新疆', '北京', '天津', '重庆', '香港', '澳门', '台湾'],
@@ -1192,7 +1290,8 @@ export default {
     document.body.appendChild(bgIframe)
   },
   mounted() {
-    this.parseMapData()
+    // this.parseMapData()
+    this.getGlobalConfig()
     this.clearRateStyle = localStorage.getItem('clearRateStyle') || 'assistClearRate'
     const query = this.$route.query
     if(query.djName){
@@ -1284,6 +1383,113 @@ ul,ol{
   flex-direction: column;
   align-items: center;
 }
+.index-version-img{
+  cursor: pointer;
+  height: 30px;
+  margin-right: 10px;
+  &.logo-pos{
+    height: 40px;
+    position: absolute;
+    top: 144px;
+    right: 13px;
+  }
+}
+.extra-conf-wrap{
+  .common-btn{
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+  .setting-btn{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+}
+.close-btn{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.config-modal{
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99;
+  background: rgba(0, 0, 0, .9);
+  border-radius: 10px;
+  width: 70%;
+  min-height: 200px;
+  .title{
+    padding: 10px 0;
+  }
+  .content-wrap{
+    box-sizing: border-box;
+    padding: 10px 20px;
+    .row{
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+      .label{
+        font-size: 8px;
+      }
+      input{
+        width: 100px;
+        color: #fff;
+        background: rgba(255, 255, 255, .2);
+        border: none;
+        outline: none;
+      }
+    }
+    .version-list{
+      width: 100%;
+      max-height: 240px;
+      overflow-y: scroll;
+      margin-bottom: 60px;
+      .version-item{
+        width: 100%;
+        margin: 10px 0;
+        .version-img{
+          position: relative;
+          width: 100%;
+          cursor: pointer;
+          box-sizing: border-box;
+          opacity: 0.4;
+          &.active{
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+  .btn-wrap{
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    button{
+      margin-right: 10px;
+      &:last-of-type{
+        margin: 0;
+      }
+    }
+    img{
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      margin-right: 40px;
+      &:last-of-type{
+        margin: 0;
+      }
+    }
+  }
+}
 .search-box{
   // margin-top: 20px;
   margin-bottom: 20px;
@@ -1295,16 +1501,16 @@ ul,ol{
   width: 400px;
   display: flex;
   justify-content: flex-start;
-  align-items: flex-end;
+  align-items: center;
   .lv-selector-wrap{
     // background: rgba(51, 51, 51,.5);
-    background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
+    // background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
     // border: 1px solid #ccc;
     height: 24px;
     border-radius: 12px;
     display: flex;
     align-items: center;
-    margin-right: 10px;
+    // margin-right: 10px;
   }
 
 }

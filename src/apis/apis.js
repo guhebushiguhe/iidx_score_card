@@ -1,17 +1,23 @@
 import axios from './axios'
 
+const globalConfigStr = localStorage.getItem('globalConfig')
+let version = '27'
+if (globalConfigStr) {
+    version = JSON.parse(globalConfigStr).version
+}
+
 const arcana_baseURL = 'https://arcana.nu'
 const netease_baseURL = 'https://apimusic.linweiqin.com'
 
 function getProfiles (djName) {
-    return axios.get(arcana_baseURL+'/api/v1/iidx/27/profiles/',{
+    return axios.get(arcana_baseURL+`/api/v1/iidx/${version}/profiles/`,{
         params: {
           'dj_name': djName
         }
     })
 }
 function getScores (id,pos) {
-    return axios.get(arcana_baseURL+'/api/v1/iidx/27/player_bests/',{
+    return axios.get(arcana_baseURL+`/api/v1/iidx/${version}/player_bests/`,{
     params:pos?
     {
         profile_id: id,
@@ -23,7 +29,7 @@ function getScores (id,pos) {
     })
 }
 function getChartsByMusicId (music_id) {
-    return axios.get(arcana_baseURL+`/api/v1/iidx/27/charts/`,{
+    return axios.get(arcana_baseURL+`/api/v1/iidx/${version}/charts/`,{
         params:{
             music_id, music_id,
             omnimix: true,
@@ -31,7 +37,7 @@ function getChartsByMusicId (music_id) {
     })
 }
 function getQpros (id) {
-    return axios.get(arcana_baseURL+'/api/v1/iidx/27/qpros/'+id)
+    return axios.get(arcana_baseURL+`/api/v1/iidx/${version}/qpros/`+id)
 }
 
 function getSongUrl (id) {

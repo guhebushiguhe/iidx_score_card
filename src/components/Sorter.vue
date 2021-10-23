@@ -85,7 +85,18 @@ export default {
                 value: -1,
                 label: 'All Folder',
             },
-            folderList:[
+
+        }
+    },
+    computed:{
+        scoreFilterVal(){
+            return {
+                searchVal: this.searchVal,
+                folderFilterVal: this.folderFilterStr.value
+            }
+        },
+        folderList(){
+            const folderListAll = [
                 {
                     value: -1,
                     label: 'All Folder',
@@ -202,15 +213,18 @@ export default {
                     value: 27,
                     label: '27 HEROIC VERSE'
                 },
+                {
+                    value: 28,
+                    label: '28 BISTROVER'
+                },
+                {
+                    value: 29,
+                    label: '29 CastHour'
+                },
             ]
-        }
-    },
-    computed:{
-        scoreFilterVal(){
-            return {
-                searchVal: this.searchVal,
-                folderFilterVal: this.folderFilterStr.value
-            }
+            const globalConfigStr = localStorage.getItem('globalConfig')
+            const version = globalConfigStr ? JSON.parse(globalConfigStr).version : '27'
+            return folderListAll.filter(i=>i.value<=version)
         }
     },
     methods:{

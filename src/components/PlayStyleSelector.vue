@@ -1,6 +1,6 @@
 <template>
-    <div :class="className">
-    <span
+    <div class="radio-wrap">
+    <!-- <span
         v-for="item in playStyleList"
         :key="item.value"
     >
@@ -19,18 +19,14 @@
             alt=""
         />
         </label>
-    </span>
+    </span> -->
+    <img :src="playStyleImg[playStyle]" alt="" :class="`style-btn ${disabled?'':'active'}`" @click="disabled? ()=>{} : changePlayStyle({target:{value:playStyle==='SINGLE' ? 'DOUBLE' : 'SINGLE'}})">
     </div>
 </template>
 <script>
 export default {
     name: "PlayStyleSelector",
     props:{
-        className:{
-            type: String,
-            required: false,
-            default: ''
-        },
         playStyle:{
             type: String,
             required: false,
@@ -71,12 +67,12 @@ export default {
 </script>
 <style lang="scss">
 .radio-wrap{
-    background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
+    // background: linear-gradient(180deg, rgba(0, 0, 0, .4) 0%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, .4) 100%,);
     // border: 1px solid #ccc;
     height: 24px;
     line-height: 24px;
     border-radius: 12px;
-    padding: 0 10px;
+    // padding: 0 10px;
     display: flex;
     align-items: center;
     .radio-label{
@@ -103,6 +99,9 @@ export default {
     .radio{
         margin-top: 10px;
         display: none;
+    }
+    .style-btn.active{
+        cursor: pointer;
     }
 }
 </style>
