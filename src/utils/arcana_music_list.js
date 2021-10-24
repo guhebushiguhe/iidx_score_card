@@ -1,4 +1,4 @@
-// 目前数据记录 DAI 的 SP 成绩
+// 目前数据记录 已经整合28
 
 const music_list = {
     "Aw4woWoKS80": {
@@ -18260,6 +18260,1057 @@ const music_list = {
         "title": "Programmed Life",
         "artist": "kors k",
         "genre": "PSY TRANCE(FULL ON)"
+    },
+    // 整合iidx28
+    "EV6Iuwt9Q6v": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/EV6Iuwt9Q6v"
+        },
+        "_id": "EV6Iuwt9Q6v",
+        "folder": 28,
+        "title": "Rub-a Dub-a",
+        "artist": "kors k",
+        "genre": "LOVERS CANDY RAVE"
+    },
+    "AggRa7mBx66": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/AggRa7mBx66"
+        },
+        "_id": "AggRa7mBx66",
+        "folder": 28,
+        "title": "Sinus Iridum",
+        "artist": "神楽改",
+        "genre": "KAMIKURA"
+    },
+    "CvqA2xfBtpW": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/CvqA2xfBtpW"
+        },
+        "_id": "CvqA2xfBtpW",
+        "folder": 28,
+        "title": "ディスコルディア",
+        "artist": "ぺのれり vs. BEMANI Sound Team \"HuΣeR\"",
+        "genre": "CROSSOVER"
+    },
+    "GKdG1fEZCK4": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/GKdG1fEZCK4"
+        },
+        "_id": "GKdG1fEZCK4",
+        "folder": 28,
+        "title": "Ritual of Anubis",
+        "artist": "KO3 & Relect",
+        "genre": "ARABIC HARD RITUAL"
+    },
+    "GxRBFfSfCXc": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/GxRBFfSfCXc"
+        },
+        "_id": "GxRBFfSfCXc",
+        "folder": 28,
+        "title": "Scandal",
+        "artist": "Osamu Kubota",
+        "genre": "PROGRESSIVE SWING"
+    },
+    "DlN-gEmMZf4": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/DlN-gEmMZf4"
+        },
+        "_id": "DlN-gEmMZf4",
+        "folder": 28,
+        "title": "MA・TSU・RI",
+        "artist": "かなたん,アマギセーラ,ぁゅ by BEMANI Sound Team \"藤森崇多\"",
+        "genre": "JAPANESQUE"
+    },
+    "DIHsJ5rf3Ce": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/DIHsJ5rf3Ce"
+        },
+        "_id": "DIHsJ5rf3Ce",
+        "folder": 28,
+        "title": "世界の果てに約束の凱歌を -ReUnion-",
+        "artist": "OSTER project feat. かなたん",
+        "genre": "BRAVE ANTHEM"
+    },
+    "ALgyfotGZnv": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/ALgyfotGZnv"
+        },
+        "_id": "ALgyfotGZnv",
+        "folder": 28,
+        "title": "Sugarplum",
+        "artist": "KOTONOHOUSE",
+        "genre": "MOE CORE"
+    },
+    "AUngW6dFfMp": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/AUngW6dFfMp"
+        },
+        "_id": "AUngW6dFfMp",
+        "folder": 28,
+        "title": "Tiempo Loco",
+        "artist": "kors k feat.Hboy",
+        "genre": "Hi-TECH / PSY CORE"
+    },
+    "DaNAykHLp9J": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/DaNAykHLp9J"
+        },
+        "_id": "DaNAykHLp9J",
+        "folder": 28,
+        "title": "ここからよろしく大作戦143",
+        "artist": "BEMANI Sound Team \"あさき隊\"",
+        "genre": "ROCK"
+    },
+    "EMljoog6MsN": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/EMljoog6MsN"
+        },
+        "_id": "EMljoog6MsN",
+        "folder": 28,
+        "title": "Breakin' Rules",
+        "artist": "BEMANI Sound Team \"Sota Fujimori\"",
+        "genre": "CYBER PUNK"
+    },
+    "G1n0arOZHmc": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/G1n0arOZHmc"
+        },
+        "_id": "G1n0arOZHmc",
+        "folder": 28,
+        "title": "Lovely Howdy Cowboy!!",
+        "artist": "まろん feat. キャサリン",
+        "genre": "HAPPY COUNTRY CORE"
+    },
+    "A8atamt4Un0": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/A8atamt4Un0"
+        },
+        "_id": "A8atamt4Un0",
+        "folder": 28,
+        "title": "儚き恋の華",
+        "artist": "BEMANI Sound Team \"TAG\" feat. 猫体質",
+        "genre": "BLOOM ROCK"
+    },
+    "EFGjE1SjnTg": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/EFGjE1SjnTg"
+        },
+        "_id": "EFGjE1SjnTg",
+        "folder": 28,
+        "title": "SOLID STATE SQUAD -RISEN RELIC REMIX-",
+        "artist": "Remixed by xi",
+        "genre": "LIFE STREAM"
+    },
+    "H_blhTyKESj": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/H_blhTyKESj"
+        },
+        "_id": "H_blhTyKESj",
+        "folder": 28,
+        "title": "When I Met U",
+        "artist": "LADY'S ONLY",
+        "genre": "HYBRID BASSLINE"
+    },
+    "A5CHMjlxmEv": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/A5CHMjlxmEv"
+        },
+        "_id": "A5CHMjlxmEv",
+        "folder": 28,
+        "title": "Here We Are",
+        "artist": "The 4th feat.ここなつ",
+        "genre": "J-CORE"
+    },
+    "BrDMH8JfGe-": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/BrDMH8JfGe-"
+        },
+        "_id": "BrDMH8JfGe-",
+        "folder": 28,
+        "title": "S-Bahn",
+        "artist": "BEMANI Sound Team \"DARK TRAIN\"",
+        "genre": "DARK TECHNO"
+    },
+    "HOgT3Wo_z4w": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/HOgT3Wo_z4w"
+        },
+        "_id": "HOgT3Wo_z4w",
+        "folder": 28,
+        "title": "LIKE A VAMPIRE",
+        "artist": "koyomi,星野奏子 by BEMANI Sound Team \"TAKA\"",
+        "genre": "HEAVY METAL"
+    },
+    "BqpNh6go_N9": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/BqpNh6go_N9"
+        },
+        "_id": "BqpNh6go_N9",
+        "folder": 28,
+        "title": "Euphoric Lagoon",
+        "artist": "BEMANI Sound Team \"TAG\"",
+        "genre": "J-DANCE FUSION"
+    },
+    "BbT6k2HRDpN": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/BbT6k2HRDpN"
+        },
+        "_id": "BbT6k2HRDpN",
+        "folder": 28,
+        "title": "Para siempre",
+        "artist": "削除 feat. 削除",
+        "genre": "MEXICAN DRUMSTEP"
+    },
+    "EajBk2p1kWH": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/EajBk2p1kWH"
+        },
+        "_id": "EajBk2p1kWH",
+        "folder": 28,
+        "title": "Viridian",
+        "artist": "REMO-CON",
+        "genre": "NU-NRG"
+    },
+    "EsG5_DUtJgC": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/EsG5_DUtJgC"
+        },
+        "_id": "EsG5_DUtJgC",
+        "folder": 28,
+        "title": "Burning Flame",
+        "artist": "AJURIKA feat.SAK.",
+        "genre": "HYPER TECHNO"
+    },
+    "Gexr6BEntuY": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Gexr6BEntuY"
+        },
+        "_id": "Gexr6BEntuY",
+        "folder": 28,
+        "title": "霧幻メモリア",
+        "artist": "BEMANI Sound Team \"劇団レコード\" feat.Risa Yuzuki",
+        "genre": "LAST FRONTIER"
+    },
+    "EQVe9qVK6qD": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/EQVe9qVK6qD"
+        },
+        "_id": "EQVe9qVK6qD",
+        "folder": 28,
+        "title": "OTOKOZAKA",
+        "artist": "BEMANI Sound Team \"Trance Liquid\"",
+        "genre": "OLD FASHIONED"
+    },
+    "H3ZH9Kt0RjA": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/H3ZH9Kt0RjA"
+        },
+        "_id": "H3ZH9Kt0RjA",
+        "folder": 28,
+        "title": "スーパー戦湯ババンバーン",
+        "artist": "すわひでお,秋成,かぼちゃ,藍月なくる,NU-KO by BEMANI Sound Team \"八戸亀生羅\"",
+        "genre": "オンセン♨ヒーロー"
+    },
+    "APdpg_LIJH5": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/APdpg_LIJH5"
+        },
+        "_id": "APdpg_LIJH5",
+        "folder": 28,
+        "title": "Level 3",
+        "artist": "Yamato",
+        "genre": "DRUMSTEP / DnB"
+    },
+    "AVTlWtJCUvj": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/AVTlWtJCUvj"
+        },
+        "_id": "AVTlWtJCUvj",
+        "folder": 28,
+        "title": "紅蓮華",
+        "artist": "Covered by BEMANI Sound Team \"HuΣeR\" feat. Mayumi Morinaga",
+        "genre": "IIDX EDITION"
+    },
+    "C8yZ9hceExp": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/C8yZ9hceExp"
+        },
+        "_id": "C8yZ9hceExp",
+        "folder": 28,
+        "title": "ASIAN VIRTUAL REALITIES (MELTING TOGETHER IN DAZZLING DARKNESS)",
+        "artist": "かめりあ",
+        "genre": "BIG BEAT"
+    },
+    "GakPQxsBzUQ": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/GakPQxsBzUQ"
+        },
+        "_id": "GakPQxsBzUQ",
+        "folder": 28,
+        "title": "Ah Hah Yeah",
+        "artist": "Masayoshi Iimori",
+        "genre": "UPTEMPO RAW"
+    },
+    "Bwxxonpxxad": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Bwxxonpxxad"
+        },
+        "_id": "Bwxxonpxxad",
+        "folder": 28,
+        "title": "Romanticが止まらない",
+        "artist": "Remixed by BEMANI Sound Team \"L.E.D.\" & IOSYS",
+        "genre": "IIDX EDITION"
+    },
+    "CDD0yBgdlir": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/CDD0yBgdlir"
+        },
+        "_id": "CDD0yBgdlir",
+        "folder": 28,
+        "title": "水無月の雫 ft. 小林まな",
+        "artist": "Xceon",
+        "genre": "-和- EURO TRANCE"
+    },
+    "Fs4TXynPClU": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Fs4TXynPClU"
+        },
+        "_id": "Fs4TXynPClU",
+        "folder": 28,
+        "title": "ABSOLUTE (kors k Remix)",
+        "artist": "Remixed by kors k",
+        "genre": "IIDX ANTHEM REVIVAL"
+    },
+    "Hh2efTAW5Rv": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Hh2efTAW5Rv"
+        },
+        "_id": "Hh2efTAW5Rv",
+        "folder": 28,
+        "title": "The Wind of China Express(The 4th Mashup)",
+        "artist": "The 4th",
+        "genre": "THE 4TH"
+    },
+    "B5O5GlVXGdM": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/B5O5GlVXGdM"
+        },
+        "_id": "B5O5GlVXGdM",
+        "folder": 28,
+        "title": "Vitrum",
+        "artist": "BEMANI Sound Team \"Yvya\"",
+        "genre": "PROGRESSIVE METAL"
+    },
+    "C3R7OXNR1bv": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/C3R7OXNR1bv"
+        },
+        "_id": "C3R7OXNR1bv",
+        "folder": 28,
+        "title": "Don't Stop The Music feat. Kanae Asaba",
+        "artist": "Nhato",
+        "genre": "ELECTRO FUNK"
+    },
+    "CkWX3BI0aiW": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/CkWX3BI0aiW"
+        },
+        "_id": "CkWX3BI0aiW",
+        "folder": 28,
+        "title": "犬に雨傘",
+        "artist": "OSTER project feat. そらこ",
+        "genre": "FRENCH POP"
+    },
+    "HIPwnGyOnpa": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/HIPwnGyOnpa"
+        },
+        "_id": "HIPwnGyOnpa",
+        "folder": 28,
+        "title": "Party Starter",
+        "artist": "ARM (IOSYS) × cotowari ft. anporin",
+        "genre": "K-POP"
+    },
+    "GcNAHRGxEv_": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/GcNAHRGxEv_"
+        },
+        "_id": "GcNAHRGxEv_",
+        "folder": 28,
+        "title": "COSMIC RAY",
+        "artist": "BEMANI Sound Team \"Captain Sonic\"",
+        "genre": "BIGCORE"
+    },
+    "F-3yrpYEKi-": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/F-3yrpYEKi-"
+        },
+        "_id": "F-3yrpYEKi-",
+        "folder": 28,
+        "title": "LAST DAY",
+        "artist": "AJURIKA",
+        "genre": "PSYCHEDELIC TRANCE"
+    },
+    "DXBxjFm4_ZD": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/DXBxjFm4_ZD"
+        },
+        "_id": "DXBxjFm4_ZD",
+        "folder": 28,
+        "title": "Hands Up feat. kradness BEMANI Sound Team \"Sota Fujimori\" Remix",
+        "artist": "BEMANI Sound Team \"Sota Fujimori\"",
+        "genre": "THE 4TH"
+    },
+    "GQmVU1PFEn6": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/GQmVU1PFEn6"
+        },
+        "_id": "GQmVU1PFEn6",
+        "folder": 28,
+        "title": "BEMANI PRO LEAGUE Theme",
+        "artist": "BEMANI Sound Team \"Sota F.\"",
+        "genre": "BPL EDM"
+    },
+    "Hl72ocfc-lt": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Hl72ocfc-lt"
+        },
+        "_id": "Hl72ocfc-lt",
+        "folder": 28,
+        "title": "Rowdy",
+        "artist": "Dazsta",
+        "genre": "DUBSTEP"
+    },
+    "Ba4s9hdMctR": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Ba4s9hdMctR"
+        },
+        "_id": "Ba4s9hdMctR",
+        "folder": 28,
+        "title": "WAKE UP NOW",
+        "artist": "Maozon feat. Chica",
+        "genre": "TROPICAL ELECTRO HOUSE"
+    },
+    "F7TMu71-uPW": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/F7TMu71-uPW"
+        },
+        "_id": "F7TMu71-uPW",
+        "folder": 28,
+        "title": "Explorer feat. ぷにぷに電機",
+        "artist": "パソコン音楽クラブ",
+        "genre": "DANCE POP"
+    },
+    "EQALnOBFY62": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/EQALnOBFY62"
+        },
+        "_id": "EQALnOBFY62",
+        "folder": 28,
+        "title": "Midnight Drive",
+        "artist": "らっぷびと Prod. by uno",
+        "genre": "HIP HOP"
+    },
+    "FE_Mh1pezu2": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/FE_Mh1pezu2"
+        },
+        "_id": "FE_Mh1pezu2",
+        "folder": 28,
+        "title": "Overslept",
+        "artist": "PARKGOLF",
+        "genre": "DRUM'N'BASS"
+    },
+    "HPT_ZAdETfD": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/HPT_ZAdETfD"
+        },
+        "_id": "HPT_ZAdETfD",
+        "folder": 28,
+        "title": "3!dolon Forc3",
+        "artist": "青龍×Eagle",
+        "genre": "THE 4TH"
+    },
+    "HQoLc4p57ID": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/HQoLc4p57ID"
+        },
+        "_id": "HQoLc4p57ID",
+        "folder": 28,
+        "title": "Chewingood!!!",
+        "artist": "TORIENA",
+        "genre": "CHIP RAVE"
+    },
+    "E-afHQlMKZP": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/E-afHQlMKZP"
+        },
+        "_id": "E-afHQlMKZP",
+        "folder": 28,
+        "title": "涙のテ・エストラーニョ・ムーチョ",
+        "artist": "LA BAILARINA☆Prim",
+        "genre": "Hi-歌謡タンゴ"
+    },
+    "Dkhu6Hr1maG": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Dkhu6Hr1maG"
+        },
+        "_id": "Dkhu6Hr1maG",
+        "folder": 28,
+        "title": "水鏡の異界",
+        "artist": "BEMANI Sound Team \"Coyaan\"",
+        "genre": "JAPANESE TECH BREAKS"
+    },
+    "B6tCudLg7oj": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/B6tCudLg7oj"
+        },
+        "_id": "B6tCudLg7oj",
+        "folder": 28,
+        "title": "伐折羅-vajra-",
+        "artist": "DJ TOTTO VS 兎々",
+        "genre": "KUDOS CORE"
+    },
+    "F5EGveumnPK": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/F5EGveumnPK"
+        },
+        "_id": "F5EGveumnPK",
+        "folder": 28,
+        "title": "MEGAERA",
+        "artist": "fallen shepherd × cotowari ft. nayuta",
+        "genre": "BULGARIAN CORE"
+    },
+    "HBJTe029Pij": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/HBJTe029Pij"
+        },
+        "_id": "HBJTe029Pij",
+        "folder": 28,
+        "title": "Rosa azuL",
+        "artist": "lapix",
+        "genre": "HARD LATIN"
+    },
+    "ClZA9mJR-QN": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/ClZA9mJR-QN"
+        },
+        "_id": "ClZA9mJR-QN",
+        "folder": 28,
+        "title": "Danza Aestas",
+        "artist": "Feryquitous",
+        "genre": "CONTEMPORARY SALSA"
+    },
+    "Ai345M7lErW": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Ai345M7lErW"
+        },
+        "_id": "Ai345M7lErW",
+        "folder": 28,
+        "title": "新宝島",
+        "artist": "Remixed by BEMANI Sound Team \"TAG feat. PON\"",
+        "genre": "IIDX EDITION"
+    },
+    "DSrPVJtF6Gw": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/DSrPVJtF6Gw"
+        },
+        "_id": "DSrPVJtF6Gw",
+        "folder": 28,
+        "title": "MOVE! (We Keep It Movin')",
+        "artist": "Jonny Dynamite!,Lisa - paint with stars -,Rio Hiiragi by BEMANI Sound Team \"U1-ASAMi\" ",
+        "genre": "ORBITALIC ELECTRIC MUSIC"
+    },
+    "DrPnDywDMd1": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/DrPnDywDMd1"
+        },
+        "_id": "DrPnDywDMd1",
+        "folder": 28,
+        "title": "冥 (かめりあ's \"甦\" Remix) ",
+        "artist": "Remixed by かめりあ",
+        "genre": "HUMAN AUTOMATION"
+    },
+    "D3ENqhSQUcE": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/D3ENqhSQUcE"
+        },
+        "_id": "D3ENqhSQUcE",
+        "folder": 28,
+        "title": "∀",
+        "artist": "BEMANI Sound Team \"HuΣeR\" respect for D.J.Amuro",
+        "genre": "RENAISSANCE"
+    },
+    "FNfNKFJtrCL": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/FNfNKFJtrCL"
+        },
+        "_id": "FNfNKFJtrCL",
+        "folder": 28,
+        "title": "THE PEERLESS UNDER HEAVEN",
+        "artist": "Yuta Imai Vs. BEMANI Sound Team \"L.E.D.-G\"",
+        "genre": "HARD MIXTURE"
+    },
+    "HBL1HWdzaiK": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/HBL1HWdzaiK"
+        },
+        "_id": "HBL1HWdzaiK",
+        "folder": 28,
+        "title": "So Punky",
+        "artist": "Y&Co. feat. 大山愛未",
+        "genre": "80s EUROBEAT"
+    },
+    "DwXv1dtHKzO": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/DwXv1dtHKzO"
+        },
+        "_id": "DwXv1dtHKzO",
+        "folder": 28,
+        "title": "X-ray binary",
+        "artist": "BEMANI Sound Team \"Trance Liquid\"",
+        "genre": "TRANCE"
+    },
+    "Eu2KwhzoQkR": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Eu2KwhzoQkR"
+        },
+        "_id": "Eu2KwhzoQkR",
+        "folder": 28,
+        "title": "閠槞彁の願い",
+        "artist": "DJ TECHNORCH & RoughSketch",
+        "genre": "DARKSTEP"
+    },
+    "DJ-6e8cV_yO": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/DJ-6e8cV_yO"
+        },
+        "_id": "DJ-6e8cV_yO",
+        "folder": 28,
+        "title": "Neo Heritage",
+        "artist": "kors k vs MAD CHILD",
+        "genre": "HDM"
+    },
+    "FsH8zrtQNBe": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/FsH8zrtQNBe"
+        },
+        "_id": "FsH8zrtQNBe",
+        "folder": 28,
+        "title": "rommmo",
+        "artist": "callasoiled",
+        "genre": "BREAKCORE"
+    },
+    "Cy7QWEZ3Ok9": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Cy7QWEZ3Ok9"
+        },
+        "_id": "Cy7QWEZ3Ok9",
+        "folder": 28,
+        "title": "GIGA RAID",
+        "artist": "Blacklolita",
+        "genre": "NEO RUSSIAN FUTURE"
+    },
+    "DPjLmqlW5H3": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/DPjLmqlW5H3"
+        },
+        "_id": "DPjLmqlW5H3",
+        "folder": 28,
+        "title": "As You Want",
+        "artist": "Maozon",
+        "genre": "CYBER LIQUID FUNK"
+    },
+    "Dnqav0ZPdFq": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Dnqav0ZPdFq"
+        },
+        "_id": "Dnqav0ZPdFq",
+        "folder": 28,
+        "title": "Brahma",
+        "artist": "m1dy",
+        "genre": "TOKYO STYLE SPEEDCORE"
+    },
+    "H1lUg6nG-IH": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/H1lUg6nG-IH"
+        },
+        "_id": "H1lUg6nG-IH",
+        "folder": 28,
+        "title": "Winner's Proof ft. KANASA from bless4",
+        "artist": "BEMANI Sound Team \"HuΣeR\" & kors k",
+        "genre": "THEME SONG"
+    },
+    "BIFgJ-zo5eG": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/BIFgJ-zo5eG"
+        },
+        "_id": "BIFgJ-zo5eG",
+        "folder": 28,
+        "title": "TOMORROW",
+        "artist": "Remixed by まろん feat. ricono",
+        "genre": "IIDX EDITION"
+    },
+    "G_SWhUDMcR-": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/G_SWhUDMcR-"
+        },
+        "_id": "G_SWhUDMcR-",
+        "folder": 28,
+        "title": "Globe Glitter",
+        "artist": "Sana,ATSUMI UEDA by BEMANI Sound Team \"PON\"",
+        "genre": "RAVE STEP"
+    },
+    "BP3iuWlK8Wa": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/BP3iuWlK8Wa"
+        },
+        "_id": "BP3iuWlK8Wa",
+        "folder": 28,
+        "title": "HIGH VOLTAGE",
+        "artist": "Yuta Imai",
+        "genre": "HARDSTYLE"
+    },
+    "Ezri8Bgzndk": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Ezri8Bgzndk"
+        },
+        "_id": "Ezri8Bgzndk",
+        "folder": 28,
+        "title": "of the first magnitude",
+        "artist": "BEMANI Sound Team \"Trance Liquid\"",
+        "genre": "TRANCE"
+    },
+    "HfaW0AZR9J4": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/HfaW0AZR9J4"
+        },
+        "_id": "HfaW0AZR9J4",
+        "folder": 28,
+        "title": "Zenith",
+        "artist": "Snail's House",
+        "genre": "PLUS ONE"
+    },
+    "BItjWG03XTL": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/BItjWG03XTL"
+        },
+        "_id": "BItjWG03XTL",
+        "folder": 28,
+        "title": "Dawn Saga",
+        "artist": "Nhato",
+        "genre": "CELTIC TRANCE STEP"
+    },
+    "H4gdqJHldP8": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/H4gdqJHldP8"
+        },
+        "_id": "H4gdqJHldP8",
+        "folder": 28,
+        "title": "二人ノ廃城幽踊宴",
+        "artist": "上ノ瀬つかさ",
+        "genre": "SPUKWALZER"
+    },
+    "B6cj540Pp-i": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/B6cj540Pp-i"
+        },
+        "_id": "B6cj540Pp-i",
+        "folder": 28,
+        "title": "Swarm Of Scarabs",
+        "artist": "C-Show",
+        "genre": "HOLIC"
+    },
+    "GlOCwozugeP": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/GlOCwozugeP"
+        },
+        "_id": "GlOCwozugeP",
+        "folder": 28,
+        "title": "Ocean Blue feat. Luschel",
+        "artist": "lapix",
+        "genre": "HiTECH FUSION"
+    },
+    "Ce26o-STcoA": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Ce26o-STcoA"
+        },
+        "_id": "Ce26o-STcoA",
+        "folder": 28,
+        "title": "BIGソムタム",
+        "artist": "AJURIKA",
+        "genre": "DRUM STEP"
+    },
+    "Di8FdDo3mKe": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/Di8FdDo3mKe"
+        },
+        "_id": "Di8FdDo3mKe",
+        "folder": 28,
+        "title": "Rejection Girl",
+        "artist": "BEMANI Sound Team \"HuΣeR\"",
+        "genre": "STYLISH FUTURE"
+    },
+    "EdH40bNiCym": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/EdH40bNiCym"
+        },
+        "_id": "EdH40bNiCym",
+        "folder": 28,
+        "title": "BLACK or WHITE?",
+        "artist": "BlackYooh vs. siromaru",
+        "genre": "SYMPHONIC SPEED SCHRANZ"
+    },
+    "FroS4J00rXl": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/FroS4J00rXl"
+        },
+        "_id": "FroS4J00rXl",
+        "folder": 28,
+        "title": "Jungle Eater",
+        "artist": "Hommarju",
+        "genre": "DRUMSTEP / RAGGATEK"
+    },
+    "HNDCS16IyTY": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/HNDCS16IyTY"
+        },
+        "_id": "HNDCS16IyTY",
+        "folder": 28,
+        "title": "Pārvatī",
+        "artist": "BEMANI Sound Team \"U1 overground\"",
+        "genre": "ORBITALIC WORLD MUSIC"
+    },
+    "HqfvRegwiqX": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/HqfvRegwiqX"
+        },
+        "_id": "HqfvRegwiqX",
+        "folder": 28,
+        "title": "That Feeling",
+        "artist": "Crayvxn",
+        "genre": "SPEED HOUSE"
+    },
+    "H1lrtITLSb2": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/H1lrtITLSb2"
+        },
+        "_id": "H1lrtITLSb2",
+        "folder": 28,
+        "title": "Ignis†Iræ",
+        "artist": "BEMANI Sound Team \"神\"",
+        "genre": "X"
+    },
+    "D17Sy5fAHZr": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/D17Sy5fAHZr"
+        },
+        "_id": "D17Sy5fAHZr",
+        "folder": 28,
+        "title": "DUAL STRIKER",
+        "artist": "Mayumi Morinaga,Fernweh by BEMANI Sound Team \"L.E.D. & HuΣeR\"",
+        "genre": "IIDX SOUNDS"
+    },
+    "FFQjWulo_Gn": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/FFQjWulo_Gn"
+        },
+        "_id": "FFQjWulo_Gn",
+        "folder": 28,
+        "title": "無意識のフィロソフィア",
+        "artist": "BEMANI Sound Team \"TAG\"",
+        "genre": "HARD TRANCE"
+    },
+    "BQQYiNc7hJL": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/BQQYiNc7hJL"
+        },
+        "_id": "BQQYiNc7hJL",
+        "folder": 28,
+        "title": "AMRITA -不滅ノ花-",
+        "artist": "SOUND HOLIC feat. Nana Takahashi",
+        "genre": "ORIENTAL TRANCE"
+    },
+    "CJZOg3rraer": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/CJZOg3rraer"
+        },
+        "_id": "CJZOg3rraer",
+        "folder": 28,
+        "title": "Mars beach",
+        "artist": "さよひめぼう",
+        "genre": "BALEARIC"
+    },
+    "AJiyG4tja2O": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/AJiyG4tja2O"
+        },
+        "_id": "AJiyG4tja2O",
+        "folder": 28,
+        "title": "魔法のかくれんぼ",
+        "artist": "Snail's House",
+        "genre": "FANTASY TOYPOP"
+    },
+    "AfPnNQ16GEr": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/AfPnNQ16GEr"
+        },
+        "_id": "AfPnNQ16GEr",
+        "folder": 28,
+        "title": "-65℃",
+        "artist": "BEMANI Sound Team \"D.J.Amuro\"",
+        "genre": "WHITE OUT"
+    },
+    "D2tCegrSJgX": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/D2tCegrSJgX"
+        },
+        "_id": "D2tCegrSJgX",
+        "folder": 28,
+        "title": "Farewell to Marrakech",
+        "artist": "Dirty Androids",
+        "genre": "MOROCCAN CROSSOVER"
+    },
+    "DN4h0qi1jWp": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/DN4h0qi1jWp"
+        },
+        "_id": "DN4h0qi1jWp",
+        "folder": 28,
+        "title": "Rubrum Piano",
+        "artist": "Xceon",
+        "genre": "ACID LATIN JAZZ"
+    },
+    "FWKZ8mokKCY": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/FWKZ8mokKCY"
+        },
+        "_id": "FWKZ8mokKCY",
+        "folder": 28,
+        "title": "乱膳の舞姫",
+        "artist": "BEMANI Sound Team \"Akhuta Works\" feat. mami",
+        "genre": "BALKANIC ROCK"
+    },
+    "FLYVBXHu-Zm": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/FLYVBXHu-Zm"
+        },
+        "_id": "FLYVBXHu-Zm",
+        "folder": 28,
+        "title": "CONNECT-",
+        "artist": "BEMANI Sound Team \"Sota Fujimori\"",
+        "genre": "EPIC TRANCE"
+    },
+    "F5OS83WLH67": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/F5OS83WLH67"
+        },
+        "_id": "F5OS83WLH67",
+        "folder": 28,
+        "title": "Empire of Fury",
+        "artist": "kors k",
+        "genre": "JUNGLE TERROR"
+    },
+    "BImSgH8ludf": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/BImSgH8ludf"
+        },
+        "_id": "BImSgH8ludf",
+        "folder": 28,
+        "title": "バッド・スイーツ、バッド・ドリーム",
+        "artist": "かめりあ feat. ななひら",
+        "genre": ".+:☆ BAD FUTURE ☆:+."
+    },
+    "G6H21u1gsof": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/G6H21u1gsof"
+        },
+        "_id": "G6H21u1gsof",
+        "folder": 28,
+        "title": "smooooch・∀・ (Snail's House Remix) ",
+        "artist": "Remixed by Snail's House",
+        "genre": "CANDY RAVE BASS"
+    },
+    "EjKpU2TxLnG": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/EjKpU2TxLnG"
+        },
+        "_id": "EjKpU2TxLnG",
+        "folder": 28,
+        "title": "Tell me what you wish feat.らっぷびと",
+        "artist": "Pizuya's Cell",
+        "genre": "ROCK"
+    },
+    "AXhhR8FrS_x": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/AXhhR8FrS_x"
+        },
+        "_id": "AXhhR8FrS_x",
+        "folder": 28,
+        "title": "Crazy Jackpot",
+        "artist": "Hommarju",
+        "genre": "UK HARDCORE"
+    },
+    "ASmqhr7WR-9": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/ASmqhr7WR-9"
+        },
+        "_id": "ASmqhr7WR-9",
+        "folder": 28,
+        "title": "apo:llioth",
+        "artist": "Juggernaut.",
+        "genre": "HARDCORE"
+    },
+    "HvE5weRBIfn": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/HvE5weRBIfn"
+        },
+        "_id": "HvE5weRBIfn",
+        "folder": 28,
+        "title": "LOCUS OF THE TRAVEL",
+        "artist": "CANVAS feat. Quimär & BEMANI Sound Team \"L.E.D.-G\"",
+        "genre": "HAPPY BISTRO CORE"
+    },
+    "BpoiXiWJ-wH": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/BpoiXiWJ-wH"
+        },
+        "_id": "BpoiXiWJ-wH",
+        "folder": 28,
+        "title": "Frisk And Squeak",
+        "artist": "nora2r",
+        "genre": "MAKINA"
+    },
+    "F1U0Bk0KwAY": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/F1U0Bk0KwAY"
+        },
+        "_id": "F1U0Bk0KwAY",
+        "folder": 28,
+        "title": "IIDX RED Ending (Ryu☆Remix)",
+        "artist": "Remixed by Ryu☆",
+        "genre": "CAPTIVATE"
+    },
+    "EqjdUf7kkQ5": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/EqjdUf7kkQ5"
+        },
+        "_id": "EqjdUf7kkQ5",
+        "folder": 28,
+        "title": "innocent revolver",
+        "artist": "OSTER project",
+        "genre": "BIGBAND JAZZ"
+    },
+    "EatM-wqcmP0": {
+        "_links": {
+            "_self": "https://arcana.nu/api/v1/iidx/28/music/EatM-wqcmP0"
+        },
+        "_id": "EatM-wqcmP0",
+        "folder": 28,
+        "title": "POLꞰAMAИIA",
+        "artist": "かめりあ feat. ななひら",
+        "genre": "ポルカ2020"
     }
 }
 
