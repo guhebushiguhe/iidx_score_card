@@ -187,9 +187,6 @@ import '@/utils/canvas2image.js'
 import localJson from '@/utils/netease_id_list.js'
 import arcana_data from '@/utils/arcana_music_list.js'
 
-// import mapJson from '@/utils/map/china.json'
-import courtNo_list from '@/utils/courtNo_list.json'
-import axios from 'axios'
 
 
 import Score from '@/components/Score.vue'
