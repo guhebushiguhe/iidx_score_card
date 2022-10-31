@@ -1,7 +1,7 @@
 import axios from './axios'
 
 const globalConfigStr = localStorage.getItem('globalConfig')
-let version = '27'
+let version = '29'
 if (globalConfigStr) {
     version = JSON.parse(globalConfigStr).version
 }

@@ -213,9 +213,19 @@ export default {
       isSettingModalShow: false,
       globalConfig: {
         game: 'iidx',
-        version: '27'
+        version: '29'
       },
       versionList: [
+        {
+          code: '30',
+          name: 'beatmania IIDX 30 RESIDENT',
+          src: require('@/assets/gameLogo/ldj_30_logo.png')
+        },
+        {
+          code: '29',
+          name: 'beatmania IIDX 29 RESIDENT',
+          src: require('@/assets/gameLogo/ldj_29_logo.png')
+        },
         {
           code: '28',
           name: 'beatmania IIDX 28 BISTROVER',
