@@ -213,9 +213,14 @@ export default {
       isSettingModalShow: false,
       globalConfig: {
         game: 'iidx',
-        version: '29'
+        version: '30'
       },
       versionList: [
+        {
+          code: '31',
+          name: 'beatmania IIDX 31 EPOLIS',
+          src: require('@/assets/gameLogo/ldj_31_logo.png')
+        },
         {
           code: '30',
           name: 'beatmania IIDX 30 RESIDENT',

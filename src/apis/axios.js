@@ -13,7 +13,7 @@ axios.interceptors.request.use(function (config) {
   // console.log(config)
   if(config.url.match('https://arcana.nu')){
     config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
-    config.headers['authorization'] = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJ0b2tlbiIsImlhdCI6MTY2NzIzMDUxMSwic3ViIjoiNjQyMDQ2MjYxQHFxLmNvbSIsInNjb3BlIjoibWFjaGluZV9hY2Nlc3Mgcml2YWxfd3JpdGUgc2V0dGluZ3NfcmVhZCBzZXR0aW5nc193cml0ZSJ9.Sq21N3u-j9vpmz1EZdRQCrDRGwpddvdj50whfPy2-rk'
+    config.headers['authorization'] = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJ0b2tlbiIsImlhdCI6MTcxNTQ1MTU0MSwic3ViIjoiNjQyMDQ2MjYxQHFxLmNvbSIsInNjb3BlIjoibWFjaGluZV9hY2Nlc3Mgcml2YWxfd3JpdGUgc2V0dGluZ3NfcmVhZCBzZXR0aW5nc193cml0ZSJ9.SzAP04T1-rU4FdfLGRj7Br1kPbJJXcqjqCFwcEgsmPI'
   }
   return config;
 }, function (err) {
