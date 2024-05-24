@@ -156,6 +156,7 @@
               :activeLabel="activeLabel"
               :activeType="activeType"
               :show-music-list="showMusicList"
+              v-if="item.label !== 'ALL VERSION'"
             />
           </span>
           <i :class="`back-btn ${isMusicListShow?'show':''}`" @click.stop="showMusicList('back')">
@@ -167,6 +168,7 @@
           :sortMusic="sortMusic"
           :filter-score="filterScore"
           :music-list-data="musicListData"
+          :activeLabel="activeLabel"
         />
       </ul>
       <MusicList
@@ -185,7 +187,10 @@
 import '@/assets/font/font.css'
 import '@/utils/canvas2image.js'
 import localJson from '@/utils/netease_id_list.js'
-import arcana_data from '@/utils/arcana_music_list.js'
+// import arcana_data from '@/utils/arcana_music_list.js'
+import common from '@/utils/common.js'
+import iidx_data from "@/utils/iidx_data.js"
+import music_charts from "@/utils/arcana_data.js"
 
 
 
@@ -396,6 +401,7 @@ export default {
   computed: {
     labelList () {
       return {
+        ALL_VERSION: 'ALL VERSION',
         ALL_TEMP:'ALL',
         FULL_COMBO: 'FC',
         EX_HARD_CLEAR: 'EXHC',
@@ -572,7 +578,7 @@ export default {
         resData._items.push(..._items)
         resData._related.charts.push(...charts)
         resData._related.music.push(...music)
-        resData._related.profiles.push(...profiles)
+        // resData._related.profiles.push(...profiles)
         _next=_links._next
         pos = data._items[249]?data._items[249]._id:null
       }while(_next)
@@ -634,6 +640,47 @@ export default {
         item.netease_ids = netease_ids
         item.show=true
       })
+      // 使用bin数据替换匹配的A网数据
+      // title、artist、folder、lv以bin数据为优先
+      let music = []
+      resData._related.music.map(i => {
+        if (music.findIndex(j => j._id === i._id) === -1) {
+          music.push(i)
+        }
+      })
+      resData._related.music = music
+      resData._related.music.map(i => {
+        if (i.bin_id) return
+        const music_id = i._id
+        let binItem, bin_id
+        if (music_charts[music_id]) {
+          bin_id = music_charts[music_id].bin_id
+          binItem = iidx_data.sp[bin_id]
+        } else {
+          const title = i.title
+          const fuseRes = common.search(title, Object.values(iidx_data.sp), {keys: ['title']})
+          if (fuseRes && fuseRes.length>0) {
+            binItem = fuseRes[0].item
+            bin_id = binItem.id
+          }
+        }
+        if (binItem) {
+          i.bin_id = bin_id
+          i.title = binItem.title
+          i.artist = binItem.artist
+          i.folder = binItem.folder - 0
+        }
+      })
+
+      resData._related.charts.map(j => {
+        const music_id = j.music_id
+        const mode = j.play_style === "SINGLE" ? 'sp' : 'dp'
+        const lvName = j.difficulty === 'BLACK' ? 'LEGGENDARIA' : j.difficulty
+        const bin_id = music_charts[music_id].bin_id
+        const binItem = iidx_data[mode][bin_id]
+        j.rating = binItem.lvArr[binItem.lvNameArr.indexOf(lvName)] - 0
+      })
+
       this.scoresData[id]=resData
       this.scores = this.parseScores(resData)
       const newTimeData = this.newFilter(resData)
@@ -779,7 +826,71 @@ export default {
       })
       const { FAILED } = LAMPS
       const NO_PLAY = musicList.filter(item=>item.status == 'NO_PLAY')
-      const ALL_TEMP = musicList
+      const ALL_TEMP = [...musicList]
+      let ALL_VERSION = [...musicList];
+      ['sp', 'dp'].map(mode => {
+        if (
+          playStyle === 'SINGLE' && mode === 'sp'
+          || playStyle === 'DOUBLE' && mode === 'sp'
+        ) return
+        Object.values(iidx_data[mode]).map(({ lvNameArr, id:bin_id, title, artist, folder, lvArr, notes: notesArr, bpm: bpmArr }) => {
+          lvNameArr.map((lvName, lvNameIndex) => {
+            const bin_lv = lvArr[lvNameIndex]
+            if (lv !== 'ALL' && bin_lv != lv) return
+            const index = musicList.findIndex(k => {
+              return k.music.bin_id === bin_id
+                    && (k.charts.difficulty === lvName
+                    || k.charts.difficulty === 'BlACK' && lvName === 'LEGGENDARIA')
+            })
+            if ( index === -1 ) {
+              const binLvNameArr = [
+                "BEGINNER",
+                "NORMAL",
+                "HYPER",
+                "ANOTHER",
+                "LEGGENDARIA"
+              ]
+              const notes = notesArr[binLvNameArr.indexOf(lvName)]
+              let bpm = bpmArr[0]
+              let bpm_min, bpm_max
+              if (/^\d+-\d+$/.test(bpm)) {
+                bpm_min = bpm.split('-')[0]
+                bpm_max = bpm.split('-')[1]
+              }
+              ALL_VERSION.push({
+                _id: bin_id + '_' + mode + '_' + lvName,
+                bin_id: bin_id,
+                title,
+                artist,
+                lamp: 'NO_SCORE',
+                ex_score: 0,
+                miss_count: 0,
+                grade: 0,
+                timestamp: new Date(0).toLocaleString(),
+                status: "NO_SCORE",
+                netease_ids: [],
+                show: true,
+                charts: {
+                  id: bin_id + '_' + mode + '_' + lvName,
+                  music_id: bin_id,
+                  play_style: mode === 'sp' ? 'SINGLE' : 'DOUBLE',
+                  difficulty: lvName === 'LEGGENDARIA' ? 'BLACK' : lvName,
+                  rating: lvArr[lvNameIndex],
+                  notes,
+                  bpm_min,
+                  bpm_max,
+                },
+                music: {
+                  _id: bin_id,
+                  folder,
+                  title,
+                  artist,
+                }
+              })
+            }
+          })
+        })
+      })
       let clearRate = ''
       if(this.clearRateStyle == 'assistClearRate'){
         clearRate = ALL_TEMP.length<=0?'----':((ALL_TEMP.length - FAILED.length - NO_PLAY.length)/ALL_TEMP.length*100).toFixed(2)+'%'
@@ -801,6 +912,7 @@ export default {
       }
 
       let res = {
+        ALL_VERSION,
         ALL_TEMP,
         ...LAMPS,
         NO_PLAY,
@@ -933,19 +1045,28 @@ export default {
       // console.log('filterScore',type,val)
       if(!val)return
       let musicListData = []
-      this.musicListData.forEach(item=>{
+      let musicList = []
+      this.musicListData.map(item=>{
         item.show = true
         musicListData.push(item)
+        if (!musicList.map(i => i._id).includes(item.music._id)) {
+          musicList.push(Object.assign({}, item.music, {id: item._id}))
+        }
       })
       Object.keys(val).map(i=>{
-        if(i=='searchVal'){
-          const reg = new RegExp(`(${val[i]})`,'ig')
+        if(i=='searchVal' && val[i]){
+          // const reg = new RegExp(`(${val[i]})`,'ig')
+          const fuseRes = common.search(val[i], musicList, { keys: ['title', 'artist']} )
+          const fuseIds = fuseRes.map(i => i.item._id)
           musicListData.map(item=>{
-            item.show = item.show && (
-              !!item.music.title.match(reg)
-              || !!item.music.artist.match(reg)
-              || !!item.music.genre.match(reg)
-            )
+            // 旧关键词匹配逻辑
+            // item.show = item.show && (
+            //   !!item.music.title.match(reg)
+            //   || !!item.music.artist.match(reg)
+            //   || !!item.music.genre.match(reg)
+            // )
+            // 新fuse模糊搜索逻辑
+            item.show = item.show && fuseIds.includes(item.music._id)
           })
         }
         if(i=='folderFilterVal'){

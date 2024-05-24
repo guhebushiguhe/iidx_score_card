@@ -72,6 +72,7 @@ export default {
     data(){
         return{
             labelImg:{
+                'ALL VERSION': require('@/assets/clear/all_version.png'),
                 'ALL': require('@/assets/clear/all_scores.png'),
                 FC: require('@/assets/clear/clear_full_combo.png'),
                 EXHC: require('@/assets/clear/clear_ex_hard.png'),

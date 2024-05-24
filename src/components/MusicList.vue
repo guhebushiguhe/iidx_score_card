@@ -8,7 +8,7 @@
             <div class="topEmpty" :style="{height: topEmptyHeight+'px'}"></div>
             <li
                 class="music-li"
-                v-for="({_id,lamp,grade,music,charts,netease_ids}) in dataActive"
+                v-for="({_id,lamp,grade,music,charts,bin_id,netease_ids}) in dataActive"
                 :key="_id"
                 @touchstart="touchstart(music,charts)"
                 @touchend="touchend"
@@ -18,7 +18,7 @@
                 <div class="wrap left-wrap">
                     <span :class="`lamp ${lamp}`"></span>
                     <Score :num="charts.rating.toString()" :type="typeList[charts.difficulty]" label="music-level" />
-                    <Label :text="grade2Str(grade)" type="small" />
+                    <Label :text="grade2Str(grade)" type="small" v-if="lamp !== 'NO_SCORE'" />
                 </div>
                 <div
                   class="wrap right-wrap"
@@ -31,10 +31,12 @@
                     <img
                         :src="playBtnSrc(music,'list')"
                         alt=""
-                        v-if="netease_ids.length"
+                        v-if="bin_id || music.bin_id"
                         class="play-btn"
-                        @click="playSong(netease_ids,music,charts)"
-                    >
+                        @click="playSongLocal(bin_id,music,charts)"
+                        >
+                        <!-- v-if="netease_ids.length" -->
+                        <!-- @click="playSong(netease_ids,music,charts)" -->
                 </div>
                 <div class="main-wrap">
                     <div class="grade-wrap">
@@ -56,7 +58,7 @@
         </ul>
         <div
             class="audio-player-box"
-            :class="musicUrl!=''?'show':''"
+            :class="isPlayerShow && musicUrl!=''?'show':''"
             @touchstart="handlePlayerTouchStart"
             @touchmove="handlePlayerTouchMove"
             @touchend="handlePlayerTouchEnd"
@@ -98,9 +100,9 @@
                         crossOrigin="anonymous"
                         @pause="audioPause"
                         @play="audioPlay"
+                        @ended="audioEnded"
                         controls
                         autoplay
-                        loop
                     >您的浏览器不支持 audio 标签</audio>
                     <div class='player-wrap'>
                         <div class="cover-wrap" :style="{animationPlayState: `${isAudioPlaying?'running':'paused'}`}">
@@ -339,7 +341,8 @@ export default {
                 }
                 const difficulty = diffLists[charts.difficulty]
                 const rating = charts.rating
-                const copyStr = `[${playStyle}${difficulty}${rating}] ${music.title}`
+                // const copyStr = `点歌 ${music.title} ${playStyle}${difficulty}${rating}`
+                const copyStr = `点歌 ${music.title}`
                 this.$copyText(copyStr)
                 .then(res => {
                     this.$message.success(`复制成功 ${copyStr}`)
@@ -350,6 +353,32 @@ export default {
         },
         touchend(){
             clearTimeout(this.touchTimer)
+        },
+        playSongLocal(bin_id, music, charts) {
+          if (!bin_id && !music.bin_id) return
+          const id = bin_id || music.bin_id
+          const binIdStr = new Array(5 - id.toString().length).fill(0).join('') + id.toString()
+          const musicUrl = require(`@/assets/pre_wavs/${binIdStr}.mp3`)
+          if (this.musicUrl === musicUrl) {
+            this.audioEnded()
+            return
+          }
+          this.musicUrl = musicUrl
+          const bpm = charts.bpm_min != charts.bpm_max
+                        ?`${charts.bpm_min} - ${charts.bpm_max}`
+                        :charts.bpm_min
+          this.playMusic = {
+                _id: music._id,
+                picUrl: '',
+                maxbpm: charts.bpm_max,
+                bpm,
+                title: music.title,
+                artist: music.artist,
+                folder: music.folder
+          }
+          this.isAudioPlaying = true
+          this.isPlayerShow = false
+          this.setBpm(charts.bpm_max)
         },
         async playSong(ids,music,charts){
             const playMusic = this.playMusic
@@ -414,6 +443,13 @@ export default {
             el_audio.pause()
             clearInterval(this.playerTimer)
             this.playerTimer = null
+        },
+        audioEnded() {
+          this.musicUrl = ''
+          this.playMusic = null
+          this.isAudioPlaying = false
+          this.isPlayerShow = false
+          this.setBpm(null)
         },
         hidePlayer() {
             this.musicUrl = ''
@@ -765,7 +801,7 @@ export default {
             &.FULL_COMBO:after{
               background: #fff;
             }
-            &.EX_HARD_CLEAR,{
+            &.EX_HARD_CLEAR{
               background: transparent;
             }
             &.EX_HARD_CLEAR:after{
@@ -786,10 +822,10 @@ export default {
             &.FAILED,&.FAILED:after{
               background: rgb(180, 0, 0);
             }
-            &.NO_PLAY{
+            &.NO_PLAY, &.NO_SCORE{
               background: rgb(50, 50, 50);
             }
-            &.NO_PLAY:after{
+            &.NO_PLAY:after, &.NO_SCORE:after{
               display: none;
             }
             &:after{

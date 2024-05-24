@@ -11,7 +11,7 @@
             <div class="search">
                 <input
                     type="text"
-                    placeholder="歌曲名/艺术家/曲风"
+                    placeholder="歌曲名/艺术家"
                     v-model="searchVal"
                     @keypress.enter="filterScore(scoreFilterVal)"
                 >
@@ -72,6 +72,11 @@ export default {
             type: Array,
             required: false,
             default: ()=>[]
+        },
+        activeLabel: {
+            type: String,
+            required: false,
+            default: ""
         }
     },
     data() {
@@ -221,10 +226,18 @@ export default {
                     value: 29,
                     label: '29 CastHour'
                 },
+                {
+                    value: 30,
+                    label: '30 RESIDENT'
+                },
+                {
+                    value: 31,
+                    label: '31 Epolis'
+                },
             ]
             const globalConfigStr = localStorage.getItem('globalConfig')
-            const version = globalConfigStr ? JSON.parse(globalConfigStr).version : '27'
-            return folderListAll.filter(i=>i.value<=version)
+            const version = globalConfigStr ? JSON.parse(globalConfigStr).version : folderListAll[folderListAll.length - 1].value
+            return this.activeLabel === 'ALL VERSION' ? folderListAll :folderListAll.filter(i=>i.value<=version)
         }
     },
     methods:{
